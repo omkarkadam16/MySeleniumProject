@@ -1,0 +1,63 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import unittest
+
+class ItemMasterTest(unittest.TestCase):
+    def setUp(self):
+        # Provide the path to your chromedriver
+        service = Service(r"C:\Users\user\Downloads\WebDrivers\chromedriver.exe")
+        self.driver = webdriver.Chrome(service=service)
+        self.driver.implicitly_wait(30)  # Implicit wait
+
+    def test_item_master(self):
+        driver = self.driver
+        driver.get("http://192.168.0.72/Rlogic9RLS/Login")
+
+        # Login
+        try:
+            driver.find_element(By.ID, "Login").clear()
+            driver.find_element(By.ID, "Login").send_keys("Riddhi")
+            driver.find_element(By.ID, "Password").clear()
+            driver.find_element(By.ID, "Password").send_keys("OMSGN9")
+            driver.find_element(By.ID, "btnLogin").click()
+
+            # Wait for successful login and redirection
+            WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.LINK_TEXT, "Transportation")))
+            print("Login successful!")
+        except Exception as e:
+            print(f"Login failed: {str(e)}")
+            driver.save_screenshot("login_error.png")  # Save screenshot on login failure
+            return  # Exit the test if login fails
+        
+        # Now perform operations on the application
+        try:
+            # Wait until "Transportation" link is clickable and click it
+            WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.LINK_TEXT, "Transportation"))).click()
+            print("Transportation link clicked successfully")
+
+            # Navigate through the rest of the application
+            WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.LINK_TEXT, "Transportation Master »"))).click()
+            WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.LINK_TEXT, "Common Masters »"))).click()
+            WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.LINK_TEXT, "Item Master"))).click()
+
+            # Other steps (clicking buttons, entering data, etc.) would go here
+            # For example, clicking the "New Record" button:
+            WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.ID, "lbl_NewRecord"))).click()
+            print("New Record button clicked successfully")
+
+            # Continue with other operations if needed...
+
+        except Exception as e:
+            print(f"Error while interacting with elements: {str(e)}")
+            driver.save_screenshot("interaction_error.png")  # Save screenshot on interaction failure
+        
+    def tearDown(self):
+        # Close the browser window after the test is done
+        self.driver.quit()
+
+if __name__ == "__main__":
+    unittest.main()

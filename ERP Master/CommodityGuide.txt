@@ -1,0 +1,77 @@
+📌 Flow of Execution: How the Code Works Step by Step
+This Selenium automation script tests the "Commodity Master" feature in a web-based ERP system. Below is the step-by-step execution flow of how the script runs:
+
+🔹 Step 1: Test Initialization (setUpClass)
+The test starts by setting up the Selenium WebDriver.
+The Chrome browser is launched.
+An implicit wait of 10 seconds is set (to handle delays in page loading).
+💡 At this point, the browser is open but not doing anything yet.
+
+🔹 Step 2: Login to the Application (login)
+The browser navigates to the login page (http://192.168.0.72/Rlogic9RLS/Login).
+Username and password are entered.
+The "Login" button is clicked.
+The test waits for the "Transportation" menu to appear (to confirm successful login).
+✅ If login is successful, the test proceeds. If login fails, the test stops here.
+
+🔹 Step 3: Navigate to "Commodity Master" (navigate_to_commodity_master)
+The test clicks through multiple menus:
+Transportation
+Transportation Master
+Common Masters
+Commodity
+Each click is explicitly waited for to ensure the menu is loaded before clicking.
+✅ If the Commodity page opens, the test continues. If it fails, the test stops here.
+
+🔹 Step 4: Switch to the Correct iFrame (switch_to_iframe_containing_element)
+The web page may contain multiple iframes, so the script tries each one until it finds the required element.
+It first switches back to the default page.
+Then, it loops through all iframes and switches to each one until it finds the target element.
+✅ If the correct iframe is found, the test proceeds. If not, an error is logged.
+
+🔹 Step 5: Click "New Record" (add_new_commodity)
+The test locates the "New Record" button inside the correct iframe.
+It clicks the button to start adding a new commodity.
+✅ If the button is clicked, the form opens. If not, an error occurs.
+
+🔹 Step 6: Enter Commodity Details (fill_text_field)
+The script locates and fills in two fields:
+Commodity Name: "Footwear"
+Commodity Code: "FTW"
+For each field:
+It scrolls to the field to make sure it's visible.
+It clicks on the field to focus.
+It enters the required value using JavaScript.
+✅ If both fields are filled, the test moves to saving the record. If any field is missing, the test fails.
+
+🔹 Step 7: Click "Save"
+The script locates the "Save" button inside the correct iframe.
+It clicks the button to save the commodity record.
+✅ If saving is successful, the test is completed. If it fails, an error occurs.
+
+🔹 Step 8: Close the Browser (tearDownClass)
+Once the test is complete, the script closes the browser.
+This ensures no leftover browser windows after the test.
+✅ This step always runs, even if the test fails.
+
+🔹 Full Flow Diagram
+pgsql
+Copy
+Edit
+START 🚀
+  ├── 1️⃣ Open Browser
+  ├── 2️⃣ Go to Login Page
+  ├── 3️⃣ Enter Credentials & Click Login
+  │     ├── ✅ Success → Proceed
+  │     └── ❌ Fail → Stop Test
+  ├── 4️⃣ Navigate to Commodity Master
+  │     ├── ✅ Success → Proceed
+  │     └── ❌ Fail → Stop Test
+  ├── 5️⃣ Switch to iFrame
+  │     ├── ✅ Found → Proceed
+  │     └── ❌ Not Found → Log Error
+  ├── 6️⃣ Click "New Record"
+  ├── 7️⃣ Enter "Commodity Name" & "Code"
+  ├── 8️⃣ Click "Save"
+  ├── 9️⃣ Close Browser
+END 🎉
