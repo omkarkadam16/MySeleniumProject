@@ -1,0 +1,49 @@
+    def switch_to_iframe(self, element_id):
+        """Switch to the iframe containing the specified element."""
+        driver = self.driver
+        driver.switch_to.default_content()
+
+        for index, iframe in enumerate(driver.find_elements(By.TAG_NAME, "iframe")):
+            driver.switch_to.frame(iframe)
+            try:
+                if driver.find_element(By.ID, element_id):
+                    print(
+                        f"✅ Switched to iframe containing {element_id} (Index {index})"
+                    )
+                    return True
+            except:
+                driver.switch_to.default_content()
+
+        print(f"❌ Unable to locate {element_id} in any iframe!")
+        return False
+
+This method `switch_to_iframe_containing_element` is designed to switch the WebDriver's focus to
+an iframe that contains a specific element identified by its ID. Here's a breakdown of what the code does:
+
+1. The method takes an `element_id` as a parameter, which is the ID of the element we're looking for.
+
+2. It starts by switching to the default content of the page using `driver.switch_to.default_content()`.
+This ensures we're starting our search from the top level of the DOM.
+
+3. It then finds all iframe elements on the page using `driver.find_elements(By.TAG_NAME, "iframe")`.
+
+4. The code iterates through each iframe found:
+   - It switches to the current iframe using `driver.switch_to.frame(index)`.
+   - It tries to find the element with the specified ID within this iframe.
+
+5. If the element is found:
+   - It prints a success message with the element ID and the index of the iframe.
+   - It returns `True` to indicate success.
+
+6. If the element is not found in the current iframe:
+   - It catches the exception (which is raised when the element is not found).
+   - It switches back to the default content to prepare for checking the next iframe.
+
+7. If the element is not found in any iframe:
+   - It prints an error message.
+   - It returns `False` to indicate failure.
+
+This method is useful when dealing with web applications that use multiple iframes,
+as it automates the process of finding the correct iframe containing a specific element.
+This is particularly helpful in test automation scenarios where elements might be located in different iframes across
+different pages or states of the application.
