@@ -1,20 +1,15 @@
-    def switch_to_iframe(self, element_id):
-        """Switch to the iframe containing the specified element."""
+ def switch_to_iframe(self, element_id):
         driver = self.driver
         driver.switch_to.default_content()
 
         for index, iframe in enumerate(driver.find_elements(By.TAG_NAME, "iframe")):
-            driver.switch_to.frame(iframe)
-            try:
-                if driver.find_element(By.ID, element_id):
-                    print(
-                        f"✅ Switched to iframe containing {element_id} (Index {index})"
-                    )
-                    return True
-            except:
-                driver.switch_to.default_content()
+            driver.switch_to.frame(iframe)  # Switch to the iframe
+            if driver.find_elements(By.ID, element_id):  # Check if element exists
+                print(f"Switched to correct iframe at index {index} for {element_id}")
+                return True
+            driver.switch_to.default_content()  # Only reset if the element was NOT found
 
-        print(f"❌ Unable to locate {element_id} in any iframe!")
+        print(f"No iframe found for {element_id}")
         return False
 
 This method `switch_to_iframe_containing_element` is designed to switch the WebDriver's focus to
