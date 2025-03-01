@@ -1,166 +1,91 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import Select
 import unittest
 
 
 class ItemMasterTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        # Set up Chrome WebDriver service
-        service = Service(r"C:\Users\user\Downloads\WebDrivers\chromedriver.exe")
-        cls.driver = webdriver.Chrome(service=service)
-        cls.driver.implicitly_wait(30)  # Implicit wait to handle minor delays
+        cls.driver = webdriver.Chrome(
+            service=Service(r"C:\Users\user\Downloads\WebDrivers\chromedriver.exe")
+        )
+        cls.driver.implicitly_wait(10)
+        cls.driver.maximize_window()
+
+    def switch_to_iframe(self, element_id):
+        driver = self.driver
+        driver.switch_to.default_content()
+
+        for index, iframe in enumerate(driver.find_elements(By.TAG_NAME, "iframe")):
+            driver.switch_to.frame(iframe)  # Switch to the iframe
+            if driver.find_elements(By.ID, element_id):  # Check if element exists
+                print(f"Switched to correct iframe at index {index} for {element_id}")
+                return True
+            driver.switch_to.default_content()  # Only reset if the element was NOT found
+
+        print(f"No iframe found for {element_id}")
+        return False
 
     def test_item_master(self):
         driver = self.driver
-        driver.get("http://192.168.0.72/Rlogic9RLS/Login")  # Open the login page
+        driver.get("http://192.168.0.72/Rlogic9RLS/Login")
 
-        # Login Process
-        driver.find_element(
-            By.ID, "Login"
-        ).clear()  # Clear the input field before entering text
-        driver.find_element(By.ID, "Login").send_keys("Riddhi")  # Enter username
-        driver.find_element(By.ID, "Password").clear()  # Clear the password field
-        driver.find_element(By.ID, "Password").send_keys("OMSGN9")  # Enter password
-        driver.find_element(By.ID, "btnLogin").click()  # Click login button
+        driver.find_element(By.ID, "Login").send_keys("Riddhi")
+        driver.find_element(By.ID, "Password").send_keys("OMSGN9")
+        driver.find_element(By.ID, "btnLogin").click()
+        print("Login successful")
 
-        # Wait for page to load after login
         WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.LINK_TEXT, "Transportation"))
         )
-        print("Login successful!")
+        print("Transportation link located successfully")
 
-        # Navigate to 'Transportation' section
-        WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.LINK_TEXT, "Transportation"))
-        ).click()
-        print("Transportation link clicked successfully")
-
-        # Navigate through menu items step by step
         menu_items = [
-            ("Transportation Master »", "Transportation "),
-            ("Common Masters »", "Common "),
-            ("Item Master", "Item "),
+            ("Transportation", "Transportation"),
+            ("Transportation Master »", "Transportation Master"),
+            ("Common Masters »", "Common Master"),
+            ("Item Master", "Item Master"),
         ]
 
         for link_text, description in menu_items:
-            WebDriverWait(driver, 20).until(
+            WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.LINK_TEXT, link_text))
             ).click()
             print(f"{description} link clicked successfully")
 
-        # Handle iframe switching dynamically to locate 'New Record' button
-        driver.switch_to.default_content()
-        iframes = driver.find_elements(By.TAG_NAME, "iframe")
+        if self.switch_to_iframe("btn_NewRecord"):
+            driver.find_element(By.ID, "btn_NewRecord").click()
+            print("New Record button clicked successfully")
+        else:
+            print("Failed to switch to iframe for btn_NewRecord")
 
-        for index, iframe in enumerate(iframes):
-            driver.switch_to.frame(index)
-            try:
-                if driver.find_element(
-                    By.ID, "btn_NewRecord"
-                ):  # Verify button exists in iframe
-                    print(f"Switched to correct iframe at index {index}")
-                    break
-            except:
-                driver.switch_to.default_content()
+        if self.switch_to_iframe("TransportProductName"):
+            driver.find_element(By.ID, "TransportProductName").send_keys("TEST3")
+            print("TransportProductName button clicked successfully")
+        else:
+            print("Failed to switch to iframe for TransportProductName")
 
-        # Click the 'New Record' button
-        new_record_btn = WebDriverWait(driver, 60).until(
-            EC.element_to_be_clickable((By.ID, "btn_NewRecord"))
-        )
-        new_record_btn.click()
-        print("New Record button clicked successfully")
+        if self.switch_to_iframe("CommodityTypeId"):
+            dropdown = Select(self.driver.find_element(By.ID, "CommodityTypeId"))
+            dropdown.select_by_visible_text("FOOD ITEMS")
+            print("FOOD ITEMS selected successfully")
+        else:
+            print("Failed to switch to iframe for CommodityTypeId")
 
-        # Locate the iframe containing 'TransportProductName' input field
-        driver.switch_to.default_content()
-        for index, iframe in enumerate(driver.find_elements(By.TAG_NAME, "iframe")):
-            driver.switch_to.frame(index)
-            try:
-                if driver.find_element(
-                    By.ID, "TransportProductName"
-                ):  # Check if field exists
-                    print(
-                        f"Switched to correct iframe at index {index} for TransportProductName"
-                    )
-                    break
-            except:
-                driver.switch_to.default_content()
-
-        # Enter Product Name into the input field
-        try:
-            product_name = WebDriverWait(driver, 60).until(
-                EC.element_to_be_clickable((By.ID, "TransportProductName"))
-            )
-            driver.execute_script(
-                "arguments[0].scrollIntoView();", product_name
-            )  # Scroll to field
-            driver.execute_script(
-                "arguments[0].click();", product_name
-            )  # Click field before input
-            print("TransportProductName clicked successfully")
-            product_name.send_keys("Oil")  # Enter the product name
-            print("TransportProductName field updated successfully")
-        except Exception as e:
-            print(f"Error interacting with TransportProductName: {str(e)}")
-
-        # Locate the iframe containing 'CommodityTypeId' dropdown
-        driver.switch_to.default_content()
-        for index, iframe in enumerate(driver.find_elements(By.TAG_NAME, "iframe")):
-            driver.switch_to.frame(index)
-            try:
-                if driver.find_element(
-                    By.ID, "CommodityTypeId"
-                ):  # Verify dropdown exists
-                    print(
-                        f"Switched to correct iframe at index {index} for CommodityTypeId"
-                    )
-                    break
-            except:
-                driver.switch_to.default_content()
-
-        # Select 'FOOD ITEMS' from the CommodityType dropdown
-        try:
-            commodity_type = WebDriverWait(driver, 20).until(
-                EC.element_to_be_clickable((By.ID, "CommodityTypeId"))
-            )
-            driver.execute_script(
-                "arguments[0].scrollIntoView();", commodity_type
-            )  # Scroll to dropdown
-            driver.execute_script(
-                "arguments[0].click();", commodity_type
-            )  # Click dropdown
-            print("CommodityTypeId dropdown clicked successfully")
-
-            # Select option "FOOD ITEMS"
-            select = Select(driver.find_element(By.ID, "CommodityTypeId"))
-            select.select_by_visible_text("FOOD ITEMS")  # Select food category
-            print("Commodity type selected successfully")
-        except Exception as e:
-            print(f"Error interacting with CommodityTypeId: {str(e)}")
-
-        # Submit the form
-        try:
-            submit_btn = WebDriverWait(driver, 20).until(
-                EC.element_to_be_clickable((By.ID, "mysubmit"))
-            )
-            driver.execute_script(
-                "arguments[0].scrollIntoView();", submit_btn
-            )  # Scroll to button
-            driver.execute_script(
-                "arguments[0].click();", submit_btn
-            )  # Click submit button
+        if self.switch_to_iframe("mysubmit"):
+            self.driver.find_element(By.ID, "mysubmit").click()
             print("Form submitted successfully")
-        except Exception as e:
-            print(f"Error clicking submit button: {str(e)}")
+        else:
+            print("Failed to switch to iframe for mysubmit")
 
     @classmethod
     def tearDownClass(cls):
-        cls.driver.quit()  # Close the browser session
+        cls.driver.quit()
 
 
 if __name__ == "__main__":
-    unittest.main()  # Run the test
+    unittest.main()
