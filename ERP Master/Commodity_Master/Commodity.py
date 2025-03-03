@@ -39,7 +39,7 @@ class LoginTest(unittest.TestCase):
     def test_commodity(self):
         """Perform login and navigate to the Commodity Master section."""
         driver = self.driver
-        driver.get("http://192.168.0.72/Rlogic9RLS/Login")
+        driver.get("'http://192.168.0.72/Rlogic9RLS/Login'")
 
         # Enter credentials and log in
         driver.find_element(By.ID, "Login").send_keys("Riddhi")
