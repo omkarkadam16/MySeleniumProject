@@ -79,8 +79,6 @@ class ItemMasterTest(unittest.TestCase):
         if self.switch_to_iframe("mysubmit"):
             self.driver.find_element(By.ID, "mysubmit").click()
             print("Form submitted successfully")
-        else:
-            print("Failed to switch to iframe for mysubmit")
 
     @classmethod
     def tearDownClass(cls):
