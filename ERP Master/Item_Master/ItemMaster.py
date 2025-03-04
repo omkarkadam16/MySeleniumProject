@@ -42,7 +42,7 @@ class ItemMasterTest(unittest.TestCase):
         driver = self.driver
         driver.switch_to.default_content()
 
-        for iframe in self.driver.find_elements(By.TAG_NAME, "iframe"):
+        for iframe in driver.find_elements(By.TAG_NAME, "iframe"):
             driver.switch_to.frame(iframe)
             if driver.find_elements(By.ID, element_id):
                 return True
