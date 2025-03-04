@@ -6,7 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import unittest
 
 
-class LoginTest(unittest.TestCase):
+class LoginTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Initialize the Chrome WebDriver and open the browser."""
@@ -36,10 +36,11 @@ class LoginTest(unittest.TestCase):
         print(f"❌ Unable to locate {element_id} in any iframe!")
         return False
 
+    # If you're using unittest, make sure your test methods start with test_
     def test_commodity(self):
         """Perform login and navigate to the Commodity Master section."""
         driver = self.driver
-        driver.get("'http://192.168.0.72/Rlogic9RLS/Login'")
+        driver.get("http://192.168.0.72/Rlogic9RLS/Login")
 
         # Enter credentials and log in
         driver.find_element(By.ID, "Login").send_keys("Riddhi")
