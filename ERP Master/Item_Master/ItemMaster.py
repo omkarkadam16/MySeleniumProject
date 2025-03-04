@@ -14,25 +14,25 @@ class ItemMasterTest(unittest.TestCase):
         cls.driver = webdriver.Chrome(
             service=Service(r"C:\Users\user\Downloads\WebDrivers\chromedriver.exe")
         )
-        cls.driver.implicitly_wait(10)
+        cls.driver.implicitly_wait(5)
         cls.driver.maximize_window()
 
-    def click_element(self, by, value, timeout=5):
+    def click_element(self, by, value, timeout=2):
         """Waits for an element to be clickable and clicks it."""
         WebDriverWait(self.driver, timeout).until(
             EC.element_to_be_clickable((by, value))
         ).click()
 
-    def send_keys(self, by, value, text, timeout=5):
+    def send_keys(self, by, value, text, timeout=2):
         """Waits for an element to be present and sends text to it."""
         WebDriverWait(self.driver, timeout).until(
-            EC.presence_of_element_located((by, value))
+            EC.visibility_of_element_located((by, value))
         ).send_keys(text)
 
-    def select_dropdown(self, by, value, option_text, timeout=5):
+    def select_dropdown(self, by, value, option_text, timeout=2):
         """Waits for a dropdown to be present and selects an option by visible text."""
         WebDriverWait(self.driver, timeout).until(
-            EC.presence_of_element_located((by, value))
+            EC.visibility_of_element_located((by, value))
         )
         dropdown = Select(self.driver.find_element(by, value))
         dropdown.select_by_visible_text(option_text)
@@ -52,6 +52,7 @@ class ItemMasterTest(unittest.TestCase):
         print(f"Unable to locate {element_id} in any iframe!")
         return False
 
+    # If you're using unittest, make sure your test methods start with test_
     def test_item_master(self):
         """Test case for interacting with the Item Master form."""
         driver = self.driver
@@ -80,7 +81,7 @@ class ItemMasterTest(unittest.TestCase):
             self.click_element(By.ID, "btn_NewRecord")
 
         if self.switch_to_iframe("TransportProductName"):
-            self.send_keys(By.ID, "TransportProductName", "TEST8")
+            self.send_keys(By.ID, "TransportProductName", "TEST10")
 
         if self.switch_to_iframe("CommodityTypeId"):
             self.select_dropdown(By.ID, "CommodityTypeId", "TEST1")
