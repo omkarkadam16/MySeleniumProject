@@ -81,7 +81,7 @@ class ItemMasterTest(unittest.TestCase):
             self.click_element(By.ID, "btn_NewRecord")
 
         if self.switch_to_iframe("TransportProductName"):
-            self.send_keys(By.ID, "TransportProductName", "TEST10")
+            self.send_keys(By.ID, "TransportProductName", "TEST11")
 
         if self.switch_to_iframe("CommodityTypeId"):
             self.select_dropdown(By.ID, "CommodityTypeId", "TEST1")
