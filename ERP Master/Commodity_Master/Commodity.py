@@ -6,92 +6,79 @@ from selenium.webdriver.support import expected_conditions as EC
 import unittest
 
 
-class LoginTestCase(unittest.TestCase):
+class LoginPage(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        """Initialize the Chrome WebDriver and open the browser."""
         cls.driver = webdriver.Chrome(
             service=Service(r"C:\Users\user\Downloads\WebDrivers\chromedriver.exe")
         )
         cls.driver.implicitly_wait(10)
         cls.driver.maximize_window()
 
-    def switch_to_iframe(self, element_id):
-        """Switch to the iframe that contains the specified element."""
+    def click_element(self, by, value, timeout=10):
+        WebDriverWait(self.driver, timeout).until(
+            EC.element_to_be_clickable((by, value))
+        ).click()
+        print(f"Clicked on {value}")
+
+    def send_keys(self, by, value, text, timeout=5):
+        WebDriverWait(self.driver, timeout).until(
+            EC.visibility_of_element_located((by, value))
+        ).send_keys(text)
+        print(f"Sent keys to {value}")
+
+    def switch_frames(self, element_id):
+        """Switches to the correct iframe containing the specified element."""
         driver = self.driver
         driver.switch_to.default_content()
 
-        iframes = driver.find_elements(By.TAG_NAME, "iframe")
-        for index, iframe in enumerate(iframes):
-            driver.switch_to.frame(index)
-            try:
-                if driver.find_element(By.ID, element_id):
-                    print(
-                        f"✅ Switched to iframe containing {element_id} (Index {index})"
-                    )
-                    return True
-            except:
-                driver.switch_to.default_content()
+        for iframe in driver.find_elements(By.TAG_NAME, "iframe"):
+            driver.switch_to.frame(iframe)
+            if driver.find_elements(By.ID, element_id):
+                return True
+            print(f"Switched to iframe containing {element_id}")
 
-        print(f"❌ Unable to locate {element_id} in any iframe!")
+            driver.switch_to.default_content()
+        print(f"Unable to locate {element_id} in any iframe!")
         return False
 
-    # If you're using unittest, make sure your test methods start with test_
-    def test_commodity(self):
-        """Perform login and navigate to the Commodity Master section."""
+    def test_Commodity_Master(self):
         driver = self.driver
-        driver.get("http://192.168.0.72/Rlogic9RLS/Login")
+        driver.get("http://192.168.0.72/Rlogic9RLS?RLS")
 
-        # Enter credentials and log in
-        driver.find_element(By.ID, "Login").send_keys("Riddhi")
-        driver.find_element(By.ID, "Password").send_keys("OMSGN9")
-        driver.find_element(By.ID, "btnLogin").click()
+        self.send_keys(By.ID, "Login", "Riddhi")
+        self.send_keys(By.ID, "Password", "OMSGN9")
+        self.click_element(By.ID, "btnLogin")
+        print("Login successful")
 
-        # Wait for the Transportation menu to appear
-        WebDriverWait(driver, 20).until(
-            EC.presence_of_element_located((By.LINK_TEXT, "Transportation"))
-        )
-        print("✅ Login successful!")
-
-        # Navigate through menu items
-        menu_items = [
-            ("Transportation", "Transportation"),
-            ("Transportation Master »", "Transportation Master"),
-            ("Common Masters »", "Common Masters"),
-            ("Commodity", "Commodity Masters"),
+        menus = [
+            "Transportation",
+            "Transportation Master »",
+            "Common Masters »",
+            "Commodity",
         ]
 
-        for link_text, description in menu_items:
-            WebDriverWait(driver, 20).until(
-                EC.element_to_be_clickable((By.LINK_TEXT, link_text))
-            ).click()
-            print(f"✅ {description} link clicked successfully")
+        for links in menus:
+            self.click_element(By.LINK_TEXT, links)
+            print(f"{links} link clicked successfully")
 
-        # Switch to iframe containing 'New Record' button
-        if self.switch_to_iframe("btn_NewRecord"):
-            WebDriverWait(driver, 5).until(
-                EC.element_to_be_clickable((By.ID, "btn_NewRecord"))
-            ).click()
-            print("✅ New Record button clicked successfully")
+        if self.switch_frames("btn_NewRecord"):
+            self.click_element(By.ID, "btn_NewRecord")
 
-        # Switch to iframe containing 'MasterName' field
-        if self.switch_to_iframe("MasterName"):
-            WebDriverWait(driver, 5).until(
-                EC.presence_of_element_located((By.ID, "MasterName"))
-            ).send_keys("TEST8")
-            print("✅ Commodity Name field filled")
+        if self.switch_frames("MasterName"):
+            self.send_keys(By.ID, "MasterName", "T3")
 
-            driver.find_element(By.ID, "Code").send_keys("T8")
-            print("✅ Commodity Code field filled")
+        if self.switch_frames("Code"):
+            self.send_keys(By.ID, "Code", "T3")
 
-            driver.find_element(By.ID, "mysubmit").click()
-            print("✅ Commodity saved successfully")
+        if self.switch_frames("mysubmit"):
+            self.click_element(By.ID, "mysubmit")
+            print("Form submitted successfully")
 
     @classmethod
     def tearDownClass(cls):
-        """Close the browser after all tests are completed."""
+        """Closes the browser after tests are complete."""
         cls.driver.quit()
-        print("🔒 Browser closed.")
 
 
 if __name__ == "__main__":
