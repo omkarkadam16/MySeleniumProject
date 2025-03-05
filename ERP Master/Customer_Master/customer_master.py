@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
@@ -24,9 +25,11 @@ class CustomerMaster(unittest.TestCase):
         print(f"{value} clicked successfully")
 
     def send_keys(self, by, value, text, timeout=5):
-        WebDriverWait(self.driver, timeout).until(
+        CE = WebDriverWait(self.driver, timeout).until(
             EC.visibility_of_element_located((by, value))
-        ).send_keys(text)
+        )
+        CE.clear()
+        CE.send_keys(text)
         print(f"{value} updated with {text}")
 
     def dropdown_option(self, by, value, option_text, timeout=5):
@@ -43,10 +46,14 @@ class CustomerMaster(unittest.TestCase):
             EC.visibility_of_element_located((by, value))
         )
         input_field.send_keys(text)  # Step 1: Enter text
-        WebDriverWait(self.driver, timeout).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "ui-menu-item"))
-        ).click()  # Step 2: Wait for suggestions and click
-        print(f"{value} updated with {text}")
+        time.sleep(2)
+        try:
+            WebDriverWait(self.driver, timeout).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "ui-menu-item"))
+            ).click()  # Step 2: Wait for suggestions and click
+            print(f"{value} updated with {text}")
+        except:
+            input_field.send_keys(Keys.DOWN, Keys.ENTER)
 
     def switch_frames(self, element_id):
         driver = self.driver
@@ -62,6 +69,33 @@ class CustomerMaster(unittest.TestCase):
             driver.switch_to.default_content()
         print(f"Unable to locate {element_id} in any iframe!")
         return False
+
+    def autocomplete_select_Submission(self, by, value, text, timeout=10):
+        """Selects an option from an autocomplete dropdown by typing and choosing the first suggestion."""
+        input_field = WebDriverWait(self.driver, timeout).until(
+            EC.visibility_of_element_located((by, value))
+        )
+        input_field.clear()
+        input_field.send_keys(text)  # Step 1: Enter text
+
+        time.sleep(3)  # Increase time for dropdown to load
+
+        # Wait until at least one suggestion appears
+        suggestions = WebDriverWait(self.driver, timeout).until(
+            EC.presence_of_all_elements_located((By.CLASS_NAME, "ui-menu-item"))
+        )
+
+        for suggestion in suggestions:
+            print(f"Suggestion found: {suggestion.text}")  # Debugging
+            if text.upper() in suggestion.text.upper():
+                suggestion.click()
+                print(f"Selected {text} from autocomplete")
+                return
+
+        # If no exact match, try arrow key + Enter
+        input_field.send_keys(Keys.DOWN)
+        input_field.send_keys(Keys.ENTER)
+        print(f"{value} updated with {text} using keyboard")
 
     def test_customer(self):
         driver = self.driver
@@ -88,7 +122,7 @@ class CustomerMaster(unittest.TestCase):
 
         # Basic Information
         if self.switch_frames("Party_PartyName"):
-            self.send_keys(By.ID, "Party_PartyName", "Ducati Motorsport")
+            self.send_keys(By.ID, "Party_PartyName", "Hero Motorsport")
 
             self.dropdown_option(By.ID, "Party_PartyCategoryId", "GENERAL")
 
@@ -97,10 +131,10 @@ class CustomerMaster(unittest.TestCase):
             self.dropdown_option(By.ID, "Party_PartyGradeId", "A Class")
 
             self.dropdown_option(By.ID, "Party_PartyGroupId", "GENERAL")
-
+        if self.switch_frames("EffectiveFromDate"):
             self.send_keys(By.ID, "EffectiveFromDate", "27-01-2025")
 
-            self.send_keys(By.ID, "PANNo", "ABCCK4599D")
+            self.send_keys(By.ID, "PANNo", "AHCCK4599D")
 
             driver.save_screenshot("Basic Details.png")
 
@@ -128,15 +162,17 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("RegistrationHeadId"):
             self.dropdown_option(By.ID, "RegistrationHeadId", "PAN No.")
 
-            self.send_keys(By.ID, "Number", "ABCCK4599D")
+            self.send_keys(By.ID, "Number", "AHCCK4599D")
 
             self.click_element(By.ID, "btnSave-RegistrationSession77")
 
             driver.save_screenshot("Registration Number Details.png")
 
         # Account Information
-
-        time.sleep(2)  # Add a small delay before clicking
+        driver.execute_script(
+            "window.scrollTo(0, 0);"
+        )  # Scroll up before switching to "liTab2"
+        time.sleep(5)  # Add a small delay before clicking
         if self.switch_frames("liTab2"):
             self.click_element(By.ID, "liTab2")
 
@@ -144,25 +180,28 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("PaymentTypeId"):
             self.dropdown_option(By.ID, "PaymentTypeId", "Paid")
             self.click_element(By.ID, "btnSave-PaymentTypeConfigSession77")
+            time.sleep(2)
             self.dropdown_option(By.ID, "PaymentTypeId", "To Pay")
             self.click_element(By.ID, "btnSave-PaymentTypeConfigSession77")
+            time.sleep(2)
             self.dropdown_option(By.ID, "PaymentTypeId", "To Be Billed")
             self.click_element(By.ID, "btnSave-PaymentTypeConfigSession77")
 
             # Billing Details
         if self.switch_frames("BillingOn"):
+            self.dropdown_option(By.ID, "BillingOn", "Booking")
             self.dropdown_option(By.ID, "BillingLocationTypeId", "Booking Branch")
             self.autocomplete_select(By.ID, "CollectionLocationId-select", "AHMEDABAD")
         if self.switch_frames("SubmissionLocationId-select"):
-            self.autocomplete_select(
-                By.ID, "SubmissionLocationId-select", "MUMBAI", timeout=10
+            self.autocomplete_select_Submission(
+                By.ID, "SubmissionLocationId-select", "MUMBAI"
             )
             self.send_keys(By.ID, "CreditDays", "20")
             self.send_keys(By.ID, "Party_CreditLimit", "20000")
             driver.save_screenshot("Account Information.png")
 
             # GST Registration
-
+        driver.execute_script("window.scrollTo(0, 0);")
         time.sleep(2)  # Add a small delay before clicking
         if self.switch_frames("liTab5"):
             self.click_element(By.ID, "liTab5")
@@ -170,13 +209,15 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("StateId"):
             self.dropdown_option(By.ID, "StateId", "MAHARASHTRA")
             self.dropdown_option(By.ID, "BusinessVerticalId", "TRANSPORTATION")
-            self.send_keys(By.ID, "GSTNumber", "27ABCCK4599DSZA")
+            self.send_keys(By.ID, "GSTNumber", "27AHCCK4599DSZH")
             self.click_element(By.ID, "btnSave-CustGSTRegistrationSession77")
             driver.save_screenshot("GST Registration.png")
 
         if self.switch_frames("mysubmit"):
+            time.sleep(5)
             self.click_element(By.ID, "mysubmit")
             print("Customer record created successfully")
+            time.sleep(5)
             driver.save_screenshot("Customer Record Created.png")
 
     @classmethod
