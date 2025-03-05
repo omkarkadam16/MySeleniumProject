@@ -36,6 +36,17 @@ class CustomerMaster(unittest.TestCase):
         dropdown.select_by_visible_text(option_text)
         print(f"{value} updated to {option_text}")
 
+    def autocomplete_select(self, by, value, text, timeout=5):
+        """Selects an option from an autocomplete dropdown by typing and choosing the first suggestion."""
+        input_field = WebDriverWait(self.driver, timeout).until(
+            EC.visibility_of_element_located((by, value))
+        )
+        input_field.send_keys(text)  # Step 1: Enter text
+        WebDriverWait(self.driver, timeout).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "ui-menu-item"))
+        ).click()  # Step 2: Wait for suggestions and click
+        print(f"{value} updated with {text}")
+
     def switch_frames(self, element_id):
         driver = self.driver
         driver.switch_to.default_content()
