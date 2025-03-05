@@ -1,0 +1,57 @@
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.support.wait import WebDriverWait
+
+
+    def click_element(self, by, value, timeout=5):
+        WebDriverWait(self.driver, timeout).until(
+            EC.element_to_be_clickable((by, value))
+        ).click()
+
+        print(f"{value} clicked successfully")
+
+    def send_keys(self, by, value, text, timeout=5):
+        CE = WebDriverWait(self.driver, timeout).until(
+            EC.visibility_of_element_located((by, value))
+        )
+        CE.clear()
+        CE.send_keys(text)
+        print(f"{value} updated with {text}")
+
+    def dropdown_option(self, by, value, option_text, timeout=2):
+        WebDriverWait(self.driver, timeout).until(
+            EC.visibility_of_element_located((by, value))
+        )
+        dropdown = Select(self.driver.find_element(by, value))
+        dropdown.select_by_visible_text(option_text)
+        print(f"{value} updated to {option_text}")
+
+
+    def autocomplete_select(self, by, value, text, timeout=5):
+        """Selects an option from an autocomplete dropdown by typing and choosing the first suggestion."""
+        input_field = WebDriverWait(self.driver, timeout).until(
+            EC.visibility_of_element_located((by, value))
+        )
+        input_field.send_keys(text)  # Step 1: Enter text
+        WebDriverWait(self.driver, timeout).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "ui-menu-item"))
+        ).click()  # Step 2: Wait for suggestions and click
+        print(f"{value} updated with {text}")
+
+    # 1️⃣ Steps to Find the Dropdown Class Name
+    # Open Developer Tools (F12)
+
+    # In Google Chrome, press F12 or Ctrl + Shift + I to open DevTools.
+    # Go to the Elements tab.
+    # Trigger the Autocomplete Dropdown
+
+    # Click inside the CityId-select input field and start typing (e.g., "Mumbai").
+    # This will make the autocomplete dropdown appear.
+    # Inspect the Dropdown Suggestions
+
+    # Once the suggestions appear, hover over them.
+    # Right-click on a suggestion and select "Inspect".
+    # Identify the Class Name
+    # Look for an <ul>, <div>, or <li> element containing the options.
+
+
