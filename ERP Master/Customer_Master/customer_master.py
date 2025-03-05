@@ -41,19 +41,23 @@ class CustomerMaster(unittest.TestCase):
         print(f"{value} updated to {option_text}")
 
     def autocomplete_select(self, by, value, text, timeout=10):
-        """Selects an option from an autocomplete dropdown by typing and choosing the first suggestion."""
         input_field = WebDriverWait(self.driver, timeout).until(
             EC.visibility_of_element_located((by, value))
         )
-        input_field.send_keys(text)  # Step 1: Enter text
-        time.sleep(2)
+        input_field.send_keys(text)
         try:
-            WebDriverWait(self.driver, timeout).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "ui-menu-item"))
-            ).click()  # Step 2: Wait for suggestions and click
-            print(f"{value} updated with {text}")
+            suggestion = WebDriverWait(self.driver, timeout).until(
+                EC.element_to_be_clickable((By.CLASS_NAME, "ui-menu-item"))
+            )
+            suggestion.click()
+            print(f"Autocomplete selected: {text}")
         except:
             input_field.send_keys(Keys.DOWN, Keys.ENTER)
+
+        # If no exact match, try arrow key + Enter
+        input_field.send_keys(Keys.DOWN)
+        input_field.send_keys(Keys.ENTER)
+        print(f"{value} updated with {text} using keyboard")
 
     def switch_frames(self, element_id):
         driver = self.driver
@@ -69,33 +73,6 @@ class CustomerMaster(unittest.TestCase):
             driver.switch_to.default_content()
         print(f"Unable to locate {element_id} in any iframe!")
         return False
-
-    def autocomplete_select_Submission(self, by, value, text, timeout=10):
-        """Selects an option from an autocomplete dropdown by typing and choosing the first suggestion."""
-        input_field = WebDriverWait(self.driver, timeout).until(
-            EC.visibility_of_element_located((by, value))
-        )
-        input_field.clear()
-        input_field.send_keys(text)  # Step 1: Enter text
-
-        time.sleep(3)  # Increase time for dropdown to load
-
-        # Wait until at least one suggestion appears
-        suggestions = WebDriverWait(self.driver, timeout).until(
-            EC.presence_of_all_elements_located((By.CLASS_NAME, "ui-menu-item"))
-        )
-
-        for suggestion in suggestions:
-            print(f"Suggestion found: {suggestion.text}")  # Debugging
-            if text.upper() in suggestion.text.upper():
-                suggestion.click()
-                print(f"Selected {text} from autocomplete")
-                return
-
-        # If no exact match, try arrow key + Enter
-        input_field.send_keys(Keys.DOWN)
-        input_field.send_keys(Keys.ENTER)
-        print(f"{value} updated with {text} using keyboard")
 
     def test_customer(self):
         driver = self.driver
@@ -122,7 +99,7 @@ class CustomerMaster(unittest.TestCase):
 
         # Basic Information
         if self.switch_frames("Party_PartyName"):
-            self.send_keys(By.ID, "Party_PartyName", "Hero Motorsport")
+            self.send_keys(By.ID, "Party_PartyName", "Yamaha Motorsport")
 
             self.dropdown_option(By.ID, "Party_PartyCategoryId", "GENERAL")
 
@@ -134,7 +111,7 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("EffectiveFromDate"):
             self.send_keys(By.ID, "EffectiveFromDate", "27-01-2025")
 
-            self.send_keys(By.ID, "PANNo", "AHCCK4599D")
+            self.send_keys(By.ID, "PANNo", "AYCCK4599D")
 
             driver.save_screenshot("Basic Details.png")
 
@@ -162,7 +139,7 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("RegistrationHeadId"):
             self.dropdown_option(By.ID, "RegistrationHeadId", "PAN No.")
 
-            self.send_keys(By.ID, "Number", "AHCCK4599D")
+            self.send_keys(By.ID, "Number", "AYCCK4599D")
 
             self.click_element(By.ID, "btnSave-RegistrationSession77")
 
@@ -172,7 +149,7 @@ class CustomerMaster(unittest.TestCase):
         driver.execute_script(
             "window.scrollTo(0, 0);"
         )  # Scroll up before switching to "liTab2"
-        time.sleep(5)  # Add a small delay before clicking
+        time.sleep(3)  # Add a small delay before clicking
         if self.switch_frames("liTab2"):
             self.click_element(By.ID, "liTab2")
 
@@ -193,9 +170,7 @@ class CustomerMaster(unittest.TestCase):
             self.dropdown_option(By.ID, "BillingLocationTypeId", "Booking Branch")
             self.autocomplete_select(By.ID, "CollectionLocationId-select", "AHMEDABAD")
         if self.switch_frames("SubmissionLocationId-select"):
-            self.autocomplete_select_Submission(
-                By.ID, "SubmissionLocationId-select", "MUMBAI"
-            )
+            self.autocomplete_select(By.ID, "SubmissionLocationId-select", "MUMBAI")
             self.send_keys(By.ID, "CreditDays", "20")
             self.send_keys(By.ID, "Party_CreditLimit", "20000")
             driver.save_screenshot("Account Information.png")
@@ -209,16 +184,21 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("StateId"):
             self.dropdown_option(By.ID, "StateId", "MAHARASHTRA")
             self.dropdown_option(By.ID, "BusinessVerticalId", "TRANSPORTATION")
-            self.send_keys(By.ID, "GSTNumber", "27AHCCK4599DSZH")
+            self.send_keys(By.ID, "GSTNumber", "27AYCCK4599DSZH")
             self.click_element(By.ID, "btnSave-CustGSTRegistrationSession77")
             driver.save_screenshot("GST Registration.png")
 
         if self.switch_frames("mysubmit"):
-            time.sleep(5)
             self.click_element(By.ID, "mysubmit")
             print("Customer record created successfully")
-            time.sleep(5)
+            time.sleep(2)
             driver.save_screenshot("Customer Record Created.png")
+
+        if self.switch_frames("txt_search"):
+            self.send_keys(By.ID, "txt_search", "Hero Motorsport")
+            self.click_element(By.ID, "btn_Seach")
+            time.sleep(2)
+            driver.save_screenshot("Search Results.png")
 
     @classmethod
     def tearDownClass(cls):
