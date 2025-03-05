@@ -41,18 +41,26 @@ class CustomerMaster(unittest.TestCase):
         print(f"{value} updated to {option_text}")
 
     def autocomplete_select(self, by, value, text, timeout=10):
+        """Selects an option from an autocomplete dropdown by typing and choosing the first suggestion."""
         input_field = WebDriverWait(self.driver, timeout).until(
             EC.visibility_of_element_located((by, value))
         )
-        input_field.send_keys(text)
-        try:
-            suggestion = WebDriverWait(self.driver, timeout).until(
-                EC.element_to_be_clickable((By.CLASS_NAME, "ui-menu-item"))
-            )
-            suggestion.click()
-            print(f"Autocomplete selected: {text}")
-        except:
-            input_field.send_keys(Keys.DOWN, Keys.ENTER)
+        input_field.clear()
+        input_field.send_keys(text)  # Step 1: Enter text
+
+        time.sleep(3)  # Increase time for dropdown to load
+
+        # Wait until at least one suggestion appears
+        suggestions = WebDriverWait(self.driver, timeout).until(
+            EC.presence_of_all_elements_located((By.CLASS_NAME, "ui-menu-item"))
+        )
+
+        for suggestion in suggestions:
+            print(f"Suggestion found: {suggestion.text}")  # Debugging
+            if text.upper() in suggestion.text.upper():
+                suggestion.click()
+                print(f"Selected {text} from autocomplete")
+                return
 
         # If no exact match, try arrow key + Enter
         input_field.send_keys(Keys.DOWN)
@@ -99,7 +107,7 @@ class CustomerMaster(unittest.TestCase):
 
         # Basic Information
         if self.switch_frames("Party_PartyName"):
-            self.send_keys(By.ID, "Party_PartyName", "Yamaha Motorsport")
+            self.send_keys(By.ID, "Party_PartyName", "Bajaj Motorsport")
 
             self.dropdown_option(By.ID, "Party_PartyCategoryId", "GENERAL")
 
@@ -111,7 +119,7 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("EffectiveFromDate"):
             self.send_keys(By.ID, "EffectiveFromDate", "27-01-2025")
 
-            self.send_keys(By.ID, "PANNo", "AYCCK4599D")
+            self.send_keys(By.ID, "PANNo", "ABCCK4590D")
 
             driver.save_screenshot("Basic Details.png")
 
@@ -139,7 +147,7 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("RegistrationHeadId"):
             self.dropdown_option(By.ID, "RegistrationHeadId", "PAN No.")
 
-            self.send_keys(By.ID, "Number", "AYCCK4599D")
+            self.send_keys(By.ID, "Number", "ABCCK4590D")
 
             self.click_element(By.ID, "btnSave-RegistrationSession77")
 
@@ -184,7 +192,7 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("StateId"):
             self.dropdown_option(By.ID, "StateId", "MAHARASHTRA")
             self.dropdown_option(By.ID, "BusinessVerticalId", "TRANSPORTATION")
-            self.send_keys(By.ID, "GSTNumber", "27AYCCK4599DSZH")
+            self.send_keys(By.ID, "GSTNumber", "27ABCCK4590DSZO")
             self.click_element(By.ID, "btnSave-CustGSTRegistrationSession77")
             driver.save_screenshot("GST Registration.png")
 
@@ -195,7 +203,7 @@ class CustomerMaster(unittest.TestCase):
             driver.save_screenshot("Customer Record Created.png")
 
         if self.switch_frames("txt_search"):
-            self.send_keys(By.ID, "txt_search", "Hero Motorsport")
+            self.send_keys(By.ID, "txt_search", "Bajaj Motorsport")
             self.click_element(By.ID, "btn_Seach")
             time.sleep(2)
             driver.save_screenshot("Search Results.png")
