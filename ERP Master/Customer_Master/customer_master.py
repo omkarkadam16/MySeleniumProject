@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
@@ -40,24 +41,31 @@ class CustomerMaster(unittest.TestCase):
         print(f"{value} updated to {option_text}")
 
     def autocomplete_select(self, by, value, text, timeout=10):
-        """Selects an option from an autocomplete dropdown."""
+        """Selects an option from an autocomplete dropdown by typing and choosing the first suggestion."""
         input_field = WebDriverWait(self.driver, timeout).until(
             EC.visibility_of_element_located((by, value))
         )
         input_field.clear()
-        input_field.send_keys(text)
+        input_field.send_keys(text)  # Step 1: Enter text
 
-        time.sleep(2)  # Wait for dropdown to load
+        time.sleep(3)  # Increase time for dropdown to load
 
+        # Wait until at least one suggestion appears
         suggestions = WebDriverWait(self.driver, timeout).until(
             EC.presence_of_all_elements_located((By.CLASS_NAME, "ui-menu-item"))
         )
 
         for suggestion in suggestions:
-            if text.lower() in suggestion.text.lower():
+            print(f"Suggestion found: {suggestion.text}")  # Debugging
+            if text.upper() in suggestion.text.upper():
                 suggestion.click()
-            print(f"Selected {text} from autocomplete")
-            return
+                print(f"Selected {text} from autocomplete")
+                return
+
+        # If no exact match, try arrow key + Enter
+        input_field.send_keys(Keys.DOWN)
+        input_field.send_keys(Keys.ENTER)
+        print(f"{value} updated with {text} using keyboard")
 
     def switch_frames(self, element_id):
         """Switches to the correct iframe containing the desired element."""
@@ -102,7 +110,7 @@ class CustomerMaster(unittest.TestCase):
 
         # Basic Information
         if self.switch_frames("Party_PartyName"):
-            self.send_keys(By.ID, "Party_PartyName", "LMN Industries Ltd")
+            self.send_keys(By.ID, "Party_PartyName", "Kadam Industries Ltd")
 
             self.dropdown_option(By.ID, "Party_PartyCategoryId", "GENERAL")
 
@@ -114,7 +122,7 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("EffectiveFromDate"):
             self.send_keys(By.ID, "EffectiveFromDate", "27-01-2025")
 
-            self.send_keys(By.ID, "PANNo", "AAACA3622D")
+            self.send_keys(By.ID, "PANNo", "AVACK3622D")
 
             driver.save_screenshot("Basic Details.png")
 
@@ -142,7 +150,7 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("RegistrationHeadId"):
             self.dropdown_option(By.ID, "RegistrationHeadId", "PAN No.")
 
-            self.send_keys(By.ID, "Number", "AOACA3622D")
+            self.send_keys(By.ID, "Number", "AVACK3622D")
 
             self.click_element(By.ID, "btnSave-RegistrationSession77")
 
@@ -187,7 +195,7 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("StateId"):
             self.dropdown_option(By.ID, "StateId", "MAHARASHTRA")
             self.dropdown_option(By.ID, "BusinessVerticalId", "TRANSPORTATION")
-            self.send_keys(By.ID, "GSTNumber", "27AALMN1234PSZO")
+            self.send_keys(By.ID, "GSTNumber", "27AVACK3622DSZO")
             self.click_element(By.ID, "btnSave-CustGSTRegistrationSession77")
             driver.save_screenshot("GST Registration.png")
 
@@ -198,7 +206,7 @@ class CustomerMaster(unittest.TestCase):
             driver.save_screenshot("Customer Record Created.png")
 
         if self.switch_frames("txt_search"):
-            self.send_keys(By.ID, "txt_search", "LMN Industries Ltd")
+            self.send_keys(By.ID, "txt_search", "Virwani Industries Ltd")
             self.click_element(By.ID, "btn_Seach")
             time.sleep(2)
             driver.save_screenshot("Search Results.png")
