@@ -41,44 +41,40 @@ class CustomerMaster(unittest.TestCase):
         print(f"{value} updated to {option_text}")
 
     def autocomplete_select(self, by, value, text, timeout=10):
-        """Selects an option from an autocomplete dropdown by typing and choosing the first suggestion."""
+        """Selects an option from an autocomplete dropdown."""
         input_field = WebDriverWait(self.driver, timeout).until(
             EC.visibility_of_element_located((by, value))
         )
         input_field.clear()
-        input_field.send_keys(text)  # Step 1: Enter text
+        input_field.send_keys(text)
 
-        time.sleep(3)  # Increase time for dropdown to load
+        time.sleep(2)  # Wait for dropdown to load
 
-        # Wait until at least one suggestion appears
         suggestions = WebDriverWait(self.driver, timeout).until(
             EC.presence_of_all_elements_located((By.CLASS_NAME, "ui-menu-item"))
         )
 
         for suggestion in suggestions:
-            print(f"Suggestion found: {suggestion.text}")  # Debugging
-            if text.upper() in suggestion.text.upper():
+            if text.lower() in suggestion.text.lower():
                 suggestion.click()
-                print(f"Selected {text} from autocomplete")
-                return
-
-        # If no exact match, try arrow key + Enter
-        input_field.send_keys(Keys.DOWN)
-        input_field.send_keys(Keys.ENTER)
-        print(f"{value} updated with {text} using keyboard")
+            print(f"Selected {text} from autocomplete")
+            return
 
     def switch_frames(self, element_id):
+        """Switches to the correct iframe containing the desired element."""
         driver = self.driver
         driver.switch_to.default_content()
 
         for iframe in driver.find_elements(By.TAG_NAME, "iframe"):
             driver.switch_to.frame(iframe)
 
-            if driver.find_elements(By.ID, element_id):
-                return True
-            print(f"Switched to correct iframe for {element_id}")
+            try:
+                if driver.find_element(By.ID, element_id):
+                    print(f"Switched to iframe containing {element_id}")
+                    return True
+            except:
+                driver.switch_to.default_content()
 
-            driver.switch_to.default_content()
         print(f"Unable to locate {element_id} in any iframe!")
         return False
 
@@ -107,7 +103,7 @@ class CustomerMaster(unittest.TestCase):
 
         # Basic Information
         if self.switch_frames("Party_PartyName"):
-            self.send_keys(By.ID, "Party_PartyName", "Bajaj Motorsport")
+            self.send_keys(By.ID, "Party_PartyName", "LMN Industries Ltd")
 
             self.dropdown_option(By.ID, "Party_PartyCategoryId", "GENERAL")
 
@@ -119,7 +115,7 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("EffectiveFromDate"):
             self.send_keys(By.ID, "EffectiveFromDate", "27-01-2025")
 
-            self.send_keys(By.ID, "PANNo", "ABCCK4590D")
+            self.send_keys(By.ID, "PANNo", "AALMN1234P")
 
             driver.save_screenshot("Basic Details.png")
 
@@ -147,7 +143,7 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("RegistrationHeadId"):
             self.dropdown_option(By.ID, "RegistrationHeadId", "PAN No.")
 
-            self.send_keys(By.ID, "Number", "ABCCK4590D")
+            self.send_keys(By.ID, "Number", "AALMN1234P")
 
             self.click_element(By.ID, "btnSave-RegistrationSession77")
 
@@ -192,7 +188,7 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("StateId"):
             self.dropdown_option(By.ID, "StateId", "MAHARASHTRA")
             self.dropdown_option(By.ID, "BusinessVerticalId", "TRANSPORTATION")
-            self.send_keys(By.ID, "GSTNumber", "27ABCCK4590DSZO")
+            self.send_keys(By.ID, "GSTNumber", "27AALMN1234PSZO")
             self.click_element(By.ID, "btnSave-CustGSTRegistrationSession77")
             driver.save_screenshot("GST Registration.png")
 
@@ -203,7 +199,7 @@ class CustomerMaster(unittest.TestCase):
             driver.save_screenshot("Customer Record Created.png")
 
         if self.switch_frames("txt_search"):
-            self.send_keys(By.ID, "txt_search", "Bajaj Motorsport")
+            self.send_keys(By.ID, "txt_search", "LMN Industries Ltd")
             self.click_element(By.ID, "btn_Seach")
             time.sleep(2)
             driver.save_screenshot("Search Results.png")

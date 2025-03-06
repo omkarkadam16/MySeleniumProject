@@ -27,16 +27,25 @@ from selenium.webdriver.support.wait import WebDriverWait
         print(f"{value} updated to {option_text}")
 
 
-    def autocomplete_select(self, by, value, text, timeout=5):
-        """Selects an option from an autocomplete dropdown by typing and choosing the first suggestion."""
+    def autocomplete_select(self, by, value, text, timeout=10):
+        """Selects an option from an autocomplete dropdown."""
         input_field = WebDriverWait(self.driver, timeout).until(
             EC.visibility_of_element_located((by, value))
         )
-        input_field.send_keys(text)  # Step 1: Enter text
-        WebDriverWait(self.driver, timeout).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "ui-menu-item"))
-        ).click()  # Step 2: Wait for suggestions and click
-        print(f"{value} updated with {text}")
+        input_field.clear()
+        input_field.send_keys(text)
+
+        time.sleep(2)  # Wait for dropdown to load
+    # Wait until at least one suggestion appears
+        suggestions = WebDriverWait(self.driver, timeout).until(
+            EC.presence_of_all_elements_located((By.CLASS_NAME, "ui-menu-item"))
+        )
+
+        for suggestion in suggestions:
+            if text.lower() in suggestion.text.lower():# Debugging
+                suggestion.click()
+            print(f"Selected {text} from autocomplete")
+            return
 
     # 1️⃣ Steps to Find the Dropdown Class Name
     # Open Developer Tools (F12)
