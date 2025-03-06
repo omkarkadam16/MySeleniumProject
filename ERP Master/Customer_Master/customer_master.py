@@ -1,5 +1,4 @@
 from selenium import webdriver
-from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
@@ -115,7 +114,7 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("EffectiveFromDate"):
             self.send_keys(By.ID, "EffectiveFromDate", "27-01-2025")
 
-            self.send_keys(By.ID, "PANNo", "AALMN1234P")
+            self.send_keys(By.ID, "PANNo", "AAACA3622D")
 
             driver.save_screenshot("Basic Details.png")
 
@@ -143,7 +142,7 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("RegistrationHeadId"):
             self.dropdown_option(By.ID, "RegistrationHeadId", "PAN No.")
 
-            self.send_keys(By.ID, "Number", "AALMN1234P")
+            self.send_keys(By.ID, "Number", "AOACA3622D")
 
             self.click_element(By.ID, "btnSave-RegistrationSession77")
 
