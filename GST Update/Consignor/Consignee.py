@@ -1,9 +1,7 @@
 import pandas as pd
 from selenium import webdriver
-from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import unittest
@@ -16,7 +14,7 @@ class CustomerMaster(unittest.TestCase):
         cls.driver = webdriver.Chrome(
             service=Service(r"C:\Users\user\Downloads\WebDrivers\chromedriver.exe")
         )
-        cls.driver.implicitly_wait(10)
+        cls.driver.implicitly_wait(5)
         cls.driver.maximize_window()
 
     def click_element(self, by, value, timeout=5):
@@ -32,41 +30,6 @@ class CustomerMaster(unittest.TestCase):
         CE.clear()
         CE.send_keys(text)
         print(f"{value} updated with {text}")
-
-    def dropdown_option(self, by, value, option_text, timeout=5):
-        WebDriverWait(self.driver, timeout).until(
-            EC.visibility_of_element_located((by, value))
-        )
-        dropdown = Select(self.driver.find_element(by, value))
-        dropdown.select_by_visible_text(option_text)
-        print(f"{value} updated to {option_text}")
-
-    def autocomplete_select(self, by, value, text, timeout=10):
-        """Selects an option from an autocomplete dropdown by typing and choosing the first suggestion."""
-        input_field = WebDriverWait(self.driver, timeout).until(
-            EC.visibility_of_element_located((by, value))
-        )
-        input_field.clear()
-        input_field.send_keys(text)  # Step 1: Enter text
-
-        time.sleep(3)  # Increase time for dropdown to load
-
-        # Wait until at least one suggestion appears
-        suggestions = WebDriverWait(self.driver, timeout).until(
-            EC.presence_of_all_elements_located((By.CLASS_NAME, "ui-menu-item"))
-        )
-
-        for suggestion in suggestions:
-            print(f"Suggestion found: {suggestion.text}")  # Debugging
-            if text.upper() in suggestion.text.upper():
-                suggestion.click()
-                print(f"Selected {text} from autocomplete")
-                return
-
-        # If no exact match, try arrow key + Enter
-        input_field.send_keys(Keys.DOWN)
-        input_field.send_keys(Keys.ENTER)
-        print(f"{value} updated with {text} using keyboard")
 
     def switch_frames(self, element_id):
         """Switches to the correct iframe containing the desired element."""
