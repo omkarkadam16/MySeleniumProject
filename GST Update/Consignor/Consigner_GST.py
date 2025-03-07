@@ -1,7 +1,6 @@
 import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -88,7 +87,7 @@ class CustomerMaster(unittest.TestCase):
                     self.click_element(By.ID, "mysubmit")
                     print(f"Customer UID {row['UID']} KYC Updated successfully")
                     #time.sleep(2)
-                    df.at[index, "Status"] = "Success"  # Update status in DataFrame
+                    df.at[index, "Status"] = "Passed"  # Update status in DataFrame
 
             except Exception as e:
                 print(f"Failed to process UID {row['UID']}: {str(e)}")

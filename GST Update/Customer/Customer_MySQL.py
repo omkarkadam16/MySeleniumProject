@@ -64,9 +64,15 @@ class CustomerMaster(unittest.TestCase):
 
         for link_text in menus:
             self.click_element(By.LINK_TEXT, link_text)
-            #print(f"{link_text} link clicked successfully")
+            print(f"{link_text} link clicked successfully")
+
+# Add selection column btn
+        if self.switch_frames("tgladdnclm"):
+            self.click_element(By.ID, "tgladdnclm")
 
         df = pd.read_excel("UID.xlsx", engine="openpyxl")
+
+
 
         for index, row in df.iterrows():
             try:

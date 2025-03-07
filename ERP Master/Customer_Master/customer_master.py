@@ -110,7 +110,7 @@ class CustomerMaster(unittest.TestCase):
 
         # Basic Information
         if self.switch_frames("Party_PartyName"):
-            self.send_keys(By.ID, "Party_PartyName", "Kadam Industries Ltd")
+            self.send_keys(By.ID, "Party_PartyName", "ABC Industries Ltd")
 
             self.dropdown_option(By.ID, "Party_PartyCategoryId", "GENERAL")
 
@@ -122,7 +122,7 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("EffectiveFromDate"):
             self.send_keys(By.ID, "EffectiveFromDate", "27-01-2025")
 
-            self.send_keys(By.ID, "PANNo", "AVACK3622D")
+            self.send_keys(By.ID, "PANNo", "AIACK3602D")
 
             driver.save_screenshot("Basic Details.png")
 
@@ -150,7 +150,7 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("RegistrationHeadId"):
             self.dropdown_option(By.ID, "RegistrationHeadId", "PAN No.")
 
-            self.send_keys(By.ID, "Number", "AVACK3622D")
+            self.send_keys(By.ID, "Number", "AIACK3602D")
 
             self.click_element(By.ID, "btnSave-RegistrationSession77")
 
@@ -195,7 +195,7 @@ class CustomerMaster(unittest.TestCase):
         if self.switch_frames("StateId"):
             self.dropdown_option(By.ID, "StateId", "MAHARASHTRA")
             self.dropdown_option(By.ID, "BusinessVerticalId", "TRANSPORTATION")
-            self.send_keys(By.ID, "GSTNumber", "27AVACK3622DSZO")
+            self.send_keys(By.ID, "GSTNumber", "27AIACK3602DSZO")
             self.click_element(By.ID, "btnSave-CustGSTRegistrationSession77")
             driver.save_screenshot("GST Registration.png")
 
