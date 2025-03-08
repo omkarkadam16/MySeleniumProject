@@ -8,6 +8,7 @@ import unittest
 import time
 import selenium.common.exceptions as ex
 
+
 class CustomerMaster(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -16,25 +17,20 @@ class CustomerMaster(unittest.TestCase):
             service=Service(r"C:\Users\user\Downloads\WebDrivers\chromedriver.exe"),
         )
         cls.driver.maximize_window()
-        cls.wait = WebDriverWait(cls.driver, 2)  # Reduced timeout
+        cls.wait = WebDriverWait(cls.driver, 10)  # Reduce timeout for faster execution
 
-    def click_element(self, by, value, retries=1):
-        """Click an element with retry logic and JS fallback."""
+    def click_element(self, by, value, retries=5):
+        """Click an element with retry logic"""
         for attempt in range(retries):
             try:
                 element = self.wait.until(EC.element_to_be_clickable((by, value)))
                 element.click()
                 return True
-            except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException, ex.TimeoutException):
+            except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException):
                 print(f"⚠️ Retrying click for {value}... ({attempt + 1}/{retries})")
-
-        try:
-            element = self.driver.find_element(by, value)
-            self.driver.execute_script("arguments[0].click();", element)
-            return True
-        except:
-            print(f"❌ Failed click for {value}")
-            return False
+                time.sleep(1)
+        print(f"❌ Failed to click {value} after retries")
+        return False
 
     def send_keys(self, by, value, text):
         """Enter text after ensuring element visibility"""
@@ -43,10 +39,9 @@ class CustomerMaster(unittest.TestCase):
         element.send_keys(text)
 
     def switch_frames(self, element_id):
-        """Switch to an iframe only if necessary"""
+        """Switch to an iframe that contains a specific element"""
         self.driver.switch_to.default_content()
-        frames = self.driver.find_elements(By.TAG_NAME, "iframe")
-        for iframe in frames:
+        for iframe in self.driver.find_elements(By.TAG_NAME, "iframe"):
             self.driver.switch_to.frame(iframe)
             try:
                 if self.driver.find_element(By.ID, element_id):
@@ -55,22 +50,16 @@ class CustomerMaster(unittest.TestCase):
                 self.driver.switch_to.default_content()
         return False
 
-    def close_popups(self):
-        """Close popups if they exist"""
-        try:
-            close_button = self.driver.find_element(By.CLASS_NAME, "close")
-            close_button.click()
-        except:
-            pass
-
     def test_customer(self):
         driver = self.driver
-        driver.get("http://r-logic9.com/RlogicDemoFtl/")
+        driver.get("http://192.168.0.72/Rlogic9UataScript/Login")
+
 
         # Login
-        self.send_keys(By.ID, "Login", "Riddhi")
-        self.send_keys(By.ID, "Password", "OMSGN9")
+        self.send_keys(By.ID, "Login", "admin")
+        self.send_keys(By.ID, "Password", "omsgn9")
         self.click_element(By.ID, "btnLogin")
+        print("Login successful")
 
         # Navigate to required page
         for link_text in [
@@ -87,11 +76,12 @@ class CustomerMaster(unittest.TestCase):
         for index, row in df.iterrows():
             try:
                 print(f"Processing UID: {row['UID']}")
-                self.close_popups()  # Close popups before proceeding
+                #self.close_popups()  # Close popups before proceeding
 
                 if self.switch_frames("txt_Extrasearch"):
                     self.send_keys(By.ID, "txt_Extrasearch", str(row["UID"]))
                     self.click_element(By.ID, "btn_Seach")
+                    #time.sleep(1)
 
                     self.click_element(By.ID, row["DD"])
 
@@ -100,7 +90,9 @@ class CustomerMaster(unittest.TestCase):
                 if self.switch_frames("acaretdowndivGstEkyc"):
                     self.click_element(By.ID, "acaretdowndivGstEkyc")
                     self.click_element(By.ID, "btn_SearchGSTNo")
-                    driver.execute_script("window.scrollTo(0, 1000);")
+                    #time.sleep(1)
+                    #driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                    driver.execute_script("window.scrollTo(0, 1000);")#Scroll to bottom
 
                 if self.switch_frames("mysubmit"):
                     self.click_element(By.ID, "mysubmit")
@@ -111,11 +103,13 @@ class CustomerMaster(unittest.TestCase):
                 print(f"Failed to process UID {row['UID']}: {str(e)}")
                 df.at[index, "Status"] = "Failed"
 
-        df.to_excel("UID.xlsx", index=False, engine="openpyxl")  # Save only once at the end
+        # Save after each entry
+            df.to_excel("UID.xlsx", index=False, engine="openpyxl")
 
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
+
 
 if __name__ == "__main__":
     unittest.main()

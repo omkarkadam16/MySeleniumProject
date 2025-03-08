@@ -121,21 +121,30 @@ self.click_element(By.LINK_TEXT, "Transportation")
 
 ---
 
-### **10. Adjustable Retry Clicks**
+### **10. Click an element with retry logic and JS fallback.**
 #### **Method:**
 ```python
-def click_element(self, by, value, retries=0):
-    for attempt in range(retries + 1):
+    def click_element(self, by, value, retries=2):
+        """Click an element with retry logic and JS fallback."""
+        for attempt in range(retries):
+            try:
+                element = self.wait.until(EC.element_to_be_clickable((by, value)))
+                element.click()
+                return True
+            except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException):
+                print(f"⚠️ Retrying click for {value}... ({attempt + 1}/{retries})")
+                time.sleep(1)
+
+            time.sleep(1)  # Small delay before retry
+
+        print(f"⚠️ Standard click failed for {value}, attempting JS click...")
         try:
-            element = self.wait.until(EC.element_to_be_clickable((by, value)))
-            element.click()
+            element = self.driver.find_element(by, value)
+            self.driver.execute_script("arguments[0].click();", element)
             return True
-        except ex.ElementClickInterceptedException:
-            if attempt < retries:
-                print(f"Retrying click for {value}... ({attempt + 1}/{retries})")
-            time.sleep(1)
-    print(f"Failed to click {value} after {retries} retries")
-    return False
+        except Exception as e:
+            print(f"❌ JS Click also failed for {value}: {e}")
+            return False
 ```
 
 ---

@@ -17,7 +17,7 @@ class CustomerMaster(unittest.TestCase):
             service=Service(r"C:\Users\user\Downloads\WebDrivers\chromedriver.exe"),
         )
         cls.driver.maximize_window()
-        cls.wait = WebDriverWait(cls.driver, 10)  # Reduce timeout for faster execution
+        cls.wait = WebDriverWait(cls.driver, 5)  # Reduce timeout for faster execution
 
     def click_element(self, by, value, retries=5):
         """Click an element with retry logic"""
@@ -50,6 +50,14 @@ class CustomerMaster(unittest.TestCase):
                 self.driver.switch_to.default_content()
         return False
 
+    def close_popups(self):
+        try:
+            close_button = self.driver.find_element(By.CLASS_NAME, "close")
+            close_button.click()
+            print("Closed blocking popup")
+        except:
+            pass
+
     def test_customer(self):
         driver = self.driver
         driver.get("http://r-logic9.com/RlogicDemoFtl/")
@@ -75,7 +83,7 @@ class CustomerMaster(unittest.TestCase):
         for index, row in df.iterrows():
             try:
                 print(f"Processing UID: {row['UID']}")
-                #self.close_popups()  # Close popups before proceeding
+                self.close_popups()  # Close popups before proceeding
 
                 if self.switch_frames("txt_Extrasearch"):
                     self.send_keys(By.ID, "txt_Extrasearch", str(row["UID"]))
@@ -108,7 +116,6 @@ class CustomerMaster(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
-
 
 if __name__ == "__main__":
     unittest.main()
