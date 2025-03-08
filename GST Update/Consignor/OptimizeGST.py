@@ -17,18 +17,19 @@ class CustomerMaster(unittest.TestCase):
             service=Service(r"C:\Users\user\Downloads\WebDrivers\chromedriver.exe"),
         )
         cls.driver.maximize_window()
-        cls.wait = WebDriverWait(cls.driver, 5)  # Reduce timeout for faster execution
+        cls.wait = WebDriverWait(cls.driver, 10)  # Reduce timeout for faster execution
 
-    def click_element(self, by, value, retries=3):
+    def click_element(self, by, value, retries=5):
         """Click an element with retry logic"""
         for attempt in range(retries):
             try:
                 element = self.wait.until(EC.element_to_be_clickable((by, value)))
                 element.click()
                 return True
-            except ex.ElementClickInterceptedException:
-                print(f"Retrying click for {value}... ({attempt + 1}/{retries})")
-        print(f"Failed to click {value} after retries")
+            except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException):
+                print(f"⚠️ Retrying click for {value}... ({attempt + 1}/{retries})")
+                time.sleep(1)
+        print(f"❌ Failed to click {value} after retries")
         return False
 
     def send_keys(self, by, value, text):
@@ -56,6 +57,7 @@ class CustomerMaster(unittest.TestCase):
             close_button.click()
             print("Closed blocking popup")
         except:
+            print("No popup found")
             pass  # No popup found
 
     def test_customer(self):
@@ -82,11 +84,13 @@ class CustomerMaster(unittest.TestCase):
 
         for index, row in df.iterrows():
             try:
+                print(f"Processing UID: {row['UID']}")
                 self.close_popups()  # Close popups before proceeding
 
                 if self.switch_frames("txt_Extrasearch"):
                     self.send_keys(By.ID, "txt_Extrasearch", str(row["UID"]))
                     self.click_element(By.ID, "btn_Seach")
+                    #time.sleep(1)
 
                     self.click_element(By.ID, row["DD"])
 
@@ -95,7 +99,9 @@ class CustomerMaster(unittest.TestCase):
                 if self.switch_frames("acaretdowndivGstEkyc"):
                     self.click_element(By.ID, "acaretdowndivGstEkyc")
                     self.click_element(By.ID, "btn_SearchGSTNo")
-                    time.sleep(1)
+                    #time.sleep(1)
+                    #driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                    driver.execute_script("window.scrollTo(0, 1000);")#Scroll to bottom
 
                 if self.switch_frames("mysubmit"):
                     self.click_element(By.ID, "mysubmit")

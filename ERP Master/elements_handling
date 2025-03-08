@@ -1,6 +1,9 @@
 **Selenium Interaction Reusable Methods & Optimizations**
 
----
+    def setUpClass(cls):
+        cls.driver=webdriver.Chrome(service=Service(r"C:\Users\user\Downloads\WebDrivers\chromedriver.exe"))
+        cls.driver.maximize_window()
+        cls.wait = WebDriverWait(cls.driver, 5)
 
 ### **1. Click an Element**
 #### **Method:**
@@ -101,16 +104,19 @@ self.click_element(By.LINK_TEXT, "Transportation")
 ### **9. Click with Retry Logic (Handling ElementClickInterceptedException)**
 #### **Method:**
 ```python
-def click_element(self, by, value, retries=2):
-    for attempt in range(retries):
-        try:
-            element = self.wait.until(EC.element_to_be_clickable((by, value)))
-            element.click()
-            return True
-        except ex.ElementClickInterceptedException:
-            print(f"Retrying click for {value}... ({attempt + 1}/{retries})")
-    print(f"Failed to click {value} after retries")
-    return False
+    def click_element(self, by, value, retries=5):
+        """Click an element with retry logic"""
+        for attempt in range(retries):
+            try:
+                element = self.wait.until(EC.element_to_be_clickable((by, value)))
+                element.click()
+                print(f"✅ Clicked {value}")
+                return True
+            except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException):
+                print(f"⚠️ Retrying click for {value}... ({attempt + 1}/{retries})")
+                time.sleep(1)
+        print(f"❌ Failed to click {value} after retries")
+        return False
 ```
 
 ---
