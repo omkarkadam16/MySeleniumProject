@@ -76,7 +76,7 @@ class CustomerMaster(unittest.TestCase):
             driver.switch_to.frame(iframe)
 
             try:
-                if driver.find_element(By.ID, element_id):
+                if driver.find_elements(By.ID, element_id):
                     print(f"Switched to iframe containing {element_id}")
                     return True
             except:

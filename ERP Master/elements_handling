@@ -1,73 +1,147 @@
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.select import Select
-from selenium.webdriver.support.wait import WebDriverWait
+**Selenium Interaction Reusable Methods & Optimizations**
 
+---
 
-    def click_element(self, by, value, timeout=5):
-        WebDriverWait(self.driver, timeout).until(
-            EC.element_to_be_clickable((by, value))
-        ).click()
+### **1. Click an Element**
+#### **Method:**
+```python
+    def click_element(self, by, value):
+        self.wait.until(EC.element_to_be_clickable((by, value))).click()
+```
+#### **Usage:**
+```python
+self.click_element(By.LINK_TEXT, "Transportation")
+```
 
-        print(f"{value} clicked successfully")
+---
 
-    def send_keys(self, by, value, text, timeout=5):
-        CE = WebDriverWait(self.driver, timeout).until(
-            EC.visibility_of_element_located((by, value))
-        )
-        CE.clear()
-        CE.send_keys(text)
-        print(f"{value} updated with {text}")
+### **2. Send Text to an Input Field**
+#### **Method:**
+```python
+    def send_keys(self, by, value, text):
+        self.wait.until(EC.visibility_of_element_located((by, value))).send_keys(text)
+```
 
-    def dropdown_option(self, by, value, option_text, timeout=2):
-        WebDriverWait(self.driver, timeout).until(
-            EC.visibility_of_element_located((by, value))
-        )
+---
+
+### **3. Select Dropdown Option**
+#### **Method:**
+```python
+    def select_dropdown(self, by, value, option_text):
+        self.wait.until(EC.visibility_of_element_located((by, value)))
         dropdown = Select(self.driver.find_element(by, value))
         dropdown.select_by_visible_text(option_text)
-        print(f"{value} updated to {option_text}")
+```
 
+---
 
-    def autocomplete_select(self, by, value, text, timeout=10):
-        """Selects an option from an autocomplete dropdown by typing and choosing the first suggestion."""
-        input_field = WebDriverWait(self.driver, timeout).until(
-            EC.visibility_of_element_located((by, value))
-        )
+### **4. Hover Over an Element**
+#### **Method:**
+```python
+    def hover_over_element(self, by, value):
+        element = self.wait.until(EC.visibility_of_element_located((by, value)))
+        ActionChains(self.driver).move_to_element(element).perform()
+```
+
+---
+
+### **5. Right Click (Context Click)**
+#### **Method:**
+```python
+    def right_click(self, by, value):
+        element = self.wait.until(EC.visibility_of_element_located((by, value)))
+        ActionChains(self.driver).context_click(element).perform()
+```
+
+---
+
+### **6. Drag and Drop**
+#### **Method:**
+```python
+    def drag_and_drop(self, source_by, source_value, target_by, target_value):
+        source = self.wait.until(EC.visibility_of_element_located((source_by, source_value)))
+        target = self.wait.until(EC.visibility_of_element_located((target_by, target_value)))
+        ActionChains(self.driver).drag_and_drop(source, target).perform()
+```
+
+---
+
+### **7. Handle Alerts**
+#### **Method:**
+```python
+    def handle_alert(self, action="accept"):
+        alert = self.wait.until(EC.alert_is_present())
+        if action.lower() == "accept":
+            alert.accept()
+        elif action.lower() == "dismiss":
+            alert.dismiss()
+```
+
+---
+
+### **8. Autocomplete Selection**
+#### **Method:**
+```python
+    def autocomplete_select(self, by, value, text):
+        input_field = self.wait.until(EC.visibility_of_element_located((by, value)))
         input_field.clear()
-        input_field.send_keys(text)  # Step 1: Enter text
-
-        time.sleep(3)  # Increase time for dropdown to load
-
-        # Wait until at least one suggestion appears
-        suggestions = WebDriverWait(self.driver, timeout).until(
-            EC.presence_of_all_elements_located((By.CLASS_NAME, "ui-menu-item"))
-        )
-
+        input_field.send_keys(text)
+        time.sleep(3)
+        suggestions = self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "ui-menu-item")))
         for suggestion in suggestions:
-            print(f"Suggestion found: {suggestion.text}")  # Debugging
             if text.upper() in suggestion.text.upper():
                 suggestion.click()
-                print(f"Selected {text} from autocomplete")
                 return
-
-        # If no exact match, try arrow key + Enter
         input_field.send_keys(Keys.DOWN)
         input_field.send_keys(Keys.ENTER)
-        print(f"{value} updated with {text} using keyboard")
+```
 
-    # 1️⃣ Steps to Find the Dropdown Class Name
-    # Open Developer Tools (F12)
+---
 
-    # In Google Chrome, press F12 or Ctrl + Shift + I to open DevTools.
-    # Go to the Elements tab.
-    # Trigger the Autocomplete Dropdown
+### **9. Click with Retry Logic (Handling ElementClickInterceptedException)**
+#### **Method:**
+```python
+def click_element(self, by, value, retries=2):
+    for attempt in range(retries):
+        try:
+            element = self.wait.until(EC.element_to_be_clickable((by, value)))
+            element.click()
+            return True
+        except ex.ElementClickInterceptedException:
+            print(f"Retrying click for {value}... ({attempt + 1}/{retries})")
+    print(f"Failed to click {value} after retries")
+    return False
+```
 
-    # Click inside the CityId-select input field and start typing (e.g., "Mumbai").
-    # This will make the autocomplete dropdown appear.
-    # Inspect the Dropdown Suggestions
+---
 
-    # Once the suggestions appear, hover over them.
-    # Right-click on a suggestion and select "Inspect".
-    # Identify the Class Name
-    # Look for an <ul>, <div>, or <li> element containing the options.
+### **10. Adjustable Retry Clicks**
+#### **Method:**
+```python
+def click_element(self, by, value, retries=0):
+    for attempt in range(retries + 1):
+        try:
+            element = self.wait.until(EC.element_to_be_clickable((by, value)))
+            element.click()
+            return True
+        except ex.ElementClickInterceptedException:
+            if attempt < retries:
+                print(f"Retrying click for {value}... ({attempt + 1}/{retries})")
+            time.sleep(1)
+    print(f"Failed to click {value} after {retries} retries")
+    return False
+```
 
+---
 
+### **11. Close Unexpected Popups Dynamically**
+#### **Method:**
+```python
+def close_popups(self):
+    try:
+        close_button = self.driver.find_element(By.CLASS_NAME, "close")
+        close_button.click()
+        print("Closed blocking popup")
+    except:
+        pass  # No popup found
+```
