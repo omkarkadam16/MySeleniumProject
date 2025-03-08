@@ -1,109 +1,118 @@
 import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import unittest
 import time
+import selenium.common.exceptions as ex
+from selenium.webdriver.chrome.options import Options
 
 
 class CustomerMaster(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        """Initialize WebDriver with Headless Mode"""
+        """Initialize WebDriver"""
         chrome_options = Options()
         chrome_options.add_argument("--headless")  # Run in headless mode
-        chrome_options.add_argument("--disable-gpu")  # Disable GPU for better performance
-        chrome_options.add_argument("--window-size=1920,1080")  # Set window size for proper rendering
-        chrome_options.add_argument("--log-level=3")  # Suppress unnecessary logs
-        chrome_options.add_argument("--no-sandbox")  # Helps in Linux environments
-        chrome_options.add_argument("--disable-dev-shm-usage")  # Prevents crashes
+        chrome_options.add_argument("--disable-gpu")  # Required for headless mode on Windows
+        chrome_options.add_argument("--window-size=1920,1080")  # Set default window size
+        chrome_options.add_argument("--no-sandbox")  # Helps prevent some permission issues
+        chrome_options.add_argument("--disable-dev-shm-usage")  # Avoid shared memory issues
 
         cls.driver = webdriver.Chrome(
             service=Service(r"C:\Users\user\Downloads\WebDrivers\chromedriver.exe"),
-            options=chrome_options  # Use headless mode
+            options=chrome_options
         )
-        cls.driver.implicitly_wait(2)
         cls.driver.maximize_window()
+        cls.wait = WebDriverWait(cls.driver, 10)
 
-    def click_element(self, by, value, timeout=1):
-        WebDriverWait(self.driver, timeout).until(
-            EC.element_to_be_clickable((by, value))
-        ).click()
-        print(f"{value} clicked successfully")
+    def click_element(self, by, value, retries=5):
+        """Click an element with retry logic"""
+        for attempt in range(retries):
+            try:
+                element = self.wait.until(EC.element_to_be_clickable((by, value)))
+                element.click()
+                return True
+            except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException):
+                print(f"⚠️ Retrying click for {value}... ({attempt + 1}/{retries})")
+                time.sleep(1)
+        print(f"❌ Failed to click {value} after retries")
+        return False
 
-    def send_keys(self, by, value, text, timeout=1):
-        CE = WebDriverWait(self.driver, timeout).until(
-            EC.visibility_of_element_located((by, value))
-        )
-        CE.clear()
-        CE.send_keys(text)
-        print(f"{value} updated with {text}")
+    def send_keys(self, by, value, text):
+        """Enter text after ensuring element visibility"""
+        element = self.wait.until(EC.visibility_of_element_located((by, value)))
+        element.clear()
+        element.send_keys(text)
 
     def switch_frames(self, element_id):
-        driver = self.driver
-        driver.switch_to.default_content()
-        for iframe in driver.find_elements(By.TAG_NAME, "iframe"):
-            driver.switch_to.frame(iframe)
+        """Switch to an iframe that contains a specific element"""
+        self.driver.switch_to.default_content()
+        for iframe in self.driver.find_elements(By.TAG_NAME, "iframe"):
+            self.driver.switch_to.frame(iframe)
             try:
-                if driver.find_element(By.ID, element_id):
-                    print(f"Switched to iframe containing {element_id}")
+                if self.driver.find_element(By.ID, element_id):
                     return True
             except:
-                driver.switch_to.default_content()
-        print(f"Unable to locate {element_id} in any iframe!")
+                self.driver.switch_to.default_content()
         return False
 
     def test_customer(self):
         driver = self.driver
         driver.get("http://r-logic9.com/RlogicDemoFtl/")
 
+        # Login
         self.send_keys(By.ID, "Login", "Riddhi")
         self.send_keys(By.ID, "Password", "OMSGN9")
         self.click_element(By.ID, "btnLogin")
         print("Login successful")
 
-        menus = [
+        # Navigate to required page
+        for link_text in [
             "Transportation",
             "Transportation Master »",
             "Consignor/Consignee »",
             "Consignor / Consignee",
-        ]
-
-        for link_text in menus:
+        ]:
             self.click_element(By.LINK_TEXT, link_text)
-            print(f"{link_text} link clicked successfully")
 
+        # Read Excel data
         df = pd.read_excel("UID.xlsx", engine="openpyxl")
 
         for index, row in df.iterrows():
             try:
+                print(f"Processing UID: {row['UID']}")
+                #self.close_popups()  # Close popups before proceeding
+
                 if self.switch_frames("txt_Extrasearch"):
                     self.send_keys(By.ID, "txt_Extrasearch", str(row["UID"]))
                     self.click_element(By.ID, "btn_Seach")
-                    time.sleep(2)
+                    #time.sleep(1)
 
                     self.click_element(By.ID, row["DD"])
-                edit_button = driver.find_element(By.PARTIAL_LINK_TEXT, "Edit")
-                edit_button.click()
+
+                self.click_element(By.PARTIAL_LINK_TEXT, "Edit")
 
                 if self.switch_frames("acaretdowndivGstEkyc"):
                     self.click_element(By.ID, "acaretdowndivGstEkyc")
                     self.click_element(By.ID, "btn_SearchGSTNo")
+                    #time.sleep(1)
+                    #driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                    driver.execute_script("window.scrollTo(0, 1000);")#Scroll to bottom
 
                 if self.switch_frames("mysubmit"):
                     self.click_element(By.ID, "mysubmit")
-                    print(f"Customer {row['UID']} record created successfully")
-                    #time.sleep(2)
-                    df.at[index, "Status"] = "Success"  # Update status in DataFrame
+                    print(f"Customer UID {row['UID']} KYC Updated successfully")
+                    df.at[index, "Status"] = "Passed"
 
             except Exception as e:
                 print(f"Failed to process UID {row['UID']}: {str(e)}")
                 df.at[index, "Status"] = "Failed"
 
-            df.to_excel("UID.xlsx", index=False, engine="openpyxl")  # Save after each entry
+        # Save after each entry
+            df.to_excel("UID.xlsx", index=False, engine="openpyxl")
 
     @classmethod
     def tearDownClass(cls):
