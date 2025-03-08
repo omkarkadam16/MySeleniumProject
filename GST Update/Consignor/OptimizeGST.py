@@ -50,16 +50,6 @@ class CustomerMaster(unittest.TestCase):
                 self.driver.switch_to.default_content()
         return False
 
-    def close_popups(self):
-        """Close unexpected popups if they appear"""
-        try:
-            close_button = self.driver.find_element(By.CLASS_NAME, "close")
-            close_button.click()
-            print("Closed blocking popup")
-        except:
-            print("No popup found")
-            pass  # No popup found
-
     def test_customer(self):
         driver = self.driver
         driver.get("http://r-logic9.com/RlogicDemoFtl/")
@@ -85,7 +75,7 @@ class CustomerMaster(unittest.TestCase):
         for index, row in df.iterrows():
             try:
                 print(f"Processing UID: {row['UID']}")
-                self.close_popups()  # Close popups before proceeding
+                #self.close_popups()  # Close popups before proceeding
 
                 if self.switch_frames("txt_Extrasearch"):
                     self.send_keys(By.ID, "txt_Extrasearch", str(row["UID"]))
