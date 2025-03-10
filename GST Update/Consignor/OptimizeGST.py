@@ -19,7 +19,6 @@ class CustomerMaster(unittest.TestCase):
             service=Service(r"C:\Users\user\Downloads\WebDrivers\chromedriver.exe"),
         )
         cls.driver.maximize_window()
-        cls.wait = WebDriverWait(cls.driver, 5)  # Reduce timeout for faster execution
 
     def click_element(self, by, value, max_attempts=3):
         attempt = 0

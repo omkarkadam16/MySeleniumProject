@@ -97,7 +97,7 @@ class SeleniumHelper:
 		input_field = self.wait.until(EC.visibility_of_element_located((by, value)))
 		input_field.clear()
 		input_field.send_keys(text)
-		time.sleep(3)  # Allow time for suggestions to appear
+		time.sleep(2)  # Allow time for suggestions to appear
 		suggestions = self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "ui-menu-item")))
 		for suggestion in suggestions:
 			if text.upper() in suggestion.text.upper():
@@ -105,6 +105,7 @@ class SeleniumHelper:
 				return
 		input_field.send_keys(Keys.DOWN)
 		input_field.send_keys(Keys.ENTER)
+		print(f"No matching suggestion found for '{text}'. Assuming the last suggestion was selected.")
 
 	def click_element_while_loop(self, by, value, max_attempts=3):
 		"""
@@ -119,37 +120,43 @@ class SeleniumHelper:
 			try:
 				element = self.wait.until(EC.element_to_be_clickable((by, value)))
 				element.click()
+				print(f"Successfully clicked element: {value}")
 				return True
-			except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException, ex.TimeoutException):
-				time.sleep(1)  # Wait before retrying
+			except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException, ex.TimeoutException) as e:
+				print(f"Attempt {attempt + 1}: Failed to click element {value} due to {type(e).__name__}. Retrying...")
+				time.sleep(1)
+
+			# JavaScript Click Fallback
 			try:
 				if element:
 					self.driver.execute_script("arguments[0].click();", element)
+					print(f"Successfully clicked element using JavaScript: {value}")
 					return True
-			except ex.JavascriptException:
-				pass
+			except ex.JavascriptException as js_error:
+				print(f"Attempt {attempt + 1}: JavaScript click failed due to {type(js_error).__name__}")
+
 			attempt += 1
+
+		print(f"Failed to click element {value} after {max_attempts} attempts.")
 		return False
 
 	def click_element(self, by, value, retries=2):
-		"""
-		Click an element with retry logic and JavaScript fallback.
-		:param by: Locator strategy
-		:param value: Locator value
-		:param retries: Number of retry attempts before failing
-		"""
+		print(f"[INFO] Clicking element: {value} with {retries} retries")
 		for attempt in range(retries):
 			try:
 				element = self.wait.until(EC.element_to_be_clickable((by, value)))
 				element.click()
+				print(f"[SUCCESS] Clicked element: {value}")
 				return True
 			except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException, ex.TimeoutException):
-				pass
+				print(f"[WARNING] Attempt {attempt + 1} failed, retrying...")
 		try:
 			element = self.driver.find_element(by, value)
 			self.driver.execute_script("arguments[0].click();", element)
+			print(f"[SUCCESS] Clicked element using JavaScript: {value}")
 			return True
-		except:
+		except Exception as e:
+			print(f"[ERROR] Failed to click element: {value}. Exception: {type(e).__name__}")
 			return False
 
 	def close_popups(self):
