@@ -19,18 +19,24 @@ class CustomerMaster(unittest.TestCase):
         cls.driver.maximize_window()
         cls.wait = WebDriverWait(cls.driver, 5)  # Reduce timeout for faster execution
 
-    def click_element(self, by, value, retries=5):
-        """Click an element with retry logic"""
+    def click_element(self, by, value, retries=2):
+        """Click an element with retry logic and JS fallback."""
         for attempt in range(retries):
             try:
                 element = self.wait.until(EC.element_to_be_clickable((by, value)))
                 element.click()
                 return True
-            except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException):
+            except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException, ex.TimeoutException):
                 print(f"⚠️ Retrying click for {value}... ({attempt + 1}/{retries})")
-                time.sleep(1)
-        print(f"❌ Failed to click {value} after retries")
-        return False
+
+        # noinspection PyBroadException
+        try:
+            element = self.driver.find_element(by, value)
+            self.driver.execute_script("arguments[0].click();", element)
+            return True
+        except:
+            print(f"❌ Failed click for {value}")
+            return False
 
     def send_keys(self, by, value, text):
         """Enter text after ensuring element visibility"""

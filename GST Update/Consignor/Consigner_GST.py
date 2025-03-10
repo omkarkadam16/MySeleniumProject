@@ -18,6 +18,7 @@ class CustomerMaster(unittest.TestCase):
         cls.driver.maximize_window()
         cls.wait = WebDriverWait(cls.driver, 2)  # Reduced timeout
 
+    # noinspection PyBroadException
     def click_element(self, by, value, retries=1):
         """Click an element with retry logic and JS fallback."""
         for attempt in range(retries):
@@ -28,6 +29,7 @@ class CustomerMaster(unittest.TestCase):
             except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException, ex.TimeoutException):
                 print(f"⚠️ Retrying click for {value}... ({attempt + 1}/{retries})")
 
+        # noinspection PyBroadException
         try:
             element = self.driver.find_element(by, value)
             self.driver.execute_script("arguments[0].click();", element)
@@ -42,12 +44,14 @@ class CustomerMaster(unittest.TestCase):
         element.clear()
         element.send_keys(text)
 
+    # noinspection PyBroadException
     def switch_frames(self, element_id):
         """Switch to an iframe only if necessary"""
         self.driver.switch_to.default_content()
         frames = self.driver.find_elements(By.TAG_NAME, "iframe")
         for iframe in frames:
             self.driver.switch_to.frame(iframe)
+            # noinspection PyBroadException
             try:
                 if self.driver.find_element(By.ID, element_id):
                     return True
@@ -55,8 +59,10 @@ class CustomerMaster(unittest.TestCase):
                 self.driver.switch_to.default_content()
         return False
 
+    # noinspection PyBroadException
     def close_popups(self):
         """Close popups if they exist"""
+        # noinspection PyBroadException
         try:
             close_button = self.driver.find_element(By.CLASS_NAME, "close")
             close_button.click()
@@ -111,7 +117,7 @@ class CustomerMaster(unittest.TestCase):
                 print(f"Failed to process UID {row['UID']}: {str(e)}")
                 df.at[index, "Status"] = "Failed"
 
-        df.to_excel("UID.xlsx", index=False, engine="openpyxl")  # Save only once at the end
+            df.to_excel("UID.xlsx", index=False, engine="openpyxl")  # Save only once at the end
 
     @classmethod
     def tearDownClass(cls):
