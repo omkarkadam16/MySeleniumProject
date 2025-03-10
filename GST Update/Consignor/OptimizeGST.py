@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -19,24 +21,33 @@ class CustomerMaster(unittest.TestCase):
         cls.driver.maximize_window()
         cls.wait = WebDriverWait(cls.driver, 5)  # Reduce timeout for faster execution
 
-    def click_element(self, by, value, retries=2):
+    def click_element(self, by, value, max_attempts=3):
+        attempt = 0
+        element = None
         """Click an element with retry logic and JS fallback."""
-        for attempt in range(retries):
+        while attempt < max_attempts:
             try:
                 element = self.wait.until(EC.element_to_be_clickable((by, value)))
                 element.click()
+                print(f"Successfully clicked element: {value}")
                 return True
-            except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException, ex.TimeoutException):
-                print(f"⚠️ Retrying click for {value}... ({attempt + 1}/{retries})")
+            except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException, ex.TimeoutException) as e:
+                print(f"Attempt {attempt + 1}: Failed to click element {value} due to {type(e).__name__}. Retrying...")
+                time.sleep(1)
 
-        # noinspection PyBroadException
-        try:
-            element = self.driver.find_element(by, value)
-            self.driver.execute_script("arguments[0].click();", element)
-            return True
-        except:
-            print(f"❌ Failed click for {value}")
-            return False
+            # JavaScript Click Fallback
+            try:
+                if element:
+                    self.driver.execute_script("arguments[0].click();", element)
+                    print(f"Successfully clicked element using JavaScript: {value}")
+                    return True
+            except ex.JavascriptException as js_error:
+                print(f"Attempt {attempt + 1}: JavaScript click failed due to {type(js_error).__name__}")
+
+            attempt += 1
+
+        print(f"Failed to click element {value} after {max_attempts} attempts.")
+        return False
 
     def send_keys(self, by, value, text):
         """Enter text after ensuring element visibility"""
@@ -111,10 +122,15 @@ class CustomerMaster(unittest.TestCase):
                     self.click_element(By.ID, "mysubmit")
                     print(f"Customer UID {row['UID']} KYC Updated successfully")
                     df.at[index, "Status"] = "Passed"
+                    df.at[index, "Execution Time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                else:
+                    print(f"Customer UID {row['UID']} KYC update failed")
+                    df.at[index, "Status"] = "Failed"
 
             except Exception as e:
                 print(f"Failed to process UID {row['UID']}: {str(e)}")
                 df.at[index, "Status"] = "Failed"
+                df.at[index, "Execution Time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # Save after each entry
             df.to_excel("UID.xlsx", index=False, engine="openpyxl")

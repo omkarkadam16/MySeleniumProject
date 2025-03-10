@@ -1,5 +1,4 @@
 from datetime import datetime
-
 import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -11,12 +10,13 @@ from selenium_helper import SeleniumHelper
 class CustomerMaster(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        """Initialize WebDriver"""
+        """Initialize WebDriver and start time tracking"""
+        cls.start_time = datetime.now()  # Start time
         cls.driver = webdriver.Chrome(
             service=Service(r"C:\Users\user\Downloads\WebDrivers\chromedriver.exe"),
         )
         cls.driver.maximize_window()
-        cls.helper=SeleniumHelper(cls.driver)
+        cls.helper = SeleniumHelper(cls.driver)
 
     def test_customer(self):
         driver = self.driver
@@ -38,16 +38,17 @@ class CustomerMaster(unittest.TestCase):
 
         # Read Excel data
         df = pd.read_excel("UID.xlsx", engine="openpyxl")
+        if "Execution Time" not in df.columns:
+            df["Execution Time"] = ""
 
         for index, row in df.iterrows():
             try:
                 print(f"Processing UID: {row['UID']}")
-                self.helper.close_popups()  # Close popups before proceeding
+                self.helper.close_popups()
 
                 if self.helper.switch_frames("txt_Extrasearch"):
                     self.helper.send_keys(By.ID, "txt_Extrasearch", str(row["UID"]))
                     self.helper.click_element(By.ID, "btn_Seach")
-
                     self.helper.click_element(By.ID, row["DD"])
 
                 self.helper.click_element(By.PARTIAL_LINK_TEXT, "Edit")
@@ -61,21 +62,22 @@ class CustomerMaster(unittest.TestCase):
                     self.helper.click_element(By.ID, "mysubmit")
                     print(f"Customer UID {row['UID']} KYC Updated successfully")
                     df.at[index, "Status"] = "Passed"
-                else:
-                    print(f"Customer UID {row['UID']} Failed to update KYC")
-                    df.at[index, "Status"] = "Failed"
+
                 df.at[index, "Execution Time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             except Exception as e:
                 print(f"Failed to process UID {row['UID']}: {str(e)}")
                 df.at[index, "Status"] = "Failed"
-            df.at[index, "Execution Time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                df.at[index, "Execution Time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-            df.to_excel("UID.xlsx", index=False, engine="openpyxl")  # Save only once at the end
+        df.to_excel("UID.xlsx", index=False, engine="openpyxl")  # Save only once at the end
 
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
+        cls.end_time = datetime.now()  # End time
+        total_time = cls.end_time - cls.start_time  # Calculate total execution time
+        print(f"Total Execution Time: {total_time}")
 
 if __name__ == "__main__":
     unittest.main()

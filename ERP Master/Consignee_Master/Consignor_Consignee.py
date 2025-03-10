@@ -1,20 +1,29 @@
 from selenium import webdriver
-from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 import unittest
-import time
+from selenium_helper import SeleniumHelper
 
-class TestMaster(unittest.TestCase):
-	@classmethod
-	def setupClass(cls):
-		cls.driver=webdriver.Chrome(service=Service(r"C:\Users\user\Downloads\WebDrivers\chromedriver.exe"))
-		cls.wait=WebDriverWait(cls.driver,5)
-		cls.driver.maximize_window()
+class ConsigneeMaster(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.driver=webdriver.Chrome(service=Service(r"C:\Users\user\Downloads\WebDrivers\chromedriver.exe"))
+        cls.wait=WebDriverWait(cls.driver,5)
+        cls.driver.maximize_window()
+        cls.helper=SeleniumHelper(cls.driver)
 
-	def test_consignor_consignee(self):
-		driver=self.driver
-		driver.get("http://r-logic9.com/RlogicDemoFtl/")
+
+
+    def test_consignor_consignee(self):
+        driver=self.driver
+        driver.get("http://192.168.0.72/Rlogic9UataScript/Login")
+        self.helper.send_keys(By.ID, "Login", "Riddhi")
+        self.helper.send_keys(By.ID, "Password", "OMSGN9")
+        self.helper.click_element(By.ID, "btnLogin")
+    @classmethod
+    def tearDownClass(cls):
+        cls.driver.quit()
+
+if __name__ == "__main__":
+    unittest.main()
