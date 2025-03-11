@@ -14,7 +14,7 @@ class SeleniumHelper:
 		:param driver: Selenium WebDriver instance
 		"""
 		self.driver = driver
-		self.wait = WebDriverWait(driver, 10)
+		self.wait = WebDriverWait(driver, 5)
 
 	def normal_click(self, by, value):
 		"""
@@ -105,6 +105,7 @@ class SeleniumHelper:
 				return
 		input_field.send_keys(Keys.DOWN)
 		input_field.send_keys(Keys.ENTER)
+		print(f"No matching suggestion found for '{text}'. Assuming the last suggestion was selected.")
 
 	def click_element_while_loop(self, by, value, max_attempts=3):
 		"""
@@ -119,6 +120,7 @@ class SeleniumHelper:
 			try:
 				element = self.wait.until(EC.element_to_be_clickable((by, value)))
 				element.click()
+				print(f"Successfully clicked element: {value}")
 				return True
 			except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException, ex.TimeoutException) as e:
 				print(f"Attempt {attempt + 1}: Failed to click element {value} due to {type(e).__name__}. Retrying...")
@@ -128,6 +130,7 @@ class SeleniumHelper:
 			try:
 				if element:
 					self.driver.execute_script("arguments[0].click();", element)
+					print(f"Successfully clicked element using JavaScript: {value}")
 					return True
 			except ex.JavascriptException as js_error:
 				print(f"Attempt {attempt + 1}: JavaScript click failed due to {type(js_error).__name__}")
@@ -138,18 +141,22 @@ class SeleniumHelper:
 		return False
 
 	def click_element(self, by, value, retries=2):
+		print(f"[INFO] Clicking element: {value} with {retries} retries")
 		for attempt in range(retries):
 			try:
 				element = self.wait.until(EC.element_to_be_clickable((by, value)))
 				element.click()
+				print(f"[SUCCESS] Clicked element: {value}")
 				return True
 			except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException, ex.TimeoutException):
 				print(f"[WARNING] Attempt {attempt + 1} failed, retrying...")
 		try:
 			element = self.driver.find_element(by, value)
 			self.driver.execute_script("arguments[0].click();", element)
+			print(f"[SUCCESS] Clicked element using JavaScript: {value}")
 			return True
-		except:
+		except Exception as e:
+			print(f"[ERROR] Failed to click element: {value}. Exception: {type(e).__name__}")
 			return False
 
 	def close_popups(self):

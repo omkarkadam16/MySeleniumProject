@@ -55,9 +55,9 @@ class CustomerMaster(unittest.TestCase):
                     By.ID, "Party_PartyIndustryTypeId", row["PartyIndustryType"]
                 )
 
-                self.Helper.select_dropdown(By.ID, "Party_PartyGradeId", row["PartyGrade"])
+                #self.Helper.select_dropdown(By.ID, "Party_PartyGradeId", row["PartyGrade"])
 
-                self.Helper.select_dropdown(By.ID, "Party_PartyGroupId", row["PartyGroup"])
+                #self.Helper.select_dropdown(By.ID, "Party_PartyGroupId", row["PartyGroup"])
             if self.Helper.switch_frames("EffectiveFromDate"):
                 self.Helper.send_keys(By.ID, "EffectiveFromDate", row["EffectiveFromDate"])
 
