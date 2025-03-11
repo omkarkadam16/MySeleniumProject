@@ -49,48 +49,6 @@ class SeleniumHelper:
         self.wait.until(EC.visibility_of_element_located((by, value)))
         dropdown = Select(self.driver.find_element(by, value))
         dropdown.select_by_visible_text(option_text)
-
-    def hover_over_element(self, by, value):
-        """
-        Hover over an element.
-        :param by: Locator strategy
-        :param value: Locator value
-        """
-        element = self.wait.until(EC.visibility_of_element_located((by, value)))
-        ActionChains(self.driver).move_to_element(element).perform()
-
-    def right_click(self, by, value):
-        """
-        Perform a right-click (context click) on an element.
-        :param by: Locator strategy
-        :param value: Locator value
-        """
-        element = self.wait.until(EC.visibility_of_element_located((by, value)))
-        ActionChains(self.driver).context_click(element).perform()
-
-    def drag_and_drop(self, source_by, source_value, target_by, target_value):
-        """
-        Drag an element from source and drop it on target.
-        :param source_by: Source element locator strategy
-        :param source_value: Source element locator value
-        :param target_by: Target element locator strategy
-        :param target_value: Target element locator value
-        """
-        source = self.wait.until(EC.visibility_of_element_located((source_by, source_value)))
-        target = self.wait.until(EC.visibility_of_element_located((target_by, target_value)))
-        ActionChains(self.driver).drag_and_drop(source, target).perform()
-
-    def handle_alert(self, action="accept"):
-        """
-        Handle JavaScript alerts (accept or dismiss).
-        :param action: "accept" to confirm, "dismiss" to cancel
-        """
-        alert = self.wait.until(EC.alert_is_present())
-        if action.lower() == "accept":
-            alert.accept()
-        elif action.lower() == "dismiss":
-            alert.dismiss()
-
     def autocomplete_select(self, by, value, text):
         """
         Select an autocomplete suggestion based on input text.
@@ -109,9 +67,6 @@ class SeleniumHelper:
                 return
         input_field.send_keys(Keys.DOWN)
         input_field.send_keys(Keys.ENTER)
-
-
-
     def click_element_while_loop(self, by, value, max_attempts=3):
         """
         Click an element with retry logic and JavaScript fallback.
@@ -179,3 +134,51 @@ class SeleniumHelper:
             except:
                 self.driver.switch_to.default_content()
         return False
+
+    def copy_paste_text(self, source_by, source_value, target_by, target_value):
+        """
+        Copy text from one input field and paste it into another.
+        :param source_by: Locator strategy for source element
+        :param source_value: Locator value for source element
+        :param target_by: Locator strategy for target element
+        :param target_value: Locator value for target element
+        """
+        source_element = self.wait.until(EC.visibility_of_element_located((source_by, source_value)))
+        text_to_copy = source_element.get_attribute("value")  # Get text from source field
+
+        target_element = self.wait.until(EC.visibility_of_element_located((target_by, target_value)))
+        target_element.clear()  # Clear the field before pasting
+        target_element.send_keys(text_to_copy)  # Paste the copied text
+
+
+    def copy_paste_text_with_click(self, source_by, source_value, click_by, click_value, target_by, target_value):
+        """
+        Click an element to reveal a field, then copy text from one field and paste it into another.
+        :param source_by: Locator strategy for source element (GSTNumber)
+        :param source_value: Locator value for source element
+        :param click_by: Locator strategy for the element to click before pasting
+        :param click_value: Locator value for the element to click (acaretUpdivGstEkyc)
+        :param target_by: Locator strategy for target element (ekycGSTNo)
+        :param target_value: Locator value for target element
+        """
+        # Click the element to reveal the ekycGSTNo field
+        self.normal_click(click_by, click_value)
+
+        # Copy text from GSTNumber field
+        source_element = self.wait.until(EC.visibility_of_element_located((source_by, source_value)))
+        text_to_copy = source_element.get_attribute("value")
+
+        # Paste text into ekycGSTNo field
+        target_element = self.wait.until(EC.visibility_of_element_located((target_by, target_value)))
+        target_element.clear()
+        target_element.send_keys(text_to_copy)
+
+    def get_text(self, by_type, element_id):
+        """Extracts text from an element"""
+        try:
+            element = self.wait.until(EC.presence_of_element_located((by_type, element_id)))
+            return element.text.strip() if element.text else None
+        except Exception as e:
+            print(f"[ERROR] Could not extract text from {element_id}: {str(e)}")
+            return None
+
