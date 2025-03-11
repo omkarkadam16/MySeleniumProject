@@ -18,7 +18,6 @@ class CustomerMaster(unittest.TestCase):
         cls.Helper=SeleniumHelper(cls.driver)
 
 
-
     def test_customer(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript/Login")
