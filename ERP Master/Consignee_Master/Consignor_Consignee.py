@@ -89,12 +89,13 @@ class ConsignorMaster(unittest.TestCase):
                 # Submit Form
                 if self.Helper.switch_frames("mysubmitNew"):
                     self.Helper.click_element(By.ID, "mysubmitNew")
+                    time.sleep(1)
                     print(f"Consignor/Consignee {row['PartyName']} record created successfully")
-                    df.at[index, "Status"] = "Passed"
                 else:
                     print(f"Customer UID {row['UID']} Failed to update record")
                     df.at[index, "Status"] = "Failed"
                 df.at[index, "Execution Time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
 
             except Exception as e:
                 print(f"Failed to process UID {row['UID']}: {str(e)}")
@@ -102,12 +103,6 @@ class ConsignorMaster(unittest.TestCase):
             df.at[index, "Execution Time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             # ✅ Save the updated DataFrame after each iteration
             df.to_excel("consignor_data.xlsx", index=False, engine="openpyxl")
-
-        self.Helper.normal_click(By.CLASS_NAME, "window_close")
-
-        if self.Helper.switch_frames("btn_Seach"):
-            self.Helper.click_element(By.ID, "btn_Seach")
-            time.sleep(2)
 
     @classmethod
     def tearDownClass(cls):
