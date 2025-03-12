@@ -16,7 +16,7 @@ class SeleniumHelper:
         :param driver: Selenium WebDriver instance
         """
         self.driver = driver
-        self.wait = WebDriverWait(driver, 10)
+        self.wait = WebDriverWait(driver, 5)
 
     def normal_click(self, by, value):
         """

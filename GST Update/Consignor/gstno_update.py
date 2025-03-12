@@ -70,6 +70,7 @@ class CustomerMaster(unittest.TestCase):
                     attempts += 1
 
                 self.Helper.click_element(By.PARTIAL_LINK_TEXT, "Edit")
+                time.sleep(2)
 
                 if self.Helper.switch_frames("acaretdowndivGstEkyc"):
                     self.Helper.click_element(By.ID, "acaretdowndivGstEkyc")
@@ -96,6 +97,8 @@ class CustomerMaster(unittest.TestCase):
 
         # Save after each entry
             df.to_excel("GST.xlsx", index=False, engine="openpyxl")
+            print()
+
 
     @classmethod
     def tearDownClass(cls):
