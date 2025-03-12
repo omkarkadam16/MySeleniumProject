@@ -5,6 +5,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.common import exceptions as ex
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.by import By
 import time
 
 class SeleniumHelper:
@@ -67,38 +69,37 @@ class SeleniumHelper:
                 return
         input_field.send_keys(Keys.DOWN)
         input_field.send_keys(Keys.ENTER)
-    def click_element_while_loop(self, by, value, max_attempts=3):
-        """
-        Click an element with retry logic and JavaScript fallback.
-        :param by: Locator strategy
-        :param value: Locator value
-        :param max_attempts: Maximum retry attempts before failing
-        """
+
+    def click_element(self, by, value, max_attempts=3):
+        """Click an element with retry logic and JS fallback."""
         attempt = 0
         element = None
+
         while attempt < max_attempts:
             try:
                 element = self.wait.until(EC.element_to_be_clickable((by, value)))
                 element.click()
+                print(f"[SUCCESS] Clicked element: {value}")
                 return True
             except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException, ex.TimeoutException) as e:
-                print(f"Attempt {attempt + 1}: Failed to click element {value} due to {type(e).__name__}. Retrying...")
+                print(f"[WARNING] Attempt {attempt + 1}: {type(e).__name__} occurred. Retrying...")
                 time.sleep(1)
 
             # JavaScript Click Fallback
-            try:
-                if element:
+            if element:
+                try:
                     self.driver.execute_script("arguments[0].click();", element)
+                    print(f"[SUCCESS] Clicked element using JavaScript: {value}")
                     return True
-            except ex.JavascriptException as js_error:
-                print(f"Attempt {attempt + 1}: JavaScript click failed due to {type(js_error).__name__}")
+                except ex.JavascriptException as js_error:
+                    print(f"[ERROR] JavaScript click failed due to {type(js_error).__name__}")
 
             attempt += 1
 
-        print(f"Failed to click element {value} after {max_attempts} attempts.")
+        print(f"[ERROR] Failed to click element {value} after {max_attempts} attempts.")
         return False
 
-    def click_element(self, by, value, retries=2):
+    def click_element_simple(self, by, value, retries=2):
         for attempt in range(retries):
             try:
                 element = self.wait.until(EC.element_to_be_clickable((by, value)))
@@ -123,55 +124,27 @@ class SeleniumHelper:
         except:
             pass  # No popup found
 
+
     def switch_frames(self, element_id):
-        """Switch to an iframe that contains a specific element"""
-        self.driver.switch_to.default_content()
-        for iframe in self.driver.find_elements(By.TAG_NAME, "iframe"):
+        """
+        Switch to the iframe that contains a specific element.
+        Returns True if successful, False otherwise.
+        """
+        self.driver.switch_to.default_content()  # Reset to main page
+
+        iframes = self.driver.find_elements(By.TAG_NAME, "iframe")
+
+        for iframe in iframes:
             self.driver.switch_to.frame(iframe)
             try:
                 if self.driver.find_element(By.ID, element_id):
-                    return True
-            except:
-                self.driver.switch_to.default_content()
-        return False
+                    print(f"Switched to iframe containing element: {element_id}")
+                    return True  # Successfully found the element inside this iframe
+            except NoSuchElementException:
+                self.driver.switch_to.default_content()  # Go back to main content before checking next iframe
 
-    def copy_paste_text(self, source_by, source_value, target_by, target_value):
-        """
-        Copy text from one input field and paste it into another.
-        :param source_by: Locator strategy for source element
-        :param source_value: Locator value for source element
-        :param target_by: Locator strategy for target element
-        :param target_value: Locator value for target element
-        """
-        source_element = self.wait.until(EC.visibility_of_element_located((source_by, source_value)))
-        text_to_copy = source_element.get_attribute("value")  # Get text from source field
-
-        target_element = self.wait.until(EC.visibility_of_element_located((target_by, target_value)))
-        target_element.clear()  # Clear the field before pasting
-        target_element.send_keys(text_to_copy)  # Paste the copied text
-
-
-    def copy_paste_text_with_click(self, source_by, source_value, click_by, click_value, target_by, target_value):
-        """
-        Click an element to reveal a field, then copy text from one field and paste it into another.
-        :param source_by: Locator strategy for source element (GSTNumber)
-        :param source_value: Locator value for source element
-        :param click_by: Locator strategy for the element to click before pasting
-        :param click_value: Locator value for the element to click (acaretUpdivGstEkyc)
-        :param target_by: Locator strategy for target element (ekycGSTNo)
-        :param target_value: Locator value for target element
-        """
-        # Click the element to reveal the ekycGSTNo field
-        self.normal_click(click_by, click_value)
-
-        # Copy text from GSTNumber field
-        source_element = self.wait.until(EC.visibility_of_element_located((source_by, source_value)))
-        text_to_copy = source_element.get_attribute("value")
-
-        # Paste text into ekycGSTNo field
-        target_element = self.wait.until(EC.visibility_of_element_located((target_by, target_value)))
-        target_element.clear()
-        target_element.send_keys(text_to_copy)
+        print(f"Element with ID '{element_id}' not found in any iframe.")
+        return False  # Element not found in any iframe
 
     def get_text(self, by_type, element_id):
         """Extracts text from an element"""
