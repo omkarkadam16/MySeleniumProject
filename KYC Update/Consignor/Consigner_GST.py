@@ -51,25 +51,35 @@ class CustomerMaster(unittest.TestCase):
                     self.helper.click_element(By.ID, row["DD"])
 
                 self.helper.click_element(By.PARTIAL_LINK_TEXT, "Edit")
+                time.sleep(2)
 
                 if self.helper.switch_frames("acaretdowndivGstEkyc"):
                     self.helper.click_element(By.ID, "acaretdowndivGstEkyc")
+                time.sleep(1)
+                if self.helper.switch_frames("btn_SearchGSTNo"):
                     self.helper.click_element(By.ID, "btn_SearchGSTNo")
                     driver.execute_script("window.scrollTo(0, 1000);")
+                    print(f"Customer UID {row['UID']} KYC Updated successfully")
+                    df.at[index, "Status"] = "Updated successfully"
+                    df.at[index, "Execution Time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                else:
+                    print(f"Customer UID {row['UID']} Failed to update KYC")
+                    df.at[index, "Status"] = "Not Updated"
+                df.at[index, "Execution Time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
                 if self.helper.switch_frames("mysubmit"):
                     self.helper.click_element(By.ID, "mysubmit")
-                    print(f"Customer UID {row['UID']} KYC Updated successfully")
-                    df.at[index, "Status"] = "Passed"
-                else:
-                    print(f"Customer UID {row['UID']} Failed to update KYC")
-                    df.at[index, "Status"] = "Failed"
-                df.at[index, "Execution Time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    #print(f"Customer UID {row['UID']} Data saved successfully")
+                    #df.at[index, "Status"] = "Passed"
+                #else:
+                    #print(f"Customer UID {row['UID']} Failed to save data")
+                    #df.at[index, "Status"] = "Failed"
+                #df.at[index, "Execution Time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             except Exception as e:
                 print(f"Failed to process UID {row['UID']}: {str(e)}")
-                df.at[index, "Status"] = "Failed"
-            df.at[index, "Execution Time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                #df.at[index, "Status"] = "Failed"
+            #df.at[index, "Execution Time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             df.to_excel("UID.xlsx", index=False, engine="openpyxl")  # Save only once at the end
 

@@ -70,7 +70,7 @@ class SeleniumHelper:
         input_field.send_keys(Keys.DOWN)
         input_field.send_keys(Keys.ENTER)
 
-    def click_element(self, by, value, max_attempts=3):
+    def click_element_with_retry(self, by, value, max_attempts=3):
         """Click an element with retry logic and JS fallback."""
         attempt = 0
         element = None
@@ -99,7 +99,7 @@ class SeleniumHelper:
         print(f"[ERROR] Failed to click element {value} after {max_attempts} attempts.")
         return False
 
-    def click_element_simple(self, by, value, retries=2):
+    def click_element(self, by, value, retries=2):
         for attempt in range(retries):
             try:
                 element = self.wait.until(EC.element_to_be_clickable((by, value)))
@@ -124,24 +124,18 @@ class SeleniumHelper:
         except:
             pass  # No popup found
 
-
     def switch_frames(self, element_id):
-        """
-        Switch to the iframe that contains a specific element.
-        Returns True if successful, False otherwise.
-        """
-        self.driver.switch_to.default_content()  # Reset to main page
-
-        iframes = self.driver.find_elements(By.TAG_NAME, "iframe")
-
+        driver = self.driver
+        driver.switch_to.default_content()  # Reset to main page
+        iframes = driver.find_elements(By.TAG_NAME, "iframe")
         for iframe in iframes:
-            self.driver.switch_to.frame(iframe)
             try:
-                if self.driver.find_element(By.ID, element_id):
-                    print(f"Switched to iframe containing element: {element_id}")
-                    return True  # Successfully found the element inside this iframe
+                driver.switch_to.frame(iframe)
+                driver.find_element(By.ID, element_id)  # Just try finding the element
+                print(f"Switched to iframe containing element: {element_id}")
+                return True  # If found, return True
             except NoSuchElementException:
-                self.driver.switch_to.default_content()  # Go back to main content before checking next iframe
+                driver.switch_to.default_content()  # Reset to check the next frame
 
         print(f"Element with ID '{element_id}' not found in any iframe.")
         return False  # Element not found in any iframe
