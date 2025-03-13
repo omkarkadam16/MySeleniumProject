@@ -32,7 +32,13 @@ class CustomerMaster(unittest.TestCase):
         cls.wait = WebDriverWait(cls.driver, timeout=5)
 
     def send_keys(self, by, value, text):
-        element=self.wait.until(EC.visibility_of_element_located((by, value)))
+        """
+        Send text to an input field when it becomes visible.
+        :param by: Locator strategy
+        :param value: Locator value
+        :param text: Text to be entered
+        """
+        element = self.wait.until(EC.visibility_of_element_located((by, value)))
         if element.is_enabled():
             element.clear()
             element.send_keys(text)
@@ -53,16 +59,26 @@ class CustomerMaster(unittest.TestCase):
             return True
         except:
             return False
+
     def switch_frames(self, element_id):
+        """
+        Switch to the iframe that contains a specific element.
+        Returns True if successful, False otherwise.
+        """
         self.driver.switch_to.default_content()  # Reset to main page
+
         iframes = self.driver.find_elements(By.TAG_NAME, "iframe")
+
         for iframe in iframes:
             self.driver.switch_to.frame(iframe)
             try:
                 if self.driver.find_element(By.ID, element_id):
+                    print(f"Switched to iframe containing element: {element_id}")
                     return True  # Successfully found the element inside this iframe
             except NoSuchElementException:
                 self.driver.switch_to.default_content()  # Go back to main content before checking next iframe
+
+        print(f"Element with ID '{element_id}' not found in any iframe.")
         return False  # Element not found in any iframe
 
     def close_popups(self):
@@ -135,8 +151,8 @@ class CustomerMaster(unittest.TestCase):
             df.at[index, "Execution Time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             df.to_excel("UID 1.xlsx", index=False, engine="openpyxl")
-            print("✅ KYC Update Completed! Check UID.xlsx for results.")
-            input("Press Enter to exit...")
+        print("✅ KYC Update Completed! Check UID.xlsx for results.")
+        input("Press Enter to exit...")
 
     @classmethod
     def tearDownClass(cls):
