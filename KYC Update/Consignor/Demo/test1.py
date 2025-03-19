@@ -111,7 +111,7 @@ class CustomerMaster(unittest.TestCase):
 
                 if self.switch_frames("btn_SearchGSTNo"):
                     if self.click_element(By.ID, "btn_SearchGSTNo"):  # Status depends on this click
-
+                        driver.execute_script("window.scrollTo(0, 1000);")
                         df.at[index, "Status"] = "Updated successfully"  # Update status immediately after button click
 
                         # Wait for timestamp field and extract value
@@ -120,17 +120,18 @@ class CustomerMaster(unittest.TestCase):
                         consignee_value=consignee_name.get_attribute("value").strip()  # Get updated timestamp
                         df.at[index, "Consignor/Consignee"] = consignee_value  # Store timestamp
                         # Wait for KYC update field and extract value
-                        time.sleep(1)
+                        time.sleep(2)
                         ekyc_element = self.wait.until(EC.presence_of_element_located((By.ID, "ekycLogDateTime")))
                         ekyc_value = ekyc_element.get_attribute("value").strip()  # Get updated timestamp
+                        print(f"KYC Update Timestamp for UID {row['UID']}: {ekyc_value}")
                         df.at[index, "GST Verified On"] = ekyc_value  # Store timestamp
                     else:
                         df.at[index, "Status"] = "Not Updated (Button Click Failed)"
-                        driver.execute_script("window.scrollTo(0, 1000);")
 
 
                 if self.switch_frames("mysubmit"):
                     self.click_element(By.ID, "mysubmit")
+                    print(f"Consignor / Consignee UID {row['UID']} Data saved successfully")
 
             except Exception as e:
                 print(f"Failed to process UID {row['UID']}: {str(e)}")
