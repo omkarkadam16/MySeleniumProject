@@ -138,7 +138,7 @@ class CustomerMaster(unittest.TestCase):
 
                 if self.switch_frames("mysubmit"):
                     self.click_element(By.ID, "mysubmit")
-                    print(f"Consignor / Consignee UID {row['UID1']} Data saved successfully")
+                    print(f"Consignor / Consignee UID {row['UID']} Data saved successfully")
                     #df.at[index, "Status"] = "Passed"
                 #else:
                     #print(f"Customer UID {row['UID']} Failed to save data")
