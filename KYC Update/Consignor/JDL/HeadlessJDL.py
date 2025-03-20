@@ -42,7 +42,7 @@ class KycUpdate(unittest.TestCase):
 			element = self.driver.find_element(by, value)
 			self.driver.execute_script("arguments[0].click();", element)
 			return True
-		except:
+		except ex.NoSuchElementException:
 			return False
 
 	def switch_frames(self,element_id):
