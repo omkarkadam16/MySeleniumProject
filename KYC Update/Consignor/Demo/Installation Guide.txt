@@ -18,7 +18,7 @@ This ensures your .exe works without internet access on the client’s system.
 ✅ 3. Create .exe Using PyInstaller
 Open Command Prompt (cmd) inside the script folder and run:
 
-pyinstaller --onefile --console gstno_update.py
+pyinstaller --onefile --console ClientFile.py
 
 --onefile → Bundles everything into a single .exe file.
 --console → Opens the command prompt when running .exe (for logs).

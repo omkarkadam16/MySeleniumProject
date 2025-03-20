@@ -49,17 +49,13 @@ class CustomerMaster(unittest.TestCase):
         """Switch to the iframe that contains a specific element."""
         self.driver.switch_to.default_content()
         iframes = self.driver.find_elements(By.TAG_NAME, "iframe")
-
         for iframe in iframes:
             self.driver.switch_to.frame(iframe)
             try:
                 if self.driver.find_element(By.ID, element_id):
-                    print(f"Switched to iframe containing element: {element_id}")
                     return True
             except NoSuchElementException:
                 self.driver.switch_to.default_content()
-
-        print(f"Element with ID '{element_id}' not found in any iframe.")
         return False
 
     def close_popups(self):
@@ -114,12 +110,13 @@ class CustomerMaster(unittest.TestCase):
 
                         df.at[index, "Status"] = "Updated successfully"  # Update status immediately after button click
 
-                        # Wait for timestamp field and extract value
+                        # Wait for ekycTradeName field and extract Consignor/Consignee value
                         time.sleep(1)
-                        consignee_name = self.wait.until(EC.presence_of_element_located((By.ID, "ekycLegalName")))
+                        consignee_name = self.wait.until(EC.presence_of_element_located((By.ID, "ekycTradeName")))
                         consignee_value=consignee_name.get_attribute("value").strip()  # Get updated timestamp
                         df.at[index, "Consignor/Consignee"] = consignee_value  # Store timestamp
-                        # Wait for KYC update field and extract value
+
+                        # Wait for KYC update field and extract GST Verified On value
                         time.sleep(1)
                         ekyc_element = self.wait.until(EC.presence_of_element_located((By.ID, "ekycLogDateTime")))
                         ekyc_value = ekyc_element.get_attribute("value").strip()  # Get updated timestamp

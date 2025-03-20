@@ -26,18 +26,14 @@ class CustomerMaster(unittest.TestCase):
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--disable-software-rasterizer")  # Prevents WebGL issues
         chrome_options.add_argument("--enable-unsafe-swiftshader")
+        chrome_options.add_argument("--disable-accelerated-2d-canvas")
 
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
         cls.driver.maximize_window()
         cls.wait = WebDriverWait(cls.driver, timeout=5)
 
     def send_keys(self, by, value, text):
-        """
-        Send text to an input field when it becomes visible.
-        :param by: Locator strategy
-        :param value: Locator value
-        :param text: Text to be entered
-        """
+        """Send text to an input field when it becomes visible."""
         element = self.wait.until(EC.visibility_of_element_located((by, value)))
         if element.is_enabled():
             element.clear()
@@ -46,6 +42,7 @@ class CustomerMaster(unittest.TestCase):
             raise Exception(f"Element located by ({by}, {value}) is not enabled.")
 
     def click_element(self, by, value, retries=2):
+        """Click an element, retrying if necessary."""
         for attempt in range(retries):
             try:
                 element = self.wait.until(EC.element_to_be_clickable((by, value)))
@@ -61,33 +58,28 @@ class CustomerMaster(unittest.TestCase):
             return False
 
     def switch_frames(self, element_id):
-        """
-        Switch to the iframe that contains a specific element.
-        Returns True if successful, False otherwise.
-        """
-        self.driver.switch_to.default_content()  # Reset to main page
-
+        """Switch to the iframe that contains a specific element."""
+        self.driver.switch_to.default_content()
         iframes = self.driver.find_elements(By.TAG_NAME, "iframe")
-
         for iframe in iframes:
             self.driver.switch_to.frame(iframe)
             try:
                 if self.driver.find_element(By.ID, element_id):
-                    print(f"Switched to iframe containing element: {element_id}")
-                    return True  # Successfully found the element inside this iframe
+                    return True
             except NoSuchElementException:
-                self.driver.switch_to.default_content()  # Go back to main content before checking next iframe
-
-        print(f"Element with ID '{element_id}' not found in any iframe.")
-        return False  # Element not found in any iframe
+                self.driver.switch_to.default_content()
+        return False
 
     def close_popups(self):
+        """Close any popups if present."""
         try:
             close_button = self.driver.find_element(By.CLASS_NAME, "close")
             close_button.click()
         except:
             pass  # No popup found
+
     def test_customer(self):
+        """Automates KYC update and stores timestamps in Excel"""
         driver = self.driver
         driver.get("http://r-logic9.com/RlogicDemoFtl/")
 
@@ -111,12 +103,11 @@ class CustomerMaster(unittest.TestCase):
         for index, row in df.iterrows():
             try:
                 print(f"Processing UID: {row['UID']}")
-                self.close_popups()  # Close popups before proceeding
+                self.close_popups()
 
                 if self.switch_frames("txt_Extrasearch"):
                     self.send_keys(By.ID, "txt_Extrasearch", str(row["UID"]))
                     self.click_element(By.ID, "btn_Seach")
-
                     self.click_element(By.ID, row["DD"])
 
                 self.click_element(By.PARTIAL_LINK_TEXT, "Edit")
@@ -125,33 +116,34 @@ class CustomerMaster(unittest.TestCase):
                 if self.switch_frames("acaretdowndivGstEkyc"):
                     self.click_element(By.ID, "acaretdowndivGstEkyc")
                 time.sleep(1)
+
                 if self.switch_frames("btn_SearchGSTNo"):
-                    self.click_element(By.ID, "btn_SearchGSTNo")
-                    driver.execute_script("window.scrollTo(0, 1000);")
-                    print(f"Consignor / Consignee UID {row['UID']} KYC Updated successfully")
-                    df.at[index, "Status"] = "Updated successfully"
-                    df.at[index, "Execution Time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                else:
-                    print(f"Consignor / Consignee UID {row['UID']} Failed to update KYC")
-                    df.at[index, "Status"] = "Not Updated"
-                df.at[index, "Execution Time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    if self.click_element(By.ID, "btn_SearchGSTNo"):  # Status depends on this click
+
+                        df.at[index, "Status"] = "Updated successfully"  # Update status immediately after button click
+
+                        # Wait for ekycTradeName field and extract value
+                        time.sleep(1)
+                        consignee_name = self.wait.until(EC.presence_of_element_located((By.ID, "ekycTradeName")))
+                        consignee_value = consignee_name.get_attribute("value").strip()  # Get updated timestamp
+                        df.at[index, "Consignor/Consignee"] = consignee_value  # Store timestamp
+                        # Wait for KYC update field and extract value
+                        time.sleep(1)
+                        ekyc_element = self.wait.until(EC.presence_of_element_located((By.ID, "ekycLogDateTime")))
+                        ekyc_value = ekyc_element.get_attribute("value").strip()  # Get updated timestamp
+                        df.at[index, "GST Verified On"] = ekyc_value  # Store timestamp
+                    else:
+                        df.at[index, "Status"] = "Not Updated (Button Click Failed)"
+                        driver.execute_script("window.scrollTo(0, 1000);")
 
                 if self.switch_frames("mysubmit"):
                     self.click_element(By.ID, "mysubmit")
-                    print(f"Consignor / Consignee UID {row['UID']} Data saved successfully")
-                    #df.at[index, "Status"] = "Passed"
-                #else:
-                    #print(f"Customer UID {row['UID']} Failed to save data")
-                    #df.at[index, "Status"] = "Failed"
-                #df.at[index, "Execution Time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             except Exception as e:
                 print(f"Failed to process UID {row['UID']}: {str(e)}")
-                #df.at[index, "Status"] = "Failed"
-            df.at[index, "Execution Time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             df.to_excel("UID 1.xlsx", index=False, engine="openpyxl")
-        print("✅ KYC Update Completed! Check UID.xlsx for results.")
+        print("✅ KYC Update Completed! Check UID 1.xlsx for results.")
         input("Press Enter to exit...")
 
     @classmethod

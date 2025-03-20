@@ -19,34 +19,41 @@ class CustomerMaster(unittest.TestCase):
         cls.driver.maximize_window()
         cls.wait = WebDriverWait(cls.driver, 10)  # Reduce timeout for faster execution
 
-    def click_element(self, by, value, retries=5):
-        """Click an element with retry logic"""
+    def click_element(self, by, value, retries=2):
+        """Click an element, retrying if necessary."""
         for attempt in range(retries):
             try:
                 element = self.wait.until(EC.element_to_be_clickable((by, value)))
                 element.click()
                 return True
-            except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException):
-                print(f"⚠️ Retrying click for {value}... ({attempt + 1}/{retries})")
-                time.sleep(1)
-        print(f"❌ Failed to click {value} after retries")
-        return False
+            except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException, ex.TimeoutException):
+                print(f"[WARNING] Attempt {attempt + 1} failed, retrying...")
+        try:
+            element = self.driver.find_element(by, value)
+            self.driver.execute_script("arguments[0].click();", element)
+            return True
+        except:
+            return False
 
     def send_keys(self, by, value, text):
-        """Enter text after ensuring element visibility"""
+        """Send text to an input field when it becomes visible."""
         element = self.wait.until(EC.visibility_of_element_located((by, value)))
-        element.clear()
-        element.send_keys(text)
+        if element.is_enabled():
+            element.clear()
+            element.send_keys(text)
+        else:
+            raise Exception(f"Element located by ({by}, {value}) is not enabled.")
 
     def switch_frames(self, element_id):
-        """Switch to an iframe that contains a specific element"""
+        """Switch to the iframe that contains a specific element."""
         self.driver.switch_to.default_content()
-        for iframe in self.driver.find_elements(By.TAG_NAME, "iframe"):
+        iframes = self.driver.find_elements(By.TAG_NAME, "iframe")
+        for iframe in iframes:
             self.driver.switch_to.frame(iframe)
             try:
                 if self.driver.find_element(By.ID, element_id):
                     return True
-            except:
+            except ex.NoSuchElementException:
                 self.driver.switch_to.default_content()
         return False
 
@@ -70,6 +77,10 @@ class CustomerMaster(unittest.TestCase):
         ]:
             self.click_element(By.LINK_TEXT, link_text)
 
+
+        if self.switch_frames("tgladdnclm"):
+                self.click_element(By.ID, "tgladdnclm")
+
         # Read Excel data
         df = pd.read_excel("UID.xlsx", engine="openpyxl")
 
@@ -81,30 +92,52 @@ class CustomerMaster(unittest.TestCase):
                 if self.switch_frames("txt_Extrasearch"):
                     self.send_keys(By.ID, "txt_Extrasearch", str(row["UID"]))
                     self.click_element(By.ID, "btn_Seach")
-                    #time.sleep(1)
 
-                    self.click_element(By.ID, row["DD"])
+                max_attempts = 5
+                attempts = 0
+                while attempts < max_attempts:
+                    if self.click_element(By.ID, row["DD"]):
+                        self.click_element(By.PARTIAL_LINK_TEXT, "Edit")
+                        break
+                    if not self.click_element(By.LINK_TEXT, "Next"):
+                        break
+                    attempts += 1
 
                 self.click_element(By.PARTIAL_LINK_TEXT, "Edit")
+                time.sleep(2)
 
                 if self.switch_frames("acaretdowndivGstEkyc"):
                     self.click_element(By.ID, "acaretdowndivGstEkyc")
-                    self.click_element(By.ID, "btn_SearchGSTNo")
-                    #time.sleep(1)
-                    #driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                    driver.execute_script("window.scrollTo(0, 1000);")#Scroll to bottom
+                time.sleep(1)
+
+                if self.switch_frames("btn_SearchGSTNo"):
+                    if self.click_element(By.ID, "btn_SearchGSTNo"):  # Status depends on this click
+
+                        df.at[index, "Status"] = "Updated successfully"  # Update status immediately after button click
+
+                        # Wait for ekycLegalName field and extract Consignor/Consignee value
+                        time.sleep(1)
+                        consignee_name = self.wait.until(EC.presence_of_element_located((By.ID, "ekycLegalName")))
+                        consignee_value = consignee_name.get_attribute("value").strip()  # Get updated timestamp
+                        df.at[index, "Consignor/Consignee"] = consignee_value  # Store timestamp
+
+                        # Wait for KYC update field and extract GST Verified On value
+                        time.sleep(1)
+                        ekyc_element = self.wait.until(EC.presence_of_element_located((By.ID, "ekycLogDateTime")))
+                        ekyc_value = ekyc_element.get_attribute("value").strip()  # Get updated timestamp
+                        df.at[index, "GST Verified On"] = ekyc_value  # Store timestamp
+                    else:
+                        df.at[index, "Status"] = "Not Updated (Button Click Failed)"
+                        driver.execute_script("window.scrollTo(0, 1000);")
 
                 if self.switch_frames("mysubmit"):
                     self.click_element(By.ID, "mysubmit")
-                    print(f"Customer UID {row['UID']} KYC Updated successfully")
-                    df.at[index, "Status"] = "Passed"
 
             except Exception as e:
                 print(f"Failed to process UID {row['UID']}: {str(e)}")
-                df.at[index, "Status"] = "Failed"
 
-        # Save after each entry
             df.to_excel("UID.xlsx", index=False, engine="openpyxl")
+            print("✅ KYC Update Completed! Check UID.xlsx for results.")
 
     @classmethod
     def tearDownClass(cls):
