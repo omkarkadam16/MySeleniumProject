@@ -155,3 +155,28 @@ class SeleniumHelper:
             checkbox.click()
             print(f"Selected checkbox: {checkbox_id}")
 
+    def paginate_select(self, product_names):
+        """
+                Selects checkboxes for the given product names from a paginated table.
+
+                Parameters:
+                product_names (set or list): A set/list of product names to be selected.
+                """
+
+        for i in range(1, 4):  # Iterate through pagination pages 1 to 3
+            self.click_element(By.XPATH, f"//*[@id='pagination']/li[{i}]/a")  # Click on page number
+            time.sleep(2)  # Wait for the table to update
+
+            # Iterate through all rows in the product table
+            for row in self.driver.find_elements(By.XPATH, "//table[@id='productTable']/tbody/tr"):
+                name = row.find_element(By.XPATH, "./td[2]").text.strip()  # Extract product name
+
+                if name in product_names:  # Check if product is in the desired list
+                    row.find_element(By.XPATH, "./td[4]/input").click()  # Click checkbox
+                    print(f"✅ Selected '{name}'")
+
+                    product_names.remove(name)  # Remove selected product from list
+
+                    if not product_names:  # Exit function if all products are selected
+                        return
+
