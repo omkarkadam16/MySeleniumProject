@@ -49,6 +49,7 @@ class SeleniumHelper:
         self.wait.until(EC.visibility_of_element_located((by, value)))
         dropdown = Select(self.driver.find_element(by, value))
         dropdown.select_by_visible_text(option_text)
+        print(f"[SUCCESS] Selected option: {option_text}")
     def autocomplete_select(self, by, value, text):
         """
         Select an autocomplete suggestion based on input text.
@@ -146,4 +147,11 @@ class SeleniumHelper:
         except Exception as e:
             print(f"[ERROR] Could not extract text from {element_id}: {str(e)}")
             return None
+
+    def checkbox(self, checkbox_id):
+        """Selects a checkbox if not already selected and verifies it."""
+        checkbox = self.driver.find_element(By.ID, checkbox_id)
+        if not checkbox.is_selected():
+            checkbox.click()
+            print(f"Selected checkbox: {checkbox_id}")
 
