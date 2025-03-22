@@ -50,24 +50,21 @@ class SeleniumHelper:
         dropdown = Select(self.driver.find_element(by, value))
         dropdown.select_by_visible_text(option_text)
         print(f"[SUCCESS] Selected option: {option_text}")
+
     def autocomplete_select(self, by, value, text):
-        """
-        Select an autocomplete suggestion based on input text.
-        :param by: Locator strategy
-        :param value: Locator value
-        :param text: Text to input and search in suggestions
-        """
         input_field = self.wait.until(EC.visibility_of_element_located((by, value)))
         input_field.clear()
         input_field.send_keys(text)
         time.sleep(2)  # Allow time for suggestions to appear
         suggestions = self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "ui-menu-item")))
-        for suggestion in suggestions:
-            if text.upper() in suggestion.text.upper():
-                suggestion.click()
+        for i in suggestions:
+            if text.upper() in i.text.upper():
+                i.click()
+                print("Selected autocomplete option:", text)
                 return
         input_field.send_keys(Keys.DOWN)
         input_field.send_keys(Keys.ENTER)
+        print("Selected autocomplete option using keyboard:", text)
 
     def click_element_with_retry(self, by, value, max_attempts=3):
         """Click an element with retry logic and JS fallback."""

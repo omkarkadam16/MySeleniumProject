@@ -9,6 +9,7 @@ import time
 import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
+
 class RegisterUser(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -137,13 +138,29 @@ class RegisterUser(unittest.TestCase):
         #Pagination
         self.select_products(["Television", "Action Camera"])
 
+        # Sroll down comboBox
+        self.select_dropdown(By.ID, "dropdown", "Item 16")
+        print("ComboBox scrolled successfully")
+
+        #Footer Links
+        self.click_element(By.LINK_TEXT,"Download Files")
+        print("LinkTest clicked successfully")
+
+        #Download Files
+        self.send_keys(By.ID,"inputText","Tesing Files") #Enter text into txt file
+        self.click_element(By.ID,"generateTxt") #Generate txt file
+        self.click_element(By.ID,"txtDownloadLink") #Click link to download txt file
+
+
+
+
+
         time.sleep(1)
         self.driver.save_screenshot("Registration Form.png")
 
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
-
 
 if __name__ == "__main__":
     unittest.main()
