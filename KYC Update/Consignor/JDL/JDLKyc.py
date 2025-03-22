@@ -23,6 +23,7 @@ class KycUpdate(unittest.TestCase):
 			try:
 				element = self.wait.until(EC.element_to_be_clickable((by, value)))
 				element.click()
+				print("[SUCCESS] Clicked element: " + value)
 				return True
 			except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException, ex.TimeoutException):
 				print(f"[WARNING] Attempt {attempt + 1} failed, retrying...")
@@ -79,7 +80,15 @@ class KycUpdate(unittest.TestCase):
 				if self.switch_frames("txt_Extrasearch"):
 					self.send_keys(By.ID, "txt_Extrasearch", str(row["UID"]))
 					self.click_element(By.ID, "btn_Seach")
-					self.click_element(By.ID, row["DD"])
+					max_attempts = 5
+					attempts = 0
+					while attempts < max_attempts:
+						if self.click_element(By.ID, row["DD"]):
+							self.click_element(By.PARTIAL_LINK_TEXT, "Edit")
+							break
+						if not self.click_element(By.LINK_TEXT, "Next"):
+							break
+						attempts += 1
 
 				self.click_element(By.PARTIAL_LINK_TEXT, "Edit")
 				time.sleep(2)

@@ -1,13 +1,8 @@
-import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.devtools.v85.page import screencast_frame_ack
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 import unittest
-import time
-import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
 class TestSelenium(unittest.TestCase):
