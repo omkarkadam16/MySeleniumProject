@@ -1,4 +1,3 @@
-from pandas.io.pytables import dropna_doc
 from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
@@ -10,6 +9,8 @@ import unittest
 import time
 import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
+
+#LR No = AHM-000515-BKG
 
 class Booking(unittest.TestCase):
     @classmethod
@@ -109,7 +110,6 @@ class Booking(unittest.TestCase):
             self.select_dropdown(By.CLASS_NAME,"ui-datepicker-month","Jun")
             self.select_dropdown(By.CLASS_NAME,"ui-datepicker-year","2024")
             self.click_element(By.XPATH,"//a[text()='1']")
-            #self.send_keys(By.ID, "DocumentDate", "01-07-2024")
 
     #Booking Details
         self.select_dropdown(By.ID, "FreightOnId", "Weight")
@@ -124,18 +124,16 @@ class Booking(unittest.TestCase):
     #Route Details
         self.autocomplete_select(By.ID, "FromServiceNetworkId-select", "AHMEDABAD")
         self.autocomplete_select(By.ID, "ToServiceNetworkId-select", "PUNE")
-        if self.switch_frames("ExpectedDeliveryDate"):
-            self.click_element(By.CLASS_NAME,"ui-datepicker-trigger")
-            self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
-            self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
-            self.click_element(By.XPATH, "//a[text()='1']")
+        self.click_element(By.XPATH,"(//img[@title='...'])[3]")
+        self.select_dropdown(By.XPATH, "(//select[@class='ui-datepicker-month'])[1]", "Jun")
+        self.select_dropdown(By.XPATH, "(//select[@class='ui-datepicker-year'])[1]", "2024")
+        self.click_element(By.XPATH, "(//a[normalize-space()='4'])[1]") #//a[normalize-space()= 1 or 2 change date
         self.autocomplete_select(By.ID, "VehicleId-select", "MHO4ER9009")
 
     #Consignor/Consignee Details(selectedtext="P M Enterprises Pvt. LTD")
         self.autocomplete_select(By.ID, "ConsignorId-select", "P M Enterprises Pvt. LTD")
         self.autocomplete_select(By.ID, "ConsigneeId-select", "Adani Wilmar Pvt. LTD")
         self.select_dropdown(By.ID, "BillingOnId", "Consignor")
-        #self.send_keys(By.ID, "BillingLocationId-select", "AHMEDABAD")
 
     #Item Details
         self.autocomplete_select(By.ID, "ItemId-select", "Coal")
@@ -144,10 +142,11 @@ class Booking(unittest.TestCase):
         self.send_keys(By.ID, "UnitWeight", "9")
         self.send_keys(By.ID, "BasicFreight", "1500")
         self.click_element(By.ID, "btnSave-BookingItemSession633")
+        time.sleep(1)
         self.click_element(By.ID, "RFRSGSTDetails")
 
     #Invoice Details
-        self.send_keys(By.ID, "InvoiceNo", "564555")
+        self.send_keys(By.ID, "InvoiceNo", "264155")
         self.send_keys(By.ID, "InvoiceDate", "01-06-2024")
         self.send_keys(By.ID, "InvoiceValue", "50000")
         self.click_element(By.ID,"btnSave-BookingInvoiceSession633")
