@@ -74,6 +74,8 @@ class LHC(unittest.TestCase):
                 time.sleep(1)
                 print("Selected autocomplete option:", text)
                 return
+        element.send_keys(Keys.DOWN)
+        element.send_keys(Keys.ENTER)
 
     def test_LHC(self):
         driver = self.driver
