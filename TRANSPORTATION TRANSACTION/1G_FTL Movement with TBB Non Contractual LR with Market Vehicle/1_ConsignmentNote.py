@@ -10,7 +10,6 @@ import time
 import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
-#LR No = AHM-000515-BKG
 
 class Booking(unittest.TestCase):
     @classmethod
@@ -104,7 +103,7 @@ class Booking(unittest.TestCase):
     #Document Details
         if self.switch_frames("OrganizationId"):
             self.select_dropdown(By.ID,"OrganizationId","AHMEDABAD")
-            self.select_dropdown(By.ID,"SeriesId","AHM - 501 To 1000")
+            self.select_dropdown(By.ID,"SeriesId","AHM - 101 To 500")
             #Calendor
             self.click_element(By.CLASS_NAME,"ui-datepicker-trigger")
             self.select_dropdown(By.CLASS_NAME,"ui-datepicker-month","Jun")
