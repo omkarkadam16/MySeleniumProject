@@ -66,6 +66,7 @@ class BillSubmission(unittest.TestCase):
 
     def autocomplete_select(self,by,value,text):
         input_text=self.wait.until(EC.visibility_of_element_located((by,value)))
+        input_text.is_enabled()
         input_text.clear()
         input_text.send_keys(text)
         time.sleep(1)
@@ -90,10 +91,10 @@ class BillSubmission(unittest.TestCase):
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
-        for i in ("Transportation",
-            "Transportation Transaction »",
-            "Bill »",
-            "Bill Submission",):
+        for i in ("Finance",
+            "Finance Transaction »",
+            "Operational Receipt »",
+            "Money Receipt (To Be Billed)",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
@@ -105,29 +106,29 @@ class BillSubmission(unittest.TestCase):
                 self.select_dropdown(By.ID, "OrganizationId", "AHMEDABAD")
                 time.sleep(1)
                 # Calendor
-                self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
-                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
-                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
-                self.click_element(By.XPATH, "//a[text()='1']")
+                self.send_keys(By.ID, "DocumentDate","01-06-2024")
 
-            #Bill Search
-            self.send_keys(By.ID, "FromDate", "01-06-2024")
-            self.send_keys(By.ID, "ToDate", "01-06-2024")
-            self.autocomplete_select(By.ID, "PartyId-select", "P M Enterprises Pvt. LTD")
-            self.send_keys(By.ID, "SubmittedTo","Omkar")
-            self.send_keys(By.ID, "SubmittedDate", "01-06-2024")
+            #Customer Info
+            if self.switch_frames("CustomerId-select"):
+                self.autocomplete_select(By.ID, "CustomerId-select","P M Enterprises Pvt. LTD")
 
-            #Bill Info
-            self.click_element(By.ID,"BtnSearch")
-            self.click_element(By.ID,"IsSelectBillSubmissionBillSessionName7171")
+            #Operation Bill Reference Info
+            self.click_element(By.ID,"btn_Pick_OperationaBillReference")
+            if self.switch_frames("btn_GetOperationalBillReference"):
+                self.click_element(By.ID,"btn_GetOperationalBillReference")
+                self.click_element(By.ID,"IsSelectOperationalBillSearchCollectionSessionName6751")
+                self.click_element(By.ID,"btn_OperationalBillReference")
+                
+            #Receipt Info
+            if self.switch_frames("PaymentModeId"):
+                self.select_dropdown(By.ID, "PaymentModeId", "Cheque")
+                self.select_dropdown(By.ID, "BankId", "HDFC")
+                self.send_keys(By.ID, "ChequeNo", "12345")
+                self.send_keys(By.ID, "PaymentReceivedFrom", "P M Enterprises Pvt. LTD")
 
-            #Submission Info
-            self.send_keys(By.ID, "SubmittedBy", "Parth")
-            self.send_keys(By.ID, "AcknowledgedDate", "01-06-2024")
-            self.send_keys(By.ID, "ReceivedDate", "01-06-2024")
-
-            #Submit Bill
+            #Submit Money Receipt
             self.click_element(By.ID, "mysubmit")
+            print("Bill submitted successfully.")
 
     @classmethod
     def tearDownClass(cls):

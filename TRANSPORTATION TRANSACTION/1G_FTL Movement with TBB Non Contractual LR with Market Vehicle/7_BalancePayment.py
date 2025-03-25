@@ -111,11 +111,11 @@ class BalancePay(unittest.TestCase):
 
             # Document Details
             if self.switch_frames("OrganizationId"):
-                self.dropdown_select(By.ID, "OrganizationId", "AHMEDABAD")
+                self.dropdown(By.ID, "OrganizationId", "AHMEDABAD")
                 # Calendor
                 self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
-                self.dropdown_select(By.CLASS_NAME, "ui-datepicker-month", "Jun")
-                self.dropdown_select(By.CLASS_NAME, "ui-datepicker-year", "2024")
+                self.dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
+                self.dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
                 self.click_element(By.XPATH, "//a[text()='1']")
 
             # general Details
@@ -132,8 +132,8 @@ class BalancePay(unittest.TestCase):
             time.sleep(1)
             #Payment Detail
             if self.switch_frames("PaymentModeId"):
-                self.dropdown_select(By.ID, "PaymentModeId","Cheque")
-                self.dropdown_select(By.ID, "BankId","HDFC")
+                self.dropdown(By.ID, "PaymentModeId","Cheque")
+                self.dropdown(By.ID, "BankId","HDFC")
                 self.send_keys(By.ID, "ChequeNo","12345")
                 self.send_keys(By.ID, "PaymentPaidTo","VIJAY ENTERPRISES")
 
