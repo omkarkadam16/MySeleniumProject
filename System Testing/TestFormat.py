@@ -85,6 +85,28 @@ class Booking(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
+
+
+    def test_Master(self):
+        driver = self.driver
+        driver.get("http://192.168.0.72/Rlogic9RLS/")
+
+        print("Logging in...")
+        self.send_keys(By.ID, "Login", "Riddhi")
+        self.send_keys(By.ID, "Password", "omsgn9")
+        self.click_element(By.ID, "btnLogin")
+        print("Login successful.")
+
+        for i in ("Transportation",
+                  "Transportation Transaction »",
+                  "Outward »",
+                  "Lorry Hire Challan",):
+            self.click_element(By.LINK_TEXT, i)
+            print(f"Navigated to {i}.")
+
+        if self.switch_frames("btn_NewRecord"):
+            self.click_element(By.ID, "btn_NewRecord")
+
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
