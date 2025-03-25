@@ -61,14 +61,18 @@ class AdvancePay(unittest.TestCase):
                 driver.switch_to.default_content()
         return False
 
-    def dropdown_select(self,by,value,text):
+    def dropdown_select(self, by, value, text):
         try:
-            self.wait.until(EC.visibility_of_element_located((by,value)))
-            dropdown= Select(self.driver.find_element(by,value))
-            dropdown.select_by_visible_text(text)
-            print("Selected dropdown option:", text)
+            e = self.wait.until(EC.element_to_be_clickable((by, value)))
+            e.is_enabled()
+            e.click()
+            print("[SUCCESS] Clicked dropdown")
+            self.wait.until(EC.visibility_of_element_located((by, value)))
+            element = Select(self.driver.find_element(by, value))
+            element.select_by_visible_text(text)
+            print(f"[SUCCESS] Selected dropdown option: {text}")
             return True
-        except ex.NoSuchElementException:
+        except (ex.NoSuchElementException, ex.ElementClickInterceptedException, ex.TimeoutException):
             return False
 
     def autocomplete_select(self, by, value, text):
@@ -139,5 +143,13 @@ class AdvancePay(unittest.TestCase):
             #Submit Payment
             self.click_element(By.ID, "mysubmit")
             print("Advanced Payment submitted successfully.")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.driver.quit()
+
+
+if __name__ == "__main__":
+    unittest.main()
 
 

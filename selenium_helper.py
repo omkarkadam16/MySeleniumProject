@@ -38,18 +38,19 @@ class SeleniumHelper:
         else:
             raise Exception(f"Element located by ({by}, {value}) is not enabled.")
 
-
-    def select_dropdown(self, by, value, option_text):
-        """
-        Select an option from a dropdown by visible text.
-        :param by: Locator strategy
-        :param value: Locator value
-        :param option_text: Option text to select
-        """
-        self.wait.until(EC.visibility_of_element_located((by, value)))
-        dropdown = Select(self.driver.find_element(by, value))
-        dropdown.select_by_visible_text(option_text)
-        print(f"[SUCCESS] Selected option: {option_text}")
+    def dropdown_select(self, by, value, text):
+        try:
+            e = self.wait.until(EC.element_to_be_clickable((by, value)))
+            e.is_enabled()
+            e.click()
+            print("[SUCCESS] Clicked dropdown")
+            self.wait.until(EC.visibility_of_element_located((by, value)))
+            element = Select(self.driver.find_element(by, value))
+            element.select_by_visible_text(text)
+            print(f"[SUCCESS] Selected dropdown option: {text}")
+            return True
+        except (ex.NoSuchElementException, ex.ElementClickInterceptedException, ex.TimeoutException):
+            return False
 
     def autocomplete_select(self, by, value, text):
         input_field = self.wait.until(EC.visibility_of_element_located((by, value)))
