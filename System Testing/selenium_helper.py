@@ -25,16 +25,18 @@ class SeleniumHelper:
         self.wait.until(EC.element_to_be_clickable((by, value))).click()
 
     def send_keys(self, by, value, text):
-        try:
-            element = self.wait.until(EC.visibility_of_element_located((by, value)))
-            element.is_enabled()
+        """
+        Send text to an input field when it becomes visible.
+        :param by: Locator strategy
+        :param value: Locator value
+        :param text: Text to be entered
+        """
+        element=self.wait.until(EC.visibility_of_element_located((by, value)))
+        if element.is_enabled():
             element.clear()
             element.send_keys(text)
-            print("Sent keys", text)
-            return True
-        except ex.NoSuchElementException:
-            print(f"Element not found: {value}")
-            return False
+        else:
+            raise Exception(f"Element located by ({by}, {value}) is not enabled.")
 
     def dropdown_select(self, by, value, text):
         try:
