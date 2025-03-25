@@ -1,8 +1,6 @@
 from selenium import webdriver
-from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import unittest
@@ -16,7 +14,7 @@ class Division(unittest.TestCase):
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         cls.driver.maximize_window()
-        cls.wait=WebDriverWait(cls.driver,15)
+        cls.wait=WebDriverWait(cls.driver,10)
 
     def click_element(self,by,value,retry=2):
         for i in range(retry):
@@ -30,6 +28,7 @@ class Division(unittest.TestCase):
         try:
             element=self.driver.find_element(by,value)
             self.driver.execute_script("arguments[0].click();",element)
+            print("Clicked on element using JavaScript")
             return True
         except:
             return False
@@ -59,32 +58,6 @@ class Division(unittest.TestCase):
             print(f"Element not found: {value}")
             return False
 
-    def select_dropdown(self,by,value,text):
-        try:
-            self.wait.until(EC.visibility_of_element_located((by,value)))
-            dropdown=Select(self.driver.find_element(by,value))
-            dropdown.select_by_visible_text(text)
-            print("Selected dropdown option:",text)
-            return True
-        except ex.NoSuchElementException:
-            return False
-
-    def autocomplete_select(self,by,value,text):
-        input_text=self.wait.until(EC.visibility_of_element_located((by,value)))
-        input_text.clear()
-        input_text.send_keys(text)
-        time.sleep(1)
-        suggest=self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME,"ui-menu-item")))
-        for i in suggest:
-            if text.upper() in i .text.upper():
-                i.click()
-                time.sleep(1)
-                print("Selected autocomplete option:", text)
-                return
-        input_text.send_keys(Keys.DOWN)
-        input_text.send_keys(Keys.ENTER)
-        print("Selected autocomplete option using keyboard:", text)
-
     def test_Division(self):
         driver=self.driver
         driver.get("http://192.168.0.72/Rlogic9RLS/")
@@ -95,17 +68,26 @@ class Division(unittest.TestCase):
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
-        for i in ("Transportation",
-                  "Transportation Transaction »",
-                  "Outward »",
-                  "Lorry Hire Challan",):
+        for i in ("Common",
+                  "Organisational Hierarchy »",
+                  "Division",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
-        if self.switch_frames("btn_NewRecord"):
-            self.click_element(By.ID, "btn_NewRecord")
+        division_names = ["TRANSPORTATION", "FINANCE", "LOGISTICS"]
 
+        for division in division_names:
+            if self.switch_frames("btn_NewRecord"):
+                self.click_element(By.ID, "btn_NewRecord")
 
+            # Enter Division Name
+            if self.switch_frames("DivisionName"):
+                self.send_keys(By.ID, "DivisionName", division)
+                print(f"Entered division name: {division}")
+
+            # Submit Details
+            self.click_element(By.ID, "mysubmit")
+            print(f"Submitted division: {division}")
 
 
     @classmethod
