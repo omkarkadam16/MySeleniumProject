@@ -11,7 +11,7 @@ import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class AdvancePay(unittest.TestCase):
+class BalancePay(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -72,7 +72,6 @@ class AdvancePay(unittest.TestCase):
             return True
         except (ex.NoSuchElementException, ex.ElementClickInterceptedException, ex.TimeoutException):
             return False
-
     def autocomplete_select(self, by, value, text):
         input_text = self.wait.until(EC.visibility_of_element_located((by, value)))
         input_text.clear()
@@ -130,7 +129,7 @@ class AdvancePay(unittest.TestCase):
                 self.click_element(By.ID, "btn_GetOperationalBillReference")
                 self.click_element(By.ID, "IsSelectOperationalBillSearchSessionName6671")
                 self.click_element(By.ID, "btn_OperationalBillReference")
-
+            time.sleep(1)
             #Payment Detail
             if self.switch_frames("PaymentModeId"):
                 self.dropdown_select(By.ID, "PaymentModeId","Cheque")
