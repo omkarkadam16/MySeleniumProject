@@ -87,7 +87,7 @@ class AdvancePay(unittest.TestCase):
             if text.upper() in i.text.upper():
                 i.click()
                 print(f"[SUCCESS] Selected autocomplete suggestion: {text}")
-                return True
+                return
         ip.send_keys(Keys.DOWN)
         ip.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
