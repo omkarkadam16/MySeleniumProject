@@ -124,7 +124,6 @@ class CustomerMaster(unittest.TestCase):
 
             self.send_keys(By.ID, "PANNo", "AIACK3602D")
 
-            driver.save_screenshot("Basic Details.png")
 
         # Address Details
 

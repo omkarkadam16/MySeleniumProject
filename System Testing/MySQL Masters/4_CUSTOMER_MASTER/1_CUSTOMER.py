@@ -97,6 +97,7 @@ class CustomerMaster(unittest.TestCase):
         for customer in customers:
             if self.switch_frames("btn_NewRecord"):
                 self.click_element(By.ID, "btn_NewRecord")
+                time.sleep(2)
 
             # Basic Information
             if self.switch_frames("Party_PartyName"):
