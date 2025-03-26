@@ -11,25 +11,25 @@ import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class AutoAllocation(unittest.TestCase):
+class DocumentPrint(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+        cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         cls.driver.maximize_window()
-        cls.wait = WebDriverWait(cls.driver, 10)
+        cls.wait=WebDriverWait(cls.driver,10)
 
-    def click_element(self, by, value, retry=2):
+    def click_element(self,by,value,retry=2):
         for i in range(retry):
             try:
-                self.wait.until(EC.element_to_be_clickable((by, value))).click()
-                print("Clicked on element", value)
+                self.wait.until(EC.element_to_be_clickable((by,value))).click()
+                print("Clicked on element",value)
                 return True
-            except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException, ex.TimeoutException):
-                print(f'Retrying click on {by} with value {value}, attempt {i + 1}/{retry}')
+            except(ex.ElementClickInterceptedException,ex.StaleElementReferenceException,ex.TimeoutException):
+                print(f'Retrying click on {by} with value {value}, attempt {i+1}/{retry}')
                 time.sleep(1)
         try:
-            element = self.driver.find_element(by, value)
-            self.driver.execute_script("arguments[0].click();", element)
+            element=self.driver.find_element(by,value)
+            self.driver.execute_script("arguments[0].click();",element)
             print("Clicked on element using JavaScript")
             return True
         except:
@@ -60,24 +60,24 @@ class AutoAllocation(unittest.TestCase):
             print(f"Element not found: {value}")
             return False
 
-    def select_dropdown(self, by, value, text):
+    def select_dropdown(self,by,value,text):
         try:
-            self.wait.until(EC.visibility_of_element_located((by, value)))
-            dropdown = Select(self.driver.find_element(by, value))
+            self.wait.until(EC.visibility_of_element_located((by,value)))
+            dropdown=Select(self.driver.find_element(by,value))
             dropdown.select_by_visible_text(text)
-            print("Selected dropdown option:", text)
+            print("Selected dropdown option:",text)
             return True
         except ex.NoSuchElementException:
             return False
 
-    def autocomplete_select(self, by, value, text):
-        input_text = self.wait.until(EC.visibility_of_element_located((by, value)))
+    def autocomplete_select(self,by,value,text):
+        input_text=self.wait.until(EC.visibility_of_element_located((by,value)))
         input_text.clear()
         input_text.send_keys(text)
         time.sleep(1)
-        suggest = self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "ui-menu-item")))
+        suggest=self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME,"ui-menu-item")))
         for i in suggest:
-            if text.upper() in i.text.upper():
+            if text.upper() in i .text.upper():
                 i.click()
                 time.sleep(1)
                 print("Selected autocomplete option:", text)
@@ -86,8 +86,9 @@ class AutoAllocation(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
+
     def test_Masters(self):
-        driver = self.driver
+        driver=self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
         print("Logging in...")
@@ -96,45 +97,75 @@ class AutoAllocation(unittest.TestCase):
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
-        Series = [
-            {"Document": "Finance", "LocationId": "MUMBAI", "YearCode": "2024 - 2025", "DocNoLength": "6"},
-            {"Document": "Finance", "LocationId": "BHIWANDI", "YearCode": "2024 - 2025", "DocNoLength": "6"},
-            {"Document": "Finance", "LocationId": "PUNE", "YearCode": "2024 - 2025", "DocNoLength": "6"},
-            {"Document": "Finance", "LocationId": "JAIPUR", "YearCode": "2024 - 2025", "DocNoLength": "6"},
-            {"Document": "Finance", "LocationId": "AHMEDABAD", "YearCode": "2024 - 2025", "DocNoLength": "6"},
-            {"Document": "Finance", "LocationId": "HYDERABAD", "YearCode": "2024 - 2025", "DocNoLength": "6"},
-            {"Document": "Finance", "LocationId": "DELHI", "YearCode": "2024 - 2025", "DocNoLength": "6"},
-        ]
-
-        for i in ("Common", "Document Setup »", "Auto Series Allocation"):
+        for i in ("Common",
+                  "Document Setup »",
+                  "Document Printing",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
+        Series = [
+            {
+                "Document": "Booking",
+                "YearCode": "2024 - 2025",
+                "StartNo": "5001",
+                "EndNo": "6000"
+            },
+            {
+                "Document": "Booking",
+                "YearCode": "2024 - 2025",
+                "StartNo": "201",
+                "EndNo": "500"
+            },
+            {
+                "Document": "Trip Settlement",
+                "YearCode": "2024 - 2025",
+                "StartNo": "201",
+                "EndNo": "500"
+            },
+            {
+                "Document": "Bank Payment",
+                "YearCode": "2024 - 2025",
+                "StartNo": "201",
+                "EndNo": "500"
+            },
+            {
+                "Document": "DirectDoorDelivery",
+                "YearCode": "2024 - 2025",
+                "StartNo": "301",
+                "EndNo": "400"
+            },
+            {
+                "Document": "Journal Voucher",
+                "YearCode": "2024 - 2025",
+                "StartNo": "5001",
+                "EndNo": "6000"
+            },
+            {
+                "Document": "Operational Expense",
+                "YearCode": "2024 - 2025",
+                "StartNo": "301",
+                "EndNo": "400"
+            }
+        ]
+
+        # Iterate over each location and create it
         for i in Series:
             if self.switch_frames("btn_NewRecord"):
                 self.click_element(By.ID, "btn_NewRecord")
 
-            if self.switch_frames("MenuHeadId"):
-                self.select_dropdown(By.ID, "MenuHeadId", i["Document"])
-                self.autocomplete_select(By.ID, "LocationId-select", i["LocationId"])
-                self.select_dropdown(By.ID, "YearCodeId", i["YearCode"])
-                self.send_keys(By.ID, "DocNoLength", i["DocNoLength"])
-                self.click_element(By.ID, "btn_GetAutoSeries")
-                time.sleep(3)
-                self.click_element(By.ID, "chkSelectAll")
+            # Fill out the form
+            if self.switch_frames("DocumentId"):
+                self.select_dropdown(By.ID, "DocumentId", i["Document"])
+                self.select_dropdown(By.ID, "ddl_YearCode", i["YearCode"])
+                self.send_keys(By.ID, "StartNo", i["StartNo"])
+                self.send_keys(By.ID, "EndNo", i["EndNo"])
                 print(f"Details entered for {i['Document']}")
 
+            # Submit the form
             if self.switch_frames("mysubmit"):
                 self.click_element(By.ID, "mysubmit")
                 print(f"Series {i['Document']} created successfully.")
 
-            # Switch back to default content after submission
-            driver.switch_to.default_content()
-            time.sleep(2)
-
-            for i in ("Common", "Document Setup »", "Auto Series Allocation"):
-                self.click_element(By.LINK_TEXT, i)
-                print(f"Re-navigated to {i}.")
 
     @classmethod
     def tearDownClass(cls):

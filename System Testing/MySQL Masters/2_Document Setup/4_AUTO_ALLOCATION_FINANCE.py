@@ -122,11 +122,11 @@ class AutoAllocation(unittest.TestCase):
                 self.click_element(By.ID, "btn_GetAutoSeries")
                 time.sleep(3)
                 self.click_element(By.ID, "chkSelectAll")
-                print(f"Details entered for {i['Document']}")
+                print(f"Details entered for {i['LocationId']}")
 
             if self.switch_frames("mysubmit"):
                 self.click_element(By.ID, "mysubmit")
-                print(f"Series {i['Document']} created successfully.")
+                print(f"Series {i['LocationId']} created successfully.")
 
             # Switch back to default content after submission
             driver.switch_to.default_content()
