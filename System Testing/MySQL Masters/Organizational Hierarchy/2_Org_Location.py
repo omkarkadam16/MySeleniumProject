@@ -87,12 +87,12 @@ class Division(unittest.TestCase):
         print("Selected autocomplete option using keyboard:", text)
 
     def test_Division(self):
-        driver=self.driver
-        driver.get("http://192.168.0.72/Rlogic9RLS/")
+        driver = self.driver
+        driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
         print("Logging in...")
-        self.send_keys(By.ID, "Login", "Riddhi")
-        self.send_keys(By.ID, "Password", "omsgn9")
+        self.send_keys(By.ID, "Login", "admin")
+        self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
@@ -108,10 +108,10 @@ class Division(unittest.TestCase):
                     "Code": "MUM",
                     "OrganizationLocationName": "MUMBAI",
                     "LocationType": "BRANCH OFFICE",
-                    "ParentLocation": "HEAD OFFICE",
+                    "ParentLocation": "Head Office",
                     "AddressType": "Office",
                     "AddressLine": "ABC Street 1",
-                    "City": "PUNE",
+                    "City": "MUMBAI",
                     "PinCode": "411001",
                     "ContactNo": "1234567891",
                     "Mobile": "9876543211"
@@ -120,7 +120,7 @@ class Division(unittest.TestCase):
                     "Code": "BWD",
                     "OrganizationLocationName": "BHIWANDI",
                     "LocationType": "BRANCH OFFICE",
-                    "ParentLocation": "HEAD OFFICE",
+                    "ParentLocation": "Head Office",
                     "AddressType": "Office",
                     "AddressLine": "ABC Street 1",
                     "City": "THANE",
@@ -132,7 +132,7 @@ class Division(unittest.TestCase):
                     "Code": "PUN",
                     "OrganizationLocationName": "PUNE",
                     "LocationType": "BRANCH OFFICE",
-                    "ParentLocation": "HEAD OFFICE",
+                    "ParentLocation": "Head Office",
                     "AddressType": "Office",
                     "AddressLine": "ABC Street 1",
                     "City": "PUNE",
@@ -144,7 +144,7 @@ class Division(unittest.TestCase):
                     "Code": "JPR",
                     "OrganizationLocationName": "JAIPUR",
                     "LocationType": "BRANCH OFFICE",
-                    "ParentLocation": "HEAD OFFICE",
+                    "ParentLocation": "Head Office",
                     "AddressType": "Office",
                     "AddressLine": "ABC Street 1",
                     "City": "Jaipur",
@@ -156,7 +156,7 @@ class Division(unittest.TestCase):
                     "Code": "AHM",
                     "OrganizationLocationName": "AHMEDABAD",
                     "LocationType": "BRANCH OFFICE",
-                    "ParentLocation": "HEAD OFFICE",
+                    "ParentLocation": "Head Office",
                     "AddressType": "Office",
                     "AddressLine": "ABC Street 1",
                     "City": "AHMEDABAD",
@@ -168,7 +168,7 @@ class Division(unittest.TestCase):
                     "Code": "HYD",
                     "OrganizationLocationName": "HYDERABAD",
                     "LocationType": "BRANCH OFFICE",
-                    "ParentLocation": "HEAD OFFICE",
+                    "ParentLocation": "Head Office",
                     "AddressType": "Office",
                     "AddressLine": "ABC Street 1",
                     "City": "HYDERABAD",
@@ -180,7 +180,7 @@ class Division(unittest.TestCase):
                     "Code": "DEL",
                     "OrganizationLocationName": "DELHI",
                     "LocationType": "BRANCH OFFICE",
-                    "ParentLocation": "HEAD OFFICE",
+                    "ParentLocation": "Head Office",
                     "AddressType": "Office",
                     "AddressLine": "ABC Street 1",
                     "City": "DELHI",

@@ -87,12 +87,12 @@ class Location(unittest.TestCase):
         print("Selected autocomplete option using keyboard:", text)
 
     def test_Division(self):
-        driver=self.driver
-        driver.get("http://192.168.0.72/Rlogic9RLS/")
+        driver = self.driver
+        driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
         print("Logging in...")
-        self.send_keys(By.ID, "Login", "Riddhi")
-        self.send_keys(By.ID, "Password", "omsgn9")
+        self.send_keys(By.ID, "Login", "admin")
+        self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 

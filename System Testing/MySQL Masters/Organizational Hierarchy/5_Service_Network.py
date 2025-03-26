@@ -87,12 +87,12 @@ class ServiceNetwork(unittest.TestCase):
         print("Selected autocomplete option using keyboard:", text)
 
     def test_Division(self):
-        driver=self.driver
-        driver.get("http://192.168.0.72/Rlogic9RLS/")
+        driver = self.driver
+        driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
         print("Logging in...")
-        self.send_keys(By.ID, "Login", "Riddhi")
-        self.send_keys(By.ID, "Password", "omsgn9")
+        self.send_keys(By.ID, "Login", "admin")
+        self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
@@ -175,12 +175,12 @@ class ServiceNetwork(unittest.TestCase):
                     self.autocomplete_select(By.ID, "CityId-select", location["CityId"])
                     self.send_keys(By.ID, "PinCode", location["PinCode"])
                     self.autocomplete_select(By.ID, "DefaultLocationId-select", location["DefaultLocationId"])
-                    print(f"Details entered for {location['ServiceName']}")
+                    print(f"Details entered for {location['ServiceNetwork']}")
 
                 # Submit the form
-                if self.switch_frames("mysubmit"):
-                    self.click_element(By.ID, "mysubmit")
-                    print(f"ServiceNetwork {location['ServiceNetwork']} created successfully.")
+                    if self.switch_frames("mysubmit"):
+                        self.click_element(By.ID, "mysubmit")
+                        print(f"ServiceNetwork {location['ServiceNetwork']} created successfully.")
 
     @classmethod
     def tearDownClass(cls):
