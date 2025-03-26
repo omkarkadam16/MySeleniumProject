@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-class CustomerMaster(unittest.TestCase):
+class ConsignorMaster(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -86,15 +86,15 @@ class CustomerMaster(unittest.TestCase):
         self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
 
-        menus = ["Transportation", "Transportation Master »", "Customer »", "Customer"]
+        menus = ["Transportation", "Transportation Master »", "Consignor/Consignee »", "Consignor / Consignee"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
         customers = [
-            {"name": "Adani Wilmar Pvt. LTD", "pan": "AACCK5599G", "city": "CHENNAI", "pincode": "400001", "phone": "1234567890","state": "TAMIL NADU","gst": "33AACCK5599GFZV"},
-            {"name": "P M Enterprises Pvt. LTD", "pan": "AACCK5599P", "city": "PUNE", "pincode": "411001", "phone": "9876543210","state": "MAHARASHTRA","gst": "27AACCK5599PTZC"},
-            {"name": "Dr. Reddys Lab Ltd", "pan": "AACCK5599D", "city": "DELHI", "pincode": "380001", "phone": "8543216789","state": "DELHI","gst": "07AACCK5599DGZJ"},
-            {"name": "Bharat Earth Movers Ltd", "pan": "AACCK9966P", "city": "Jaipur", "pincode": "380001","phone": "8543216789", "state": "RAJASTHAN", "gst": "08AACCK9966PPZC"},
+            {"name": "Prasad Industries Ltd", "pan": "AACCK5567Y", "city": "MUMBAI", "pincode": "400001", "phone": "1234567890","state": "MAHARASHTRA","gst": "27AACCK5567YTZM"},
+            {"name": "Food Corp", "pan": "AACCK5534G", "city": "MUMBAI", "pincode": "411001", "phone": "9876543210","state": "MAHARASHTRA","gst": "27AACCK5534GTZC"},
+            {"name": "Kirloskar Pumps Ltd", "pan": "AACCK5578H", "city": "MUMBAI", "pincode": "380001", "phone": "8543216789","state": "MAHARASHTRA","gst": "27AACCK5578HTZF"},
+            {"name": "Ganesh Metal Works", "pan": "AACCK5598S", "city": "Pune", "pincode": "380001","phone": "8543216789", "state": "MAHARASHTRA", "gst": "27AACCK5598STZV"},
         ]
 
         for customer in customers:
@@ -105,10 +105,8 @@ class CustomerMaster(unittest.TestCase):
             # Basic Information
             if self.switch_frames("Party_PartyName"):
                 self.send_keys(By.ID, "Party_PartyName", customer["name"])
-                self.select_dropdown(By.ID, "Party_PartyCategoryId", "GENERAL")
                 self.select_dropdown(By.ID, "Party_PartyIndustryTypeId", "GENERAL")
-                self.select_dropdown(By.ID, "Party_PartyGradeId", "A Class")
-                self.select_dropdown(By.ID, "Party_PartyGroupId", "GENERAL")
+                self.select_dropdown(By.ID, "Party_ClassificationId", "Normal")
             if self.switch_frames("EffectiveFromDate"):
                 self.send_keys(By.ID, "EffectiveFromDate", "27-01-2025")
                 self.send_keys(By.ID, "PANNo", customer["pan"])
@@ -121,35 +119,13 @@ class CustomerMaster(unittest.TestCase):
                 self.send_keys(By.ID, "PinCode", customer["pincode"])
                 self.send_keys(By.ID, "ContactNo", customer["phone"])
                 self.send_keys(By.ID, "Mob", "5564567890")
-                self.click_element(By.ID, "btnSave-AddressSession77")
+                self.click_element(By.ID, "btnSave-AddressSession748")
 
             # Registation Number Details
             if self.switch_frames("RegistrationHeadId"):
                 self.select_dropdown(By.ID, "RegistrationHeadId", "PAN No.")
                 self.send_keys(By.ID, "Number", customer["pan"])
-                self.click_element(By.ID, "btnSave-RegistrationSession77")
-
-            driver.execute_script("window.scrollTo(0, 0);")
-            time.sleep(2)
-            if self.switch_frames("liTab2"):
-                self.click_element(By.ID, "liTab2")
-
-            # Applicable Payment Types
-            if self.switch_frames("PaymentTypeId"):
-                for payment_type in ["Paid", "To Pay", "To Be Billed"]:
-                    self.select_dropdown(By.ID, "PaymentTypeId", payment_type)
-                    self.click_element(By.ID, "btnSave-PaymentTypeConfigSession77")
-                    time.sleep(2)
-
-            # Billing Details
-            if self.switch_frames("BillingOn"):
-                self.select_dropdown(By.ID, "BillingOn", "Booking")
-                self.select_dropdown(By.ID, "BillingLocationTypeId", "Booking Branch")
-                self.autocomplete_select(By.ID, "CollectionLocationId-select", "AHMEDABAD")
-            if self.switch_frames("SubmissionLocationId-select"):
-                self.autocomplete_select(By.ID, "SubmissionLocationId-select", "MUMBAI")
-                self.send_keys(By.ID, "CreditDays", "20")
-                self.send_keys(By.ID, "Party_CreditLimit", "20000")
+                self.click_element(By.ID, "btnSave-RegistrationSession748")
 
             driver.execute_script("window.scrollTo(0, 0);")
             time.sleep(2)
@@ -161,7 +137,7 @@ class CustomerMaster(unittest.TestCase):
                 self.select_dropdown(By.ID, "StateId", customer["state"])
                 self.select_dropdown(By.ID, "BusinessVerticalId", "TRANSPORTATION")
                 self.send_keys(By.ID, "GSTNumber", customer["gst"])
-                self.click_element(By.ID, "btnSave-CustGSTRegistrationSession77")
+                self.click_element(By.ID, "btnSave-CustGSTRegistrationSession748")
 
             if self.switch_frames("mysubmit"):
                 self.click_element(By.ID, "mysubmit")

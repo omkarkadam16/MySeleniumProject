@@ -1,8 +1,6 @@
 from selenium import webdriver
-from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import unittest
@@ -11,7 +9,7 @@ import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class DocumentPrint(unittest.TestCase):
+class Zones(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -60,34 +58,6 @@ class DocumentPrint(unittest.TestCase):
             print(f"Element not found: {value}")
             return False
 
-    def select_dropdown(self,by,value,text):
-        try:
-            e = self.wait.until(EC.element_to_be_clickable((by, value)))
-            e.is_enabled()
-            e.click()
-            self.wait.until(EC.visibility_of_element_located((by, value)))
-            element = Select(self.driver.find_element(by, value))
-            element.select_by_visible_text(text)
-            return True
-        except (ex.NoSuchElementException, ex.ElementClickInterceptedException, ex.TimeoutException):
-            return False
-
-    def autocomplete_select(self,by,value,text):
-        input_text=self.wait.until(EC.visibility_of_element_located((by,value)))
-        input_text.clear()
-        input_text.send_keys(text)
-        time.sleep(1)
-        suggest=self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME,"ui-menu-item")))
-        for i in suggest:
-            if text.upper() in i .text.upper():
-                i.click()
-                time.sleep(1)
-                print("Selected autocomplete option:", text)
-                return
-        input_text.send_keys(Keys.DOWN)
-        input_text.send_keys(Keys.ENTER)
-        print("Selected autocomplete option using keyboard:", text)
-
 
     def test_Masters(self):
         driver=self.driver
@@ -100,53 +70,27 @@ class DocumentPrint(unittest.TestCase):
         print("Login successful.")
 
         for i in ("Common",
-                  "Document Setup »",
-                  "Document Printing",):
+                  "Geographical Hierarchy »",
+                  "Zone",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
         Series = [
             {
-                "Document": "Booking",
-                "YearCode": "2024 - 2025",
-                "StartNo": "5001",
-                "EndNo": "6000"
+                "Code": "001",
+                "ZoneName": "EAST"
             },
             {
-                "Document": "Booking",
-                "YearCode": "2024 - 2025",
-                "StartNo": "201",
-                "EndNo": "500"
+                "Code": "002",
+                "ZoneName": "WEST"
             },
             {
-                "Document": "Trip Settlement",
-                "YearCode": "2024 - 2025",
-                "StartNo": "201",
-                "EndNo": "500"
+                "Code": "003",
+                "ZoneName": "SOUTH"
             },
             {
-                "Document": "Bank Payment",
-                "YearCode": "2024 - 2025",
-                "StartNo": "201",
-                "EndNo": "500"
-            },
-            {
-                "Document": "DirectDoorDelivery",
-                "YearCode": "2024 - 2025",
-                "StartNo": "301",
-                "EndNo": "400"
-            },
-            {
-                "Document": "Journal Voucher",
-                "YearCode": "2024 - 2025",
-                "StartNo": "5001",
-                "EndNo": "6000"
-            },
-            {
-                "Document": "Operational Expense",
-                "YearCode": "2024 - 2025",
-                "StartNo": "301",
-                "EndNo": "400"
+                "Code": "004",
+                "ZoneName": "NORTH"
             }
         ]
 
@@ -156,17 +100,14 @@ class DocumentPrint(unittest.TestCase):
                 self.click_element(By.ID, "btn_NewRecord")
 
             # Fill out the form
-            if self.switch_frames("DocumentId"):
-                self.select_dropdown(By.ID, "DocumentId", i["Document"])
-                self.select_dropdown(By.ID, "ddl_YearCode", i["YearCode"])
-                self.send_keys(By.ID, "StartNo", i["StartNo"])
-                self.send_keys(By.ID, "EndNo", i["EndNo"])
-                print(f"Details entered for {i['Document']}")
+            if self.switch_frames("Code"):
+                self.send_keys(By.ID, "Code", i["Code"])
+                self.send_keys(By.ID, "ZoneName", i["ZoneName"])
 
             # Submit the form
             if self.switch_frames("mysubmit"):
                 self.click_element(By.ID, "mysubmit")
-                print(f"Series {i['Document']} created successfully.")
+                print(f"Zone = {i['ZoneName']} created successfully.")
 
 
     @classmethod
