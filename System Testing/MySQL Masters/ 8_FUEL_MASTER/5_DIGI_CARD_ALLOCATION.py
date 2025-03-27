@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-class VehicleMaster1(unittest.TestCase):
+class FuelMaster(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -86,50 +86,55 @@ class VehicleMaster1(unittest.TestCase):
         self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
 
-        menus = ["Fleet", "Fleet Master »", "Vehicle »", "Vehicle"]
+        menus = ["Fleet", "Fleet Master »", "Fuel »", "DigiCard Allocation"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
         Series = [
             {
-                "VehicleNo": "MH06RR1006",
-                "VehicleTypeId": "10 MT",
-                "VehicleCategory": "Attached",
-                "VehicleBody": "CONTAINER BODY",
-                "ControllingBranchId": "Ahmedabad",
-                "VehicleOwnerId": "INTER INDIA ROADWAYS LTD",
-                "ChasisNo": "ch88",
-                "EngineNo": "eng88"
+                "DigiCardNo": "F-9211",
+                "DigiCardAllocationType": "Vehicle",
+                "VehicleId": "MH04AA7007",
             },
             {
-                "VehicleNo": "MH04TT9008",
-                "VehicleTypeId": "20 MT",
-                "VehicleCategory": "Owned",
-                "VehicleBody": "CLOSED BODY",
-                "ControllingBranchId": "Jaipur",
-                "VehicleOwnerId": "None",
-                "ChasisNo": "ch99",
-                "EngineNo": "eng99"
+                "DigiCardNo": "F-9212",
+                "DigiCardAllocationType": "Vendor",
+                "VendorId": "IOCL FUEL PUMP",
             },
             {
-                "VehicleNo": "MH04AA0099",
-                "VehicleTypeId": "16 MT",
-                "VehicleCategory": "Managed",
-                "VehicleBody": "CONTAINER BODY",
-                "ControllingBranchId": "Delhi",
-                "VehicleOwnerId": "Bhoruka Logistics Pvt Ltd",
-                "ChasisNo": "ch810",
-                "EngineNo": "eng810"
+                "DigiCardNo": "F-9213",
+                "DigiCardAllocationType": "Location",
+                "LocationId": "HYDERABAD",
             },
             {
-                "VehicleNo": "MH04AA7007",
-                "VehicleTypeId": "15 MT",
-                "VehicleCategory": "Owned",
-                "VehicleBody": "FULL BODY",
-                "ControllingBranchId": "PUNE",
-                "VehicleOwnerId": "None",
-                "ChasisNo": "ch07",
-                "EngineNo": "eng07"
+                "DigiCardNo": "T-9214",
+                "DigiCardAllocationType": "Vehicle",
+                "VehicleId": "MH04AA7007",
+            },
+            {
+                "DigiCardNo": "T-9215",
+                "DigiCardAllocationType": "Vehicle",
+                "VehicleId": "MH04TT9008",
+            },
+            {
+                "DigiCardNo": "T-9216",
+                "DigiCardAllocationType": "Vehicle",
+                "VehicleId": "MH04AA0099",
+            },
+            {
+                "DigiCardNo": "D-9217",
+                "DigiCardAllocationType": "Vehicle",
+                "VehicleId": "MH06RR1006",
+            },
+            {
+                "DigiCardNo": "D-9218",
+                "DigiCardAllocationType": "Location",
+                "LocationId": "PUNE",
+            },
+            {
+                "DigiCardNo": "D-9219",
+                "DigiCardAllocationType": "Location",
+                "LocationId": "JAIPUR",
             }
         ]
 
@@ -139,30 +144,31 @@ class VehicleMaster1(unittest.TestCase):
                 self.click_element(By.ID, "btn_NewRecord")
 
             # General Details
-            if self.switch_frames("VehicleNo"):
-                self.send_keys(By.ID, "VehicleNo", i["VehicleNo"])
-                self.select_dropdown(By.ID, "VehicleTypeId", i["VehicleTypeId"])
-                self.select_dropdown(By.ID, "VehicleCategoryId", i["VehicleCategory"])
-                self.select_dropdown(By.ID, "VehicleBodyId", i["VehicleBody"])
-                self.select_dropdown(By.ID, "CarrierCategoryId", "GOODS CARRIER")
-                self.send_keys(By.ID, "YearOfManufacturer", "2020")
-                self.select_dropdown(By.ID, "ManufactureId", "TATA MOTORS")
-                self.select_dropdown(By.ID, "VehicleModelId", "TATA - 3520")
-                self.send_keys(By.ID, "OnRoadDate", "05-03-2020")
-                self.autocomplete_select(By.ID, "ControllingBranchId-select",i["ControllingBranchId"])
-                if i["VehicleCategory"] != "Owned" and i["VehicleOwnerId"] != "None":
-                    self.autocomplete_select(By.ID, "VehicleOwnerId-select", i["VehicleOwnerId"])
+            if self.switch_frames("DigiCardId-select"):
+                self.autocomplete_select(By.ID, "DigiCardId-select",  i["DigiCardNo"])
+                self.select_dropdown(By.ID, "DigiCardAllocationTypeId", i["DigiCardAllocationType"])
 
-            #Specification Details
-                self.send_keys(By.ID, "ChasisNo", i["ChasisNo"])
-                self.send_keys(By.ID, "EngineNo", i["EngineNo"])
-                self.select_dropdown(By.ID, "FuelTypeId", "DIESEL")
-                self.send_keys(By.ID, "GrossWeight", "2000")
-                self.send_keys(By.ID, "UnLadenWeight", "1000")
+                # Handle fields dynamically based on allocation type
+                if i["DigiCardAllocationType"] == "Vehicle":
+                    vehicle = i.get("VehicleId")
+                    if vehicle:
+                        self.autocomplete_select(By.ID, "VehicleId-select", vehicle)
+
+                elif i["DigiCardAllocationType"] == "Vendor":
+                    vendor = i.get("VendorId")
+                    if vendor:
+                        self.autocomplete_select(By.ID, "VendorId-select", vendor)
+
+                elif i["DigiCardAllocationType"] == "Location":
+                    location = i.get("LocationId")
+                    if location:
+                        self.autocomplete_select(By.ID, "LocationId-select", location)
+
+                self.send_keys(By.ID, "EffectiveFrom", "01-04-2018")
 
             if self.switch_frames("mysubmit"):
                 self.click_element(By.ID, "mysubmit")
-                print("Successfully submitted", i["VehicleNo"])
+                print("DigiCardNo Successfully submitted", i["DigiCardNo"])
                 time.sleep(2)
         print("All data created successfully.")
 

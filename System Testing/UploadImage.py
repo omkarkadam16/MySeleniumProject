@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-class VehicleMaster1(unittest.TestCase):
+class Test1(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -78,7 +78,7 @@ class VehicleMaster1(unittest.TestCase):
         input_text.send_keys(Keys.DOWN)
         input_text.send_keys(Keys.ENTER)
 
-    def test_master(self):
+    def Test1(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
@@ -86,85 +86,42 @@ class VehicleMaster1(unittest.TestCase):
         self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
 
-        menus = ["Fleet", "Fleet Master »", "Vehicle »", "Vehicle"]
+        menus = ["Fleet", "Fleet Master »", "Driver »", "Driver"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
-        Series = [
-            {
-                "VehicleNo": "MH06RR1006",
-                "VehicleTypeId": "10 MT",
-                "VehicleCategory": "Attached",
-                "VehicleBody": "CONTAINER BODY",
-                "ControllingBranchId": "Ahmedabad",
-                "VehicleOwnerId": "INTER INDIA ROADWAYS LTD",
-                "ChasisNo": "ch88",
-                "EngineNo": "eng88"
-            },
-            {
-                "VehicleNo": "MH04TT9008",
-                "VehicleTypeId": "20 MT",
-                "VehicleCategory": "Owned",
-                "VehicleBody": "CLOSED BODY",
-                "ControllingBranchId": "Jaipur",
-                "VehicleOwnerId": "None",
-                "ChasisNo": "ch99",
-                "EngineNo": "eng99"
-            },
-            {
-                "VehicleNo": "MH04AA0099",
-                "VehicleTypeId": "16 MT",
-                "VehicleCategory": "Managed",
-                "VehicleBody": "CONTAINER BODY",
-                "ControllingBranchId": "Delhi",
-                "VehicleOwnerId": "Bhoruka Logistics Pvt Ltd",
-                "ChasisNo": "ch810",
-                "EngineNo": "eng810"
-            },
-            {
-                "VehicleNo": "MH04AA7007",
-                "VehicleTypeId": "15 MT",
-                "VehicleCategory": "Owned",
-                "VehicleBody": "FULL BODY",
-                "ControllingBranchId": "PUNE",
-                "VehicleOwnerId": "None",
-                "ChasisNo": "ch07",
-                "EngineNo": "eng07"
-            }
+        series = [
+            {"name": "Ram", "LicenseNo": "license45726721", "LicenseIssueCityId": "THANE", "phone": "1234567890"},
+            {"name": "Raju", "LicenseNo": "license96237445", "LicenseIssueCityId": "THANE","phone": "8543216789"},
         ]
 
-        # Iterate over each location and create it
-        for i in Series:
+        for i in series:
             if self.switch_frames("btn_NewRecord"):
                 self.click_element(By.ID, "btn_NewRecord")
+                time.sleep(2)
 
-            # General Details
-            if self.switch_frames("VehicleNo"):
-                self.send_keys(By.ID, "VehicleNo", i["VehicleNo"])
-                self.select_dropdown(By.ID, "VehicleTypeId", i["VehicleTypeId"])
-                self.select_dropdown(By.ID, "VehicleCategoryId", i["VehicleCategory"])
-                self.select_dropdown(By.ID, "VehicleBodyId", i["VehicleBody"])
-                self.select_dropdown(By.ID, "CarrierCategoryId", "GOODS CARRIER")
-                self.send_keys(By.ID, "YearOfManufacturer", "2020")
-                self.select_dropdown(By.ID, "ManufactureId", "TATA MOTORS")
-                self.select_dropdown(By.ID, "VehicleModelId", "TATA - 3520")
-                self.send_keys(By.ID, "OnRoadDate", "05-03-2020")
-                self.autocomplete_select(By.ID, "ControllingBranchId-select",i["ControllingBranchId"])
-                if i["VehicleCategory"] != "Owned" and i["VehicleOwnerId"] != "None":
-                    self.autocomplete_select(By.ID, "VehicleOwnerId-select", i["VehicleOwnerId"])
-
-            #Specification Details
-                self.send_keys(By.ID, "ChasisNo", i["ChasisNo"])
-                self.send_keys(By.ID, "EngineNo", i["EngineNo"])
-                self.select_dropdown(By.ID, "FuelTypeId", "DIESEL")
-                self.send_keys(By.ID, "GrossWeight", "2000")
-                self.send_keys(By.ID, "UnLadenWeight", "1000")
+            # Driver Info
+            if self.switch_frames("DriverName"):
+                self.send_keys(By.ID, "DriverName", i["name"])
+                self.select_dropdown(By.ID, "DriverCategoryId", "PERMANENT")
+                self.send_keys(By.ID, "DOB", "27-01-1999")
+                self.send_keys(By.ID, "LicenseNo", i["LicenseNo"])
+                self.send_keys(By.ID, "LicenseIssueDate", "27-01-2017")
+                self.send_keys(By.ID, "LicenseExpDate", "31-03-2026")
+                self.autocomplete_select(By.ID, "LicenseIssueCityId-select", i["LicenseIssueCityId"])
+                self.send_keys(By.ID, "ContactNo", i["phone"])
+                self.select_dropdown(By.ID, "LicenseCategoryId", "GENERAL")
+                self.click_element(By.ID, "adddrvrimg")
+                file_input = driver.find_element(By.ID, "DriverfileUpload")
+                driver.execute_script("arguments[0].style.display = 'block';",file_input)  # Make input visible (optional)
+                file_input.send_keys(r"C:\Users\user\Pictures\MRlogic\BKP----OG\MyScmLR(rnd)\Attachments\1-63644799357510043361xcg4d1USL.png")
 
             if self.switch_frames("mysubmit"):
                 self.click_element(By.ID, "mysubmit")
-                print("Successfully submitted", i["VehicleNo"])
+                print("Successfully submitted", i["name"])
                 time.sleep(2)
-        print("All data created successfully.")
+
+        print("All customers created successfully.")
 
     @classmethod
     def tearDownClass(cls):

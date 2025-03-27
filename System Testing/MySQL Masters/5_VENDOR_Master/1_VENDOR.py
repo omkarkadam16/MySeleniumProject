@@ -98,7 +98,7 @@ class VendorMaster(unittest.TestCase):
             {"name": "IOCL FUEL PUMP", "category": "FUEL PUMP VENDOR", "pan": "AACCK5597F", "city": "NASHIK","pincode": "400001", "phone": "1234567890", "state": "MAHARASHTRA", "gst": "27AACCK5597F6ZF"},
             {"name": "SHAKTI FREIGHT CARRIERS", "category": "RTO / INSURANCE AGENT", "pan": "CIEPS7027K", "city": "GANDHIDHAM","pincode": "400001", "phone": "1234567890", "state": "GUJARAT", "gst": "24CIEPS7027K7ZH"},
             {"name": "AKIL KHAN SO HABIB KHAN", "category": "VEHICLE BROKER", "pan": "BLCPK9405R", "city": "VIJAYAWADA","pincode": "380001", "phone": "8543216789", "state": "ANDHRA PRADESH", "gst": "37BLCPK9405R6ZS"},
-            {"name": "BHAGAT SINGH", "category": "VEHICLE OWNER", "pan": "CGTPS9629G", "city": "LUDHIANA","pincode": "380001", "phone": "8543216789", "state": "PANJAB", "gst": "03CGTPS9629G9ZV"},
+            {"name": "BHAGAT SINGH", "category": "VEHICLE OWNER", "pan": "CGTPS9629G", "city": "LUDHIANA","pincode": "380001", "phone": "8543216789", "state": "PUNJAB", "gst": "03CGTPS9629G9ZV"},
             {"name": "DARSHAN SINGH", "category": "VEHICLE OWNER", "pan": "CETPS9996J", "city": "JALGAON","pincode": "380001", "phone": "8543216789", "state": "MAHARASHTRA", "gst": "27CETPS9996J6ZU"},
         ]
 
