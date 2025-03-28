@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-class RouteMaster(unittest.TestCase):
+class UserMaster(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -78,18 +78,6 @@ class RouteMaster(unittest.TestCase):
         input_text.send_keys(Keys.DOWN)
         input_text.send_keys(Keys.ENTER)
 
-    def handle_popup(self):
-        try:
-            # Wait for the popup to appear
-            popup_ok_button = self.wait.until(
-                EC.element_to_be_clickable((By.XPATH, "//div[@class='ui-dialog-buttonset']/button[text()='OK']")))
-            popup_ok_button.click()
-            print("Popup handled successfully.")
-            return True
-        except ex.TimeoutException:
-            print("Popup not found.")
-            return False
-
     def test_route(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
@@ -98,89 +86,24 @@ class RouteMaster(unittest.TestCase):
         self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
 
-        menus = ["Administration", "User Config »", "Profile Rights"]
+        menus = ["Administration", "User Config »", "User"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
-        data = [
-            {"Group": "User Config"},
-            {"Group": "Grid Config"},
-            {"Group": "Implementation"},
-            {"Group": "Link"},
-            {"Group": "Geographical Hierarchy"},
-            {"Group": "Charge Head"},
-            {"Group": "Custom Field"},
-            {"Group": "Organisational Hierarchy"},
-            {"Group": "Document Setup"},
-            {"Group": "GST Master"},
-            {"Group": "GST Configuration"},
-            {"Group": "Inventory Transaction"},
-            {"Group": "Inventory Master"},
-            {"Group": "Ledger Creation"},
-            {"Group": "Account Master"},
-            {"Group": "Bank Master"},
-            {"Group": "Finacial Post"},
-            {"Group": "Ledger Mapping"},
-            {"Group": "Operational Payment"},
-            {"Group": "Operational Receipt"},
-            {"Group": "Purchase Voucher"},
-            {"Group": "Contra"},
-            {"Group": "Sales Vouchers"},
-            {"Group": "Ledger Openings"},
-            {"Group": "Receipt Voucher"},
-            {"Group": "Payment Voucher"},
-            {"Group": "Journal Voucher"},
-            {"Group": "Fund Transfer"},
-            {"Group": "Bank Reconciliation"},
-            {"Group": "Other Transaction"},
-            {"Group": "Booking"},
-            {"Group": "Indent / Placement"},
-            {"Group": "Outward"},
-            {"Group": "Inward"},
-            {"Group": "Delivery"},
-            {"Group": "Trip Management"},
-            {"Group": "Inter Office Memo"},
-            {"Group": "Bill"},
-            {"Group": "Money Receipt"},
-            {"Group": "Contract"},
-            {"Group": "Purchase Bill"},
-            {"Group": "Track N Trace Reports"},
-            {"Group": "Transport SAC HSN Mapping"},
-            {"Group": "Common Masters"},
-            {"Group": "Party"},
-            {"Group": "Customer"},
-            {"Group": "Vendor"},
-            {"Group": "Consignor/Consignee"},
-            {"Group": "Route"},
-            {"Group": "Vehicle"},
-            {"Group": "Fuel"},
-            {"Group": "Preventive Maintainance"},
-            {"Group": "Driver"},
-            {"Group": "Tyre"},
-            {"Group": "Loan"},
-            {"Group": "Job Work"},
-            {"Group": "Tyre Movement"},
-            {"Group": "Renewals"},
-            {"Group": "Purchase"},
-        ]
+            if self.switch_frames("btn_NewRecord"):
+                self.click_element(By.ID, "btn_NewRecord")
+                time.sleep(2)
 
-        for i in data:
-            # General Details
-            if self.switch_frames("ProfileId"):
-                self.select_dropdown(By.ID, "ProfileId", "ADMINISTRATION")
-                self.select_dropdown(By.ID, "GroupId", i["Group"])
-                time.sleep(5)
-                self.click_element(By.ID, "LinkchkIsSelectAll")
-                self.click_element(By.ID, "btnLinkRightsSave")
+            if self.switch_frames("UserName"):
+                self.send_keys(By.ID, "UserName", "Omkar")
+                self.send_keys(By.ID, "UserLoginName", "Omkar")
+                self.send_keys(By.ID, "Password", "Omsgn9")
+                self.send_keys(By.ID, "ResetAfterDays", "365")
+                self.select_dropdown(By.ID, "OrganizationLocationId","Head Office")
+                self.select_dropdown(By.ID, "ProfileId", "OMKAR")
+                self.click_element(By.ID, "mysubmit")
                 time.sleep(1)
-
-                # Handle the popup
-                self.handle_popup()
-
-                print(i["Group"],"Rights saved")
-
-        print("All routes created successfully.")
-
+                print("User saved")
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()

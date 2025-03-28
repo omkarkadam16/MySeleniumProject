@@ -10,12 +10,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-class SubLedgerMaster(unittest.TestCase):
+class CustomMaster(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         cls.driver.maximize_window()
-        cls.wait = WebDriverWait(cls.driver, 10)
+        cls.wait = WebDriverWait(cls.driver, 15)
 
     def click_element(self, by, value, retry=2):
         for i in range(retry):
@@ -78,7 +78,8 @@ class SubLedgerMaster(unittest.TestCase):
         input_text.send_keys(Keys.DOWN)
         input_text.send_keys(Keys.ENTER)
 
-    def test_customer(self):
+
+    def test_custom(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
@@ -86,34 +87,34 @@ class SubLedgerMaster(unittest.TestCase):
         self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
 
-        menus = ["Finance", "Finance Master »", "Account Master »", "Account Sub Ledger"]
+        menus = ["Common", "Custom Field »", "Custom Field Set"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
-        series = [
-            {"LedgerName": "Raju", "LedgerAlias": "Raju"},
-            {"LedgerName": "Ram", "LedgerAlias": "Ram"},
+        data = [
+            {"set": "C00001","Name": "Cust Id","Value": "110"},
+            {"set": "C0002","Name": "Cust Name","Description": "Omkar"},
+            {"set": "A0001","Name": "CUST ADDRESS","Description": "MUMBAI"},
         ]
 
-        for i in series:
+        for i in data:
             if self.switch_frames("btn_NewRecord"):
                 self.click_element(By.ID, "btn_NewRecord")
-                time.sleep(2)
+            # Field Detail
+                if self.switch_frames("FieldSetName"):
+                    self.send_keys(By.ID, "FieldSetName", i["set"])
+                    self.select_dropdown(By.ID, "FieldId", i["Name"])
+                    if i["Name"] =="Cust Id":
+                        self.send_keys(By.ID, "Value", i["Value"])
+                    elif i["Name"] == "Cust Name" or i["Name"] == "CUST ADDRESS":
+                        self.send_keys(By.ID, "Description", i["Description"])
+                    self.click_element(By.ID, "btnSave-FieldSetFieldValueSession2")
 
-            # General Information
-            if self.switch_frames("LedgerName"):
-                self.send_keys(By.ID, "LedgerName", i["LedgerName"])
-                self.send_keys(By.ID, "LedgerAlias", i["LedgerAlias"])
-                self.select_dropdown(By.ID, "ControlLedgerId", "Sundry Creditors (Market)")
-                time.sleep(2)
+                    self.click_element(By.ID, "mysubmit")
+                    time.sleep(1)
+                    print(i["Name"],"Rights saved")
 
-
-            if self.switch_frames("mysubmit"):
-                self.click_element(By.ID, "mysubmit")
-                print("Successfully submitted", i["LedgerName"])
-                time.sleep(2)
-
-        print("All BankName created successfully.")
+        print("All routes created successfully.")
 
     @classmethod
     def tearDownClass(cls):
