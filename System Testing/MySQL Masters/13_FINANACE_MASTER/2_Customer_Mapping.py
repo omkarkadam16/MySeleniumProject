@@ -108,12 +108,13 @@ class SubLedgerMaster1(unittest.TestCase):
                     self.select_dropdown(By.ID, "MappingType", "General Mapping")
                     self.send_keys(By.ID, "txt_search", i["Name"])
                     self.click_element(By.ID, "btn_Seach")
-                    self.click_element(By.ID, "LedgerMappingGridSession244-1")
-                    self.autocomplete_select(By.ID, "SubLedgerLedgerMappingSession-select", i["SubLedger"])
-                    self.autocomplete_select(By.ID, "LedgerLedgerMappingSession-select", "Sundry Debtors")
+                    if self.switch_frames("LedgerMappingGridSession273-1"):
+                        self.click_element(By.ID, "LedgerMappingGridSession273-1")
+                        self.autocomplete_select(By.ID, "SubLedgerLedgerMappingSession-select", i["SubLedger"])
+                        self.autocomplete_select(By.ID, "LedgerLedgerMappingSession-select", "Sundry Debtors")
                     # Save after each selection
-                    self.click_element(By.ID, "btnSave-LedgerMappingGridSession244")
-                    time.sleep(2)
+                        self.click_element(By.ID, "btnSave-LedgerMappingGridSession273")
+                        time.sleep(2)
 
             print("All BankName created successfully.")
 
