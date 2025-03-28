@@ -11,7 +11,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-class SubLedgerMaster1(unittest.TestCase):
+class FinanceMaster(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -87,37 +87,25 @@ class SubLedgerMaster1(unittest.TestCase):
         self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
 
-        menus = ["Finance", "Ledger Mapping »", "Customer Ledger Mapping"]
+        menus = ["Finance", "Ledger Creation »", "Vehicle Ledger Creation"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
-        series = [
-            {"Name": "Adani Wilmar Pvt. LTD", "SubLedger": "Adani Wilmar Pvt. LTD"},
-            {"Name": "P M Enterprises Pvt. LTD", "SubLedger": "P M Enterprises Pvt. LTD"},
-            {"Name": "Dr. Reddys Lab Ltd", "SubLedger": "Dr. Reddys Lab Ltd"},
-            {"Name": "Bharat Earth Movers Ltd", "SubLedger": "Bharat Earth Movers Ltd"},
-        ]
-
-        for i in series:
-            if self.switch_frames("btn_NewRecord"):
-                self.click_element(By.ID, "btn_NewRecord")
-                time.sleep(2)
-
             # General Information
-                if self.switch_frames("MappingType"):
-                    self.select_dropdown(By.ID, "MappingType", "General Mapping")
-                    self.send_keys(By.ID, "txt_search", i["Name"])
-                    self.click_element(By.ID, "btn_Seach")
-                    if self.switch_frames("LedgerMappingGridSession273-1"):
-                        self.click_element(By.ID, "LedgerMappingGridSession273-1")
-                        self.autocomplete_select(By.ID, "SubLedgerLedgerMappingSession-select", i["SubLedger"])
-                        self.autocomplete_select(By.ID, "LedgerLedgerMappingSession-select", "Sundry Debtors")
-                    # Save after each selection
-                        self.click_element(By.ID, "btnSave-LedgerMappingGridSession273")
-                        time.sleep(2)
+            if self.switch_frames("MappingType"):
+                self.select_dropdown(By.ID, "MappingType", "General Mapping")
+                self.click_element(By.ID, "btn_Seach")
+                time.sleep(5)
 
-            print("All BankName created successfully.")
+                if self.switch_frames("chkIsSelectAll"):
+                    self.click_element(By.ID, "chkIsSelectAll")
+                    time.sleep(2)
 
+                if self.switch_frames("LedgerTypeId"):
+                    self.select_dropdown(By.ID, "LedgerTypeId", "Sub Ledger")
+                    self.select_dropdown(By.ID, "ControlLedgerId", "Sundry Creditors (Owned)")
+                    self.click_element(By.ID, "btnCreateLedger")
+                    time.sleep(2)
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()

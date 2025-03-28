@@ -5,12 +5,13 @@ from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-class SubLedgerMaster(unittest.TestCase):
+class FinanceMaster(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -86,42 +87,25 @@ class SubLedgerMaster(unittest.TestCase):
         self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
 
-        menus = ["Finance", "Finance Master »", "Account Master »", "Account Sub Ledger"]
+        menus = ["Finance", "Ledger Creation »", "Location Ledger Creation"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
-        series = [
-            {"LedgerName": "BHORUKA LOGISTICS PVT LTD", "LedgerAlias": "BHORUKA LOGISTICS PVT LTD"},
-            {"LedgerName": "BAJAJ CORPORATION PVT LTD", "LedgerAlias": "BAJAJ CORPORATION PVT LTD"},
-            {"LedgerName": "INTER INDIA ROADWAYS LTD", "LedgerAlias": "INTER INDIA ROADWAYS LTD"},
-            {"LedgerName": "VIJAY ENTERPRISES", "LedgerAlias": "VIJAY ENTERPRISES"},
-            {"LedgerName": "SHAKTI FREIGHT CARRIERS", "LedgerAlias": "SHAKTI FREIGHT CARRIERS"},
-            {"LedgerName": "AKIL KHAN SO HABIB KHAN", "LedgerAlias": "AKIL KHAN SO HABIB KHAN"},
-            {"LedgerName": "BHAGAT SINGH", "LedgerAlias": "BHAGAT SINGH"},
-            {"LedgerName": "DARSHAN SINGH", "LedgerAlias": "DARSHAN SINGH"},
-            {"LedgerName": "IOCL FUEL PUMP", "LedgerAlias": "IOCL FUEL PUMP"},
-        ]
-
-        for i in series:
-            if self.switch_frames("btn_NewRecord"):
-                self.click_element(By.ID, "btn_NewRecord")
-                time.sleep(2)
-
             # General Information
-            if self.switch_frames("LedgerName"):
-                self.send_keys(By.ID, "LedgerName", i["LedgerName"])
-                self.send_keys(By.ID, "LedgerAlias", i["LedgerAlias"])
-                self.select_dropdown(By.ID, "ControlLedgerId", "Sundry Creditors (Market)")
-                time.sleep(2)
+            if self.switch_frames("MappingType"):
+                self.select_dropdown(By.ID, "MappingType", "General Mapping")
+                self.click_element(By.ID, "btn_Seach")
+                time.sleep(5)
 
+                if self.switch_frames("chkIsSelectAll"):
+                    self.click_element(By.ID, "chkIsSelectAll")
+                    time.sleep(2)
 
-            if self.switch_frames("mysubmit"):
-                self.click_element(By.ID, "mysubmit")
-                print("Successfully submitted", i["LedgerName"])
-                time.sleep(2)
-
-        print("All BankName created successfully.")
-
+                if self.switch_frames("LedgerTypeId"):
+                    self.select_dropdown(By.ID, "LedgerTypeId", "General Ledger")
+                    self.select_dropdown(By.ID, "AccountGroupId", "Branch And Division")
+                    self.click_element(By.ID, "btnCreateLedger")
+                    time.sleep(2)
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()

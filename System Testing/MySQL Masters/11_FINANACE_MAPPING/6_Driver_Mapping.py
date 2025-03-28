@@ -5,12 +5,13 @@ from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-class LedgerMaster1(unittest.TestCase):
+class FinanceMaster(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -86,41 +87,25 @@ class LedgerMaster1(unittest.TestCase):
         self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
 
-        menus = ["Finance", "Finance Master »", "Account Master »", "Account Ledger"]
+        menus = ["Finance", "Ledger Creation »", "Driver Ledger Creation"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
-        series = [
-            {"LedgerName": "MUMBAI", "LedgerAlias": "MUM"},
-            {"LedgerName": "BHIWANDI", "LedgerAlias": "BWD"},
-            {"LedgerName": "PUNE", "LedgerAlias": "PUN"},
-            {"LedgerName": "JAIPUR", "LedgerAlias": "JPR"},
-            {"LedgerName": "AHMEDABAD", "LedgerAlias": "AHM"},
-            {"LedgerName": "HYDERABAD", "LedgerAlias": "HYD"},
-            {"LedgerName": "DELHI", "LedgerAlias": "DEL"},
-        ]
-
-        for i in series:
-            if self.switch_frames("btn_NewRecord"):
-                self.click_element(By.ID, "btn_NewRecord")
-                time.sleep(2)
-
             # General Information
-            if self.switch_frames("LedgerName"):
-                self.send_keys(By.ID, "LedgerName", i["LedgerName"])
-                self.send_keys(By.ID, "LedgerAlias", i["LedgerAlias"])
-                self.select_dropdown(By.ID, "LedgerTypeId", "General Ledger")
-                self.select_dropdown(By.ID, "AccountGroupId", "Branch And Division")
-                time.sleep(2)
+            if self.switch_frames("MappingType"):
+                self.select_dropdown(By.ID, "MappingType", "General Mapping")
+                self.click_element(By.ID, "btn_Seach")
+                time.sleep(5)
 
+                if self.switch_frames("chkIsSelectAll"):
+                    self.click_element(By.ID, "chkIsSelectAll")
+                    time.sleep(2)
 
-            if self.switch_frames("mysubmit"):
-                self.click_element(By.ID, "mysubmit")
-                print("Successfully submitted", i["LedgerName"])
-                time.sleep(2)
-
-        print("All BankName created successfully.")
-
+                if self.switch_frames("LedgerTypeId"):
+                    self.select_dropdown(By.ID, "LedgerTypeId", "Sub Ledger")
+                    self.select_dropdown(By.ID, "ControlLedgerId", "Sundry Creditors (Market)")
+                    self.click_element(By.ID, "btnCreateLedger")
+                    time.sleep(2)
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
