@@ -176,3 +176,16 @@ class SeleniumHelper:
                     if not product_names:  # Exit function if all products are selected
                         return
 
+    def handle_popup(self, button_text="OK"):
+        try:
+            # Wait for the popup button with the given text
+            popup_ok_button = self.wait.until(EC.element_to_be_clickable(
+                (By.XPATH, f"//div[contains(@class, 'ui-dialog')]//button[text()='{button_text}']")
+            ))
+            popup_ok_button.click()
+            print(f"Popup with button '{button_text}' handled successfully.")
+            return True
+        except ex.TimeoutException:
+            print(f"Popup with button '{button_text}' not found.")
+            return False
+

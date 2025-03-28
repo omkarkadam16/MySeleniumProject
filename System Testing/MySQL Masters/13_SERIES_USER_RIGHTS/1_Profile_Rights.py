@@ -78,6 +78,18 @@ class RouteMaster(unittest.TestCase):
         input_text.send_keys(Keys.DOWN)
         input_text.send_keys(Keys.ENTER)
 
+    def handle_popup(self):
+        try:
+            # Wait for the popup to appear
+            popup_ok_button = self.wait.until(
+                EC.element_to_be_clickable((By.XPATH, "//div[@class='ui-dialog-buttonset']/button[text()='OK']")))
+            popup_ok_button.click()
+            print("Popup handled successfully.")
+            return True
+        except ex.TimeoutException:
+            print("Popup not found.")
+            return False
+
     def test_route(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
@@ -86,7 +98,7 @@ class RouteMaster(unittest.TestCase):
         self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
 
-        menus = ["Transportation", "Transportation Master »", "Route »", "Route - General"]
+        menus = ["Administration", "User Config »", "Profile Rights"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
@@ -155,12 +167,16 @@ class RouteMaster(unittest.TestCase):
         for i in data:
             # General Details
             if self.switch_frames("ProfileId"):
-                self.send_keys(By.ID, "ProfileId", "ADMINISTRATION")
+                self.select_dropdown(By.ID, "ProfileId", "ADMINISTRATION")
                 self.select_dropdown(By.ID, "GroupId", i["Group"])
                 time.sleep(5)
                 self.click_element(By.ID, "LinkchkIsSelectAll")
                 self.click_element(By.ID, "btnLinkRightsSave")
                 time.sleep(1)
+
+                # Handle the popup
+                self.handle_popup()
+
                 print(i["Group"],"Rights saved")
 
         print("All routes created successfully.")
