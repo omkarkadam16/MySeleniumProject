@@ -93,22 +93,19 @@ class CustomMaster(unittest.TestCase):
 
         data = [
             {"Location": "DELHI","Back": "02"},
-            {"Location": "HYDERABAD","Back": "05"},
+            {"Location": "HYDERABAD","Back": "03"},
         ]
 
         for i in data:
             # Document Process
                 if self.switch_frames("ProcessId"):
-                    self.select_dropdown(By.ID, "ProcessId", "Booking")
+                    self.select_dropdown(By.ID, "ProcessId", "BILL")
                     self.autocomplete_select(By.ID, "OrganizationLocationId-select", i["Location"])
                     self.send_keys(By.ID, "BackDays", i["Back"])
                     self.click_element(By.ID, "btnSave-DocumentDateConfigSession")
-                    self.autocomplete_select(By.ID, "OrganizationLocationId-select", i["Location"])
-                    self.send_keys(By.ID, "BackDays", i["Back"])
-                    self.click_element(By.ID, "btnSave-DocumentDateConfigSession")
-                    self.click_element(By.ID, "mysubmit")
-                    time.sleep(1)
-                    print("Document Days Booking Process saved")
+        self.click_element(By.ID, "mysubmit")
+        time.sleep(1)
+        print("Document Days BILL Process saved")
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()

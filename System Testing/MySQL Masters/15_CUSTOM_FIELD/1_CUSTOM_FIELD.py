@@ -77,8 +77,8 @@ class CustomMaster(unittest.TestCase):
             self.click_element(By.LINK_TEXT, link_test)
 
         data = [
-            #{"Code": "C00001","Input": "NUMBER","Name": "Cust Id"},
-            #{"Code": "C0002","Input": "TEXT","Name": "Cust Name"},
+            {"Code": "C00001","Input": "NUMBER","Name": "Cust Id"},
+            {"Code": "C0002","Input": "TEXT","Name": "Cust Name"},
             {"Code": "A0001","Input": "TEXT","Name": "CUST ADDRESS"},
         ]
 
