@@ -87,25 +87,26 @@ class CustomMaster(unittest.TestCase):
         self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
 
-        menus = ["Common", "Document Setup »", "Document Days Process"]
+        menus = ["Common", "Document Setup »", "Document Date Process"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
         data = [
-            {"Location": "DELHI","Back": "02"},
-            {"Location": "HYDERABAD","Back": "05"},
+            {"Location": "AHMEDABAD"},
+            {"Location": "DELHI"},
         ]
 
         for i in data:
             # Document Process
                 if self.switch_frames("ProcessId"):
-                    self.select_dropdown(By.ID, "ProcessId", "Booking")
+                    self.select_dropdown(By.ID, "ProcessId", "BILL")
                     self.autocomplete_select(By.ID, "OrganizationLocationId-select", i["Location"])
-                    self.send_keys(By.ID, "BackDays", i["Back"])
+                    self.send_keys(By.ID, "FromDate", "01-10-2018")
+                    self.send_keys(By.ID, "ToDate", "31-10-2025")
                     self.click_element(By.ID, "btnSave-DocumentDateConfigSession")
                     time.sleep(1)
         self.click_element(By.ID, "mysubmit")
-        print("Document Days Booking Process saved")
+        print("Document Date BILL Process saved")
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
