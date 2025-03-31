@@ -11,7 +11,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-class FinanceMaster(unittest.TestCase):
+class CustomerMapping(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -79,7 +79,7 @@ class FinanceMaster(unittest.TestCase):
         input_text.send_keys(Keys.DOWN)
         input_text.send_keys(Keys.ENTER)
 
-    def test_customer(self):
+    def test_Customer_Mapping(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
@@ -106,6 +106,8 @@ class FinanceMaster(unittest.TestCase):
                     self.select_dropdown(By.ID, "ControlLedgerId", "Sundry Debtors")
                     self.click_element(By.ID, "btnCreateLedger")
                     time.sleep(2)
+
+
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()

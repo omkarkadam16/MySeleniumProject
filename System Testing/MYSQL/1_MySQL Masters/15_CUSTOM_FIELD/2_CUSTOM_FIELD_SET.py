@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-class CustomMaster(unittest.TestCase):
+class CustomFieldSet(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -79,7 +79,7 @@ class CustomMaster(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
 
 
-    def test_custom(self):
+    def test_custom_set(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 

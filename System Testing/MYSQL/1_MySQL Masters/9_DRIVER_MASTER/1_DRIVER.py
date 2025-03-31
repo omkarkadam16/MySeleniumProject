@@ -78,7 +78,7 @@ class DriverMaster(unittest.TestCase):
         input_text.send_keys(Keys.DOWN)
         input_text.send_keys(Keys.ENTER)
 
-    def test_customer(self):
+    def test_driver(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
@@ -118,7 +118,7 @@ class DriverMaster(unittest.TestCase):
                 print("Successfully submitted", i["name"])
                 time.sleep(2)
 
-        print("All customers created successfully.")
+        print("All Drivers created successfully.")
 
     @classmethod
     def tearDownClass(cls):

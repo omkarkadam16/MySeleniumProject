@@ -78,7 +78,7 @@ class BankMaster(unittest.TestCase):
         input_text.send_keys(Keys.DOWN)
         input_text.send_keys(Keys.ENTER)
 
-    def test_customer(self):
+    def test_Bank(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
@@ -119,7 +119,7 @@ class BankMaster(unittest.TestCase):
                 print("Successfully submitted", i["BankName"])
                 time.sleep(2)
 
-        print("All customers created successfully.")
+        print("All Banks created successfully.")
 
     @classmethod
     def tearDownClass(cls):
