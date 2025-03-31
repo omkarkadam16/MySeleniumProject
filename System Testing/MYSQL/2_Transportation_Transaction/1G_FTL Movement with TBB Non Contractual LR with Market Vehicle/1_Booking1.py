@@ -86,11 +86,11 @@ class Booking(unittest.TestCase):
 
     def test_booking(self):
         driver = self.driver
-        driver.get("http://192.168.0.72/Rlogic9RLS/")
+        driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
         print("Logging in...")
-        self.send_keys(By.ID, "Login", "Riddhi")
-        self.send_keys(By.ID, "Password", "omsgn9")
+        self.send_keys(By.ID, "Login", "admin")
+        self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
@@ -127,15 +127,11 @@ class Booking(unittest.TestCase):
     #Route Details
         self.autocomplete_select(By.ID, "FromServiceNetworkId-select", "AHMEDABAD")
         self.autocomplete_select(By.ID, "ToServiceNetworkId-select", "PUNE")
-        self.click_element(By.XPATH,"(//img[@title='...'])[3]")
-        self.select_dropdown(By.XPATH, "(//select[@class='ui-datepicker-month'])[1]", "Jun")
-        self.select_dropdown(By.XPATH, "(//select[@class='ui-datepicker-year'])[1]", "2024")
-        self.click_element(By.XPATH, "(//a[normalize-space()='4'])[1]") #//a[normalize-space()= 1 or 2 change date
         self.autocomplete_select(By.ID, "VehicleId-select", "MHO4ER9009")
 
     #Consignor/Consignee Details(selectedtext="P M Enterprises Pvt. LTD")
-        self.autocomplete_select(By.ID, "ConsignorId-select", "P M Enterprises Pvt. LTD")
-        self.autocomplete_select(By.ID, "ConsigneeId-select", "Adani Wilmar Pvt. LTD")
+        self.autocomplete_select(By.ID, "ConsignorId-select", "P M Enterprise")
+        self.autocomplete_select(By.ID, "ConsigneeId-select", "Adani Wilmar")
         self.select_dropdown(By.ID, "BillingOnId", "Consignor")
 
     #Item Details
@@ -156,16 +152,7 @@ class Booking(unittest.TestCase):
 
     #Submit Details
         self.click_element(By.ID, "mysubmit")
-        time.sleep(2)
-
-
-        if self.switch_frames("btn_Seach"):
-            self.click_element(By.ID, "btn_Seach")
-
-
-
-
-
+        time.sleep(5)
 
     @classmethod
     def tearDownClass(cls):

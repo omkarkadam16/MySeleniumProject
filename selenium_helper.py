@@ -36,7 +36,7 @@ class SeleniumHelper:
             print(f"Element not found: {value}")
             return False
 
-    def dropdown_select(self, by, value, text):
+    def select_dropdown(self, by, value, text):
         try:
             e = self.wait.until(EC.element_to_be_clickable((by, value)))
             e.is_enabled()
