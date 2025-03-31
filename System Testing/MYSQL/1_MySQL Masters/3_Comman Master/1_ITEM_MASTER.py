@@ -10,7 +10,7 @@ import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class DocumentPrint(unittest.TestCase):
+class ItemMaster(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -72,7 +72,7 @@ class DocumentPrint(unittest.TestCase):
             return False
 
 
-    def test_Masters(self):
+    def test_items(self):
         driver=self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 

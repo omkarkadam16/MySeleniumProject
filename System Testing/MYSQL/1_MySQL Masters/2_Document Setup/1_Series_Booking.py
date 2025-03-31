@@ -87,7 +87,7 @@ class SeriesBook(unittest.TestCase):
         print("Selected autocomplete option using keyboard:", text)
 
 
-    def test_Masters(self):
+    def test_SeriesBook(self):
         driver=self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 

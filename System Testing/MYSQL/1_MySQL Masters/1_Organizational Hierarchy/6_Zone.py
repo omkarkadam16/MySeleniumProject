@@ -59,7 +59,7 @@ class Zones(unittest.TestCase):
             return False
 
 
-    def test_Masters(self):
+    def test_Zones(self):
         driver=self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 

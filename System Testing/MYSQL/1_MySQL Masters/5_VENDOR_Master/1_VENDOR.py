@@ -78,7 +78,7 @@ class VendorMaster(unittest.TestCase):
         input_text.send_keys(Keys.DOWN)
         input_text.send_keys(Keys.ENTER)
 
-    def test_customer(self):
+    def test_vendor(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
@@ -90,7 +90,7 @@ class VendorMaster(unittest.TestCase):
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
-        customers = [
+        Vendor = [
             {"name": "BHORUKA LOGISTICS PVT LTD", "category": "VEHICLE OWNER", "pan": "DDCCK5575Y", "city": "Delhi", "pincode": "400001", "phone": "1234567890","state": "DELHI","gst": "07DDCCK5575YPZD"},
             {"name": "BAJAJ CORPORATION PVT LTD", "category": "VEHICLE OWNER", "pan": "DDCCK5575P", "city": "Delhi", "pincode": "400001", "phone": "1234567890","state": "DELHI","gst": "07DDCCK5575PUZD"},
             {"name": "INTER INDIA ROADWAYS LTD", "category": "VEHICLE OWNER", "pan": "AACCK5599U", "city": "THANE", "pincode": "380001", "phone": "8543216789","state": "MAHARASHTRA","gst": "27AACCK5599UPZH"},
@@ -102,7 +102,7 @@ class VendorMaster(unittest.TestCase):
             {"name": "DARSHAN SINGH", "category": "VEHICLE OWNER", "pan": "CETPS9996J", "city": "JALGAON","pincode": "380001", "phone": "8543216789", "state": "MAHARASHTRA", "gst": "27CETPS9996J6ZU"},
         ]
 
-        for i in customers:
+        for i in Vendor:
             if self.switch_frames("btn_NewRecord"):
                 self.click_element(By.ID, "btn_NewRecord")
                 time.sleep(2)
@@ -167,7 +167,7 @@ class VendorMaster(unittest.TestCase):
                 print("Successfully submitted", i["name"])
                 time.sleep(2)
 
-        print("All customers created successfully.")
+        print("All Vendors created successfully.")
 
     @classmethod
     def tearDownClass(cls):

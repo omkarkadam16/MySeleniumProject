@@ -58,7 +58,7 @@ class Department(unittest.TestCase):
             print(f"Element not found: {value}")
             return False
 
-    def test_Division(self):
+    def test_Department(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 

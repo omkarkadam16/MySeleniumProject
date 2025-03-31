@@ -11,7 +11,7 @@ import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class SeriesBook(unittest.TestCase):
+class SeriesLHC(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -89,7 +89,7 @@ class SeriesBook(unittest.TestCase):
         print("Selected autocomplete option using keyboard:", text)
 
 
-    def test_Masters(self):
+    def test_SeriesLHC(self):
         driver=self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 

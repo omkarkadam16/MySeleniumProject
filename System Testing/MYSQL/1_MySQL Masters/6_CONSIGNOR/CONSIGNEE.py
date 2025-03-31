@@ -78,7 +78,7 @@ class ConsignorMaster(unittest.TestCase):
         input_text.send_keys(Keys.DOWN)
         input_text.send_keys(Keys.ENTER)
 
-    def test_customer(self):
+    def test_ConsignorMaster(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
@@ -90,41 +90,41 @@ class ConsignorMaster(unittest.TestCase):
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
-        customers = [
+        Consignor = [
             {"name": "Prasad Industries Ltd", "pan": "AACCK5567Y", "city": "MUMBAI", "pincode": "400001", "phone": "1234567890","state": "MAHARASHTRA","gst": "27AACCK5567YTZM"},
             {"name": "Food Corp", "pan": "AACCK5534G", "city": "MUMBAI", "pincode": "411001", "phone": "9876543210","state": "MAHARASHTRA","gst": "27AACCK5534GTZC"},
             {"name": "Kirloskar Pumps Ltd", "pan": "AACCK5578H", "city": "MUMBAI", "pincode": "380001", "phone": "8543216789","state": "MAHARASHTRA","gst": "27AACCK5578HTZF"},
             {"name": "Ganesh Metal Works", "pan": "AACCK5598S", "city": "Pune", "pincode": "380001","phone": "8543216789", "state": "MAHARASHTRA", "gst": "27AACCK5598STZV"},
         ]
 
-        for customer in customers:
+        for i in Consignor:
             if self.switch_frames("btn_NewRecord"):
                 self.click_element(By.ID, "btn_NewRecord")
                 time.sleep(2)
 
             # Basic Information
             if self.switch_frames("Party_PartyName"):
-                self.send_keys(By.ID, "Party_PartyName", customer["name"])
+                self.send_keys(By.ID, "Party_PartyName", i["name"])
                 self.select_dropdown(By.ID, "Party_PartyIndustryTypeId", "GENERAL")
                 self.select_dropdown(By.ID, "Party_ClassificationId", "Normal")
             if self.switch_frames("EffectiveFromDate"):
                 self.send_keys(By.ID, "EffectiveFromDate", "27-01-2025")
-                self.send_keys(By.ID, "PANNo", customer["pan"])
+                self.send_keys(By.ID, "PANNo", i["pan"])
 
             # Address Details
             if self.switch_frames("AddressTypeId"):
                 self.select_dropdown(By.ID, "AddressTypeId", "Office")
                 self.send_keys(By.ID, "AddressLine", "123 Main St")
-                self.autocomplete_select(By.ID, "CityId-select", customer["city"])
-                self.send_keys(By.ID, "PinCode", customer["pincode"])
-                self.send_keys(By.ID, "ContactNo", customer["phone"])
+                self.autocomplete_select(By.ID, "CityId-select", i["city"])
+                self.send_keys(By.ID, "PinCode", i["pincode"])
+                self.send_keys(By.ID, "ContactNo", i["phone"])
                 self.send_keys(By.ID, "Mob", "5564567890")
                 self.click_element(By.ID, "btnSave-AddressSession748")
 
             # Registation Number Details
             if self.switch_frames("RegistrationHeadId"):
                 self.select_dropdown(By.ID, "RegistrationHeadId", "PAN No.")
-                self.send_keys(By.ID, "Number", customer["pan"])
+                self.send_keys(By.ID, "Number", i["pan"])
                 self.click_element(By.ID, "btnSave-RegistrationSession748")
 
             driver.execute_script("window.scrollTo(0, 0);")
@@ -134,17 +134,17 @@ class ConsignorMaster(unittest.TestCase):
 
             # GST Registration
             if self.switch_frames("StateId"):
-                self.select_dropdown(By.ID, "StateId", customer["state"])
+                self.select_dropdown(By.ID, "StateId", i["state"])
                 self.select_dropdown(By.ID, "BusinessVerticalId", "TRANSPORTATION")
-                self.send_keys(By.ID, "GSTNumber", customer["gst"])
+                self.send_keys(By.ID, "GSTNumber", i["gst"])
                 self.click_element(By.ID, "btnSave-CustGSTRegistrationSession748")
 
             if self.switch_frames("mysubmit"):
                 self.click_element(By.ID, "mysubmit")
-                print("Successfully submitted", customer["name"])
+                print("Successfully submitted", i["name"])
                 time.sleep(2)
 
-        print("All customers created successfully.")
+        print("All Consignor / Consignee created successfully.")
 
     @classmethod
     def tearDownClass(cls):
