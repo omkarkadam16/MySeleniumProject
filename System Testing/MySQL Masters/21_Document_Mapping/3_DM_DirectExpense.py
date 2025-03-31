@@ -96,22 +96,44 @@ class DocumentMapping(unittest.TestCase):
                 self.click_element(By.ID, "dd 4")
                 self.click_element(By.PARTIAL_LINK_TEXT, "Edit")
                 time.sleep(2)
-            # Finance Rule
+            # Finance Rule BILL
                 if self.switch_frames("Sign"):
                     self.select_dropdown(By.ID, "Sign", "Cr")
-                    self.select_dropdown(By.ID, "ProcessId", "Vehicle LCC")
-                    self.autocomplete_select(By.ID, "LedgerId-select", "Sundry Creditors (Market)")
-                    #time.sleep(2)
-                    self.click_element(By.ID, "ProcessId")
+                    self.select_dropdown(By.ID, "ProcessId", "BILL")
+                    self.autocomplete_select(By.ID, "AccountGroupId-select", "Direct Expense")
                     self.click_element(By.ID, "btnSave-FinanceRuleConfigSession")
                     time.sleep(2)
                     self.select_dropdown(By.ID, "Sign", "Dr")
-                    self.select_dropdown(By.ID, "ProcessId", "Vehicle LCC")
-                    self.autocomplete_select(By.ID, "LedgerId-select", "Sundry Creditors (Market)")
-                    #time.sleep(2)
-                    self.click_element(By.ID, "ProcessId")
+                    self.select_dropdown(By.ID, "ProcessId", "BILL")
+                    self.autocomplete_select(By.ID, "AccountGroupId-select", "Direct Expense")
                     self.click_element(By.ID, "btnSave-FinanceRuleConfigSession")
-                    print("Finance Rule saved")
+                    print("Finance Rule BILL saved")
+
+            # Finance Rule Fund Transfer
+                if self.switch_frames("Sign"):
+                    self.select_dropdown(By.ID, "Sign", "Cr")
+                    self.select_dropdown(By.ID, "ProcessId", "Fund Transfer")
+                    self.autocomplete_select(By.ID, "AccountGroupId-select", "Direct Expense")
+                    self.click_element(By.ID, "btnSave-FinanceRuleConfigSession")
+                    time.sleep(2)
+                    self.select_dropdown(By.ID, "Sign", "Dr")
+                    self.select_dropdown(By.ID, "ProcessId", "Fund Transfer")
+                    self.autocomplete_select(By.ID, "AccountGroupId-select", "Direct Expense")
+                    self.click_element(By.ID, "btnSave-FinanceRuleConfigSession")
+                    print("Finance Rule Fund Transfer saved")
+
+                # Finance Rule Payment Voucher
+                if self.switch_frames("Sign"):
+                    self.select_dropdown(By.ID, "Sign", "Cr")
+                    self.select_dropdown(By.ID, "ProcessId", "Payment Voucher")
+                    self.autocomplete_select(By.ID, "AccountGroupId-select", "Direct Expense")
+                    self.click_element(By.ID, "btnSave-FinanceRuleConfigSession")
+                    time.sleep(2)
+                    self.select_dropdown(By.ID, "Sign", "Dr")
+                    self.select_dropdown(By.ID, "ProcessId", "Payment Voucher")
+                    self.autocomplete_select(By.ID, "AccountGroupId-select", "Direct Expense")
+                    self.click_element(By.ID, "btnSave-FinanceRuleConfigSession")
+                    print("Finance Rule Payment Voucher saved")
 
     @classmethod
     def tearDownClass(cls):
