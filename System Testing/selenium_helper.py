@@ -38,7 +38,7 @@ class SeleniumHelper:
         else:
             raise Exception(f"Element located by ({by}, {value}) is not enabled.")
 
-    def dropdown_select(self, by, value, text):
+    def select_dropdown(self, by, value, text):
         try:
             e = self.wait.until(EC.element_to_be_clickable((by, value)))
             e.is_enabled()
