@@ -107,6 +107,12 @@ class BankMaster(unittest.TestCase):
                 self.select_dropdown(By.ID, "AddressTypeId", "Office")
                 self.send_keys(By.ID, "AddressLine", "123 Main St")
                 self.autocomplete_select(By.ID, "CityId-select", i["City"])
+
+                # Generate Branch Name as combination of Bank Name and City
+                branch_name = f"{i['BankName']},{i['City'].title()}"
+                # Send keys for Branch Name
+                self.send_keys(By.ID, "BranchName", branch_name)
+
                 self.send_keys(By.ID, "PinCode", "123456")
                 self.send_keys(By.ID, "ContactNo", "8543216789")
                 self.send_keys(By.ID, "Mob", "9543216789")
