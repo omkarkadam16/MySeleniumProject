@@ -33,18 +33,30 @@ class LHC(unittest.TestCase):
         except:
             return False
 
-    def send_keys(self, by, locator, text):
+    def send_keys_alert(self, by, locator, text):
         """Handles alerts before and after sending keys."""
         try:
             element = self.wait.until(EC.visibility_of_element_located((by, locator)))
             element.clear()
             element.send_keys(text)
             print(f"[SUCCESS] Sent keys: {text} to element: {locator}")
-            time.sleep(1)  # Give time for alert to appear
-            self.handle_alert()  # Handle the alert after sending keys
+            time.sleep(1)  # Allow time for alert to appear
+            self.handle_alert()  # Automatically handle any alert
         except ex.UnexpectedAlertPresentException:
             print(f"[ERROR] Unexpected alert detected after sending keys: {text}")
             self.handle_alert()
+
+    def send_keys(self, by, value, text):
+        try:
+            element = self.wait.until(EC.visibility_of_element_located((by, value)))
+            element.is_enabled()
+            element.clear()
+            element.send_keys(text)
+            print("Sent keys", text)
+            return True
+        except ex.NoSuchElementException:
+            print(f"Element not found: {value}")
+            return False
 
     def handle_alert(self):
         """Handles unexpected alerts if present."""
@@ -154,9 +166,8 @@ class LHC(unittest.TestCase):
         #Hire Charges Details
         self.select_dropdown(By.ID, "FreightUnitId","Fixed")
         time.sleep(2)
-        self.send_keys(By.ID, "FreightRate", "15000")
+        self.send_keys_alert(By.ID, "FreightRate", "15000")
         time.sleep(1)
-        self.handle_alert()
 
         #Advance Payable Details
         self.auto_select(By.ID, "OrganizationalLocationId-select","AHMEDABAD")
