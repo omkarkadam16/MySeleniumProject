@@ -105,12 +105,12 @@ class Booking(unittest.TestCase):
         for i in ("Fleet",
                   "Fleet Master »",
                   "Vehicle »",
-                  "Crane",):
+                  "Trolly",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
         # Read Excel data
-        df = pd.read_excel("test.xlsx", engine="openpyxl")
+        df = pd.read_excel("test1.xlsx", engine="openpyxl")
 
         for index, row in df.iterrows():
             try:
@@ -122,10 +122,11 @@ class Booking(unittest.TestCase):
                 #General Details
                 if self.switch_frames("VehicleNo"):
                     self.send_keys(By.ID, "VehicleNo", row["Vehicle_No"])
-                    self.select_dropdown(By.ID, "VehicleTypeId",row["Vehicle_Type"])
+                    if pd.notna(row["Vehicle_Type"]):
+                        self.select_dropdown(By.ID, "VehicleTypeId",row["Vehicle_Type"])
                     self.select_dropdown(By.ID, "VehicleCategoryId", row["Vehicle_Category"])
                     self.select_dropdown(By.ID, "VehicleBodyId", row["Vehicle_Body"])
-                    #self.select_dropdown(By.ID, "CarrierCategoryId", "VehicleNo")
+                    #self.select_dropdown(By.ID, "CarrierCategoryId", "CarrierCategoryId")
                     self.send_keys(By.ID, "YearOfManufacturer", row["Year_Of_Manufacture"])
                     self.select_dropdown(By.ID, "ManufactureId", row["Manufacturer"])
                     self.select_dropdown(By.ID, "VehicleModelId", row["Vehicle_Model"])
@@ -136,11 +137,10 @@ class Booking(unittest.TestCase):
                     if pd.notna(row["Engine_No"]):
                         self.send_keys(By.ID, "EngineNo", row["Engine_No"])
                     self.send_keys(By.ID, "TrolleyChasisNo", row["Trolly_Chasis_No"])
-                    #self.select_dropdown(By.ID, "FuelTypeId", row["VehicleNo"])
+                    #self.select_dropdown(By.ID, "FuelTypeId", row["FuelTypeId"])
                     self.send_keys(By.ID, "GrossWeight", row["Gross_Wt"])
                     self.send_keys(By.ID, "Length", row["Length"])
-                    self.send_keys(By.ID, "Breadth", row["Width"])#Width
-
+                    self.send_keys(By.ID, "Breadth", row["Width"]) #Width
                     self.send_keys(By.ID, "FuelTankCapacity", row["Fuel_Tank_Capacity"])
                     self.send_keys(By.ID, "UnLadenWeight", row["Unladen_Wt"])
                     self.send_keys(By.ID, "WheelBase", row["Wheel_Base"])
@@ -152,7 +152,7 @@ class Booking(unittest.TestCase):
                 time.sleep(2)
 
             except Exception as e:
-                print(f"Failed to process UID {row['Vehicle_No']}: {str(e)}")
+                print(f"Failed to process Vehicle_No {row['Vehicle_No']}: {str(e)}")
 
     @classmethod
     def tearDownClass(cls):
