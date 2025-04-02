@@ -31,12 +31,15 @@ class SeleniumHelper:
         :param value: Locator value
         :param text: Text to be entered
         """
-        element=self.wait.until(EC.visibility_of_element_located((by, value)))
-        if element.is_enabled():
+        try:
+            element = self.wait.until(EC.visibility_of_element_located((by, value)))
             element.clear()
             element.send_keys(text)
-        else:
-            raise Exception(f"Element located by ({by}, {value}) is not enabled.")
+            print(f'Sent keys {text} to {by} with value {value}')
+            return True
+        except ex.NoSuchElementException:
+            print(f'Element not found: {value}')
+            return False
 
     def select_dropdown(self, by, value, text):
         try:

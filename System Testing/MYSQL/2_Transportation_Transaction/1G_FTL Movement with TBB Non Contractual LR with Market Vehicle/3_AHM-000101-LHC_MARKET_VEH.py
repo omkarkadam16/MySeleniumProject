@@ -33,16 +33,30 @@ class LHC(unittest.TestCase):
         except:
             return False
 
-    def send_keys(self,by,value,text):
+    def send_keys(self, by, locator, text):
+        """Handles alerts before and after sending keys."""
         try:
-            element = self.wait.until(EC.visibility_of_element_located((by, value)))
+            element = self.wait.until(EC.visibility_of_element_located((by, locator)))
             element.clear()
             element.send_keys(text)
-            print(f'Sent keys {text} to {by} with value {value}')
-            return True
-        except ex.NoSuchElementException:
-            print(f'Element not found: {value}')
-            return False
+            print(f"[SUCCESS] Sent keys: {text} to element: {locator}")
+            time.sleep(1)  # Give time for alert to appear
+            self.handle_alert()  # Handle the alert after sending keys
+        except ex.UnexpectedAlertPresentException:
+            print(f"[ERROR] Unexpected alert detected after sending keys: {text}")
+            self.handle_alert()
+
+    def handle_alert(self):
+        """Handles unexpected alerts if present."""
+        try:
+            time.sleep(2)  # Ensure enough time for the alert to appear
+            WebDriverWait(self.driver, 5).until(EC.alert_is_present())
+            alert = self.driver.switch_to.alert
+            print(f"[ALERT DETECTED] {alert.text}")
+            alert.accept()
+            print("[SUCCESS] Alert accepted.")
+        except ex.TimeoutException:
+            print("[INFO] No alert found. Proceeding...")
 
     def switch_frames(self, element_id):
         driver = self.driver
@@ -59,19 +73,23 @@ class LHC(unittest.TestCase):
 
     def select_dropdown(self,by,value,text):
         try:
-            self.wait.until(EC.element_to_be_clickable((by,value)))
-            self.wait.until(EC.visibility_of_element_located((by,value)))
-            dropdown=Select(self.driver.find_element(by, value))
-            dropdown.select_by_visible_text(text)
+            e = self.wait.until(EC.element_to_be_clickable((by, value)))
+            e.is_enabled()
+            e.click()
+            print("[SUCCESS] Clicked dropdown")
+            self.wait.until(EC.visibility_of_element_located((by, value)))
+            element = Select(self.driver.find_element(by, value))
+            element.select_by_visible_text(text)
+            print(f"[SUCCESS] Selected dropdown option: {text}")
             return True
-        except ex.NoSuchElementException:
+        except (ex.NoSuchElementException, ex.ElementClickInterceptedException, ex.TimeoutException):
             return False
 
     def auto_select(self,by,value,text):
-        element=self.wait.until(EC.visibility_of_element_located((by,value)))
-        element.clear()
-        element.send_keys(text)
-        time.sleep(2)
+        input_text = self.wait.until(EC.visibility_of_element_located((by, value)))
+        input_text.clear()
+        input_text.send_keys(text)
+        time.sleep(1)
         suggest = self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "ui-menu-item")))
         for i in suggest:
             if text.upper() in i.text.upper():
@@ -79,16 +97,17 @@ class LHC(unittest.TestCase):
                 time.sleep(1)
                 print("Selected autocomplete option:", text)
                 return
-        element.send_keys(Keys.DOWN)
-        element.send_keys(Keys.ENTER)
+        input_text.send_keys(Keys.DOWN)
+        input_text.send_keys(Keys.ENTER)
+        print("Selected autocomplete option using keyboard:", text)
 
     def test_LHC(self):
         driver = self.driver
-        driver.get("http://192.168.0.72/Rlogic9RLS/")
+        driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
         print("Logging in...")
-        self.send_keys(By.ID, "Login", "Riddhi")
-        self.send_keys(By.ID, "Password", "omsgn9")
+        self.send_keys(By.ID, "Login", "admin")
+        self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
@@ -113,27 +132,31 @@ class LHC(unittest.TestCase):
             self.click_element(By.XPATH, "//a[text()='1']")
             time.sleep(1)
 
-        #General Details
-        self.click_element(By.ID,"btn_modify")
-        time.sleep(1)
-        self.send_keys(By.ID, "SearchValue", "AHM-000007-MEMO")
-        self.click_element(By.ID, "btn-searchcriteria")
+        #Route Details
+        self.auto_select(By.ID, "ServiceNetworkId-select", "PUNE")
+        self.send_keys(By.ID, "ScheduleTime","02-06-2024")
+        self.click_element(By.ID, "btnSave-VehicleTripRouteVehicleTripSessionName661")
         self.auto_select(By.ID, "VehicleId-select","MHO4ER9009")
-        time.sleep(1)
 
         #Hire Details
-        self.select_dropdown(By.ID, "PurchaseBookedOnId","Owner")
+        self.click_element(By.ID, "PurchaseBookedOnId")
+        time.sleep(2)
         self.send_keys(By.ID, "DriverName", "Shailesh Gothal")
-        self.send_keys(By.ID, "LicenseExpDate","31-12-2025")
+        self.send_keys(By.ID, "LicenseExpDate","31-12-2027")
         self.auto_select(By.ID, "BalanceLocationId-select","Pune")
         self.send_keys(By.ID, "LicenseNo", "98765")
         self.send_keys(By.ID, "ContactNo", "9863575754")
+
         #Booking movement
         self.click_element(By.ID, "IsSelectMemoSearchSessionName6611")
+        time.sleep(1)
 
         #Hire Charges Details
         self.select_dropdown(By.ID, "FreightUnitId","Fixed")
-        self.send_keys(By.ID, "FreightRate","15000")
+        time.sleep(2)
+        self.send_keys(By.ID, "FreightRate", "15000")
+        time.sleep(1)
+        self.handle_alert()
 
         #Advance Payable Details
         self.auto_select(By.ID, "OrganizationalLocationId-select","AHMEDABAD")

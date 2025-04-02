@@ -11,7 +11,7 @@ import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class Booking(unittest.TestCase):
+class Booking2(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -48,11 +48,15 @@ class Booking(unittest.TestCase):
         return False
 
     def send_keys(self,by,value,text):
-        element=self.wait.until(EC.visibility_of_element_located((by,value)))
-        element.clear()
-        time.sleep(1)
-        element.send_keys(text)
-        print("Sent keys:",text)
+        try:
+            element = self.wait.until(EC.visibility_of_element_located((by, value)))
+            element.clear()
+            element.send_keys(text)
+            print(f'Sent keys {text} to {by} with value {value}')
+            return True
+        except ex.NoSuchElementException:
+            print(f'Element not found: {value}')
+            return False
 
     def select_dropdown(self,by,value,text):
         try:
@@ -84,7 +88,7 @@ class Booking(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
-    def test_booking(self):
+    def test_booking2(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
@@ -115,7 +119,7 @@ class Booking(unittest.TestCase):
             self.click_element(By.XPATH,"//a[text()='1']")
 
     #Booking Details
-        self.select_dropdown(By.ID, "FreightOnId", "Weight")
+        self.select_dropdown(By.ID, "FreightOnId", "Packet")
         self.select_dropdown(By.ID,"PaymentTypeId","To Be Billed")
         self.select_dropdown(By.ID,"BookingTypeId","FTL")
         self.select_dropdown(By.ID,"BookingModeId","Road")
@@ -137,22 +141,22 @@ class Booking(unittest.TestCase):
     #Item Details
         self.autocomplete_select(By.ID, "ItemId-select", "Coal")
         self.select_dropdown(By.ID, "PackingTypeId", "BAGS")
-        self.autocomplete_select(By.ID, "Packets", "1")
-        self.send_keys(By.ID, "UnitWeight", "9")
-        self.send_keys(By.ID, "BasicFreight", "1500")
+        self.autocomplete_select(By.ID, "Packets", "1500")
+        self.send_keys(By.ID, "UnitWeight", "8")
+        self.send_keys(By.ID, "BasicFreight", "15")
         self.click_element(By.ID, "btnSave-BookingItemSession633")
         time.sleep(1)
         self.click_element(By.ID, "RFRSGSTDetails")
 
     #Invoice Details
-        self.send_keys(By.ID, "InvoiceNo", "264155")
         self.send_keys(By.ID, "InvoiceDate", "01-06-2024")
-        self.send_keys(By.ID, "InvoiceValue", "50000")
+        self.click_element(By.ID, "IsNVC")
         self.click_element(By.ID,"btnSave-BookingInvoiceSession633")
+        time.sleep(1)
 
     #Submit Details
         self.click_element(By.ID, "mysubmit")
-        time.sleep(5)
+        time.sleep(1)
 
     @classmethod
     def tearDownClass(cls):
