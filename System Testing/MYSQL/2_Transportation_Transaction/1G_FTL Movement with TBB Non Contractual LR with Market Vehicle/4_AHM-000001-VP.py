@@ -9,7 +9,6 @@ import unittest
 import time
 import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
-import pandas as pd
 
 
 class Booking(unittest.TestCase):
@@ -92,66 +91,55 @@ class Booking(unittest.TestCase):
 
     def test_Master(self):
         driver = self.driver
-        driver.get("https://rlogic9.com/RLogicSumeet?ccode=Sumeet")
+        driver.get("http://192.168.0.72/Rlogic9RLS/")
 
         print("Logging in...")
-        self.send_keys(By.ID, "Login", "RIDDHI")
-        self.send_keys(By.ID, "Password", "OMSGN9")
+        self.send_keys(By.ID, "Login", "Riddhi")
+        self.send_keys(By.ID, "Password", "omsgn9")
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
-        for i in ("Fleet",
-                  "Fleet Master »",
-                  "Vehicle »",
-                  "Crane",):
+        for i in ("Finance",
+                  "Finance Transaction »",
+                  "Operational Payment »",
+                  "Operational Payment (Vendor)",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
-        # Read Excel data
-        df = pd.read_excel("test.xlsx", engine="openpyxl")
 
-        for index, row in df.iterrows():
-            try:
-                print(f"Processing Vehicle_Category: {row['Vehicle_Category']}")
+        if self.switch_frames("btn_NewRecord"):
+            self.click_element(By.ID, "btn_NewRecord")
 
-                if self.switch_frames("btn_NewRecord"):
-                    self.click_element(By.ID, "btn_NewRecord")
+            if self.switch_frames("OrganizationId"):
+                self.select_dropdown(By.ID, "OrganizationId", "AHMEDABAD")
+                # Calendar
+                self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
+                self.click_element(By.XPATH, "//a[text()='1']")
 
-                #General Details
-                if self.switch_frames("VehicleNo"):
-                    self.send_keys(By.ID, "VehicleNo", row["Vehicle_No"])
-                    self.select_dropdown(By.ID, "VehicleTypeId",row["Vehicle_Type"])
-                    self.select_dropdown(By.ID, "VehicleCategoryId", row["Vehicle_Category"])
-                    self.select_dropdown(By.ID, "VehicleBodyId", row["Vehicle_Body"])
-                    #self.select_dropdown(By.ID, "CarrierCategoryId", "VehicleNo")
-                    self.send_keys(By.ID, "YearOfManufacturer", row["Year_Of_Manufacture"])
-                    self.select_dropdown(By.ID, "ManufactureId", row["Manufacturer"])
-                    self.select_dropdown(By.ID, "VehicleModelId", row["Vehicle_Model"])
-                    self.autocomplete_select(By.ID, "ControllingBranchId-select", "MUMBAI")
+            # general Details
+            self.autocomplete_select(By.ID,"VendorId-select","VIJAY ENTERPRISES")
+            self.click_element(By.ID, "btnSave-VendorPaymentOnSession667")
+            self.click_element(By.ID, "btn_Pick_OperationaBillReference")
+            time.sleep(2)
 
-                #Specification Details
-                    self.send_keys(By.ID, "ChasisNo", row["Chasis_No"])
-                    if pd.notna(row["Engine_No"]):
-                        self.send_keys(By.ID, "EngineNo", row["Engine_No"])
-                    if pd.notna(row["Trolly_Chasis_No"]):
-                        self.send_keys(By.ID, "TrolleyChasisNo", row["Trolly_Chasis_No"])
-                    #self.select_dropdown(By.ID, "FuelTypeId", row["DIESEL"])
-                    self.send_keys(By.ID, "GrossWeight", row["Gross_Wt"])
-                    self.send_keys(By.ID, "Length", row["Length"])
-                    self.send_keys(By.ID, "Breadth", row["Width"])#Width
-                    if pd.notna(row["Fuel_Tank_Capacity"]):
-                        self.send_keys(By.ID, "FuelTankCapacity", row["Fuel_Tank_Capacity"])
-                    self.send_keys(By.ID, "UnLadenWeight", row["Unladen_Wt"])
-                    self.send_keys(By.ID, "WheelBase", row["Wheel_Base"])
-                    self.send_keys(By.ID, "Height", row["Height"])
-                    if pd.notna(row["Power_bhp"]):
-                        self.send_keys(By.ID, "CustomField1", row["Power_bhp"]) #Power BHP
+            #Trip Reference Info
+            if self.switch_frames("btn_GetOperationalBillReference"):
+                self.click_element(By.ID, "btn_GetOperationalBillReference")
+                self.click_element(By.ID, "IsSelectOperationalBillSearchSessionName6671")
+                self.click_element(By.ID, "btn_OperationalBillReference")
 
-                #if self.switch_frames("mysubmit"):
-                    #self.click_element(By.ID, "mysubmit")
-                time.sleep(2)
+            #Payment Detail
+            if self.switch_frames("PaymentModeId"):
+                self.select_dropdown(By.ID, "PaymentModeId","Cheque")
+                self.select_dropdown(By.ID, "BankId","HDFC")
+                self.send_keys(By.ID, "ChequeNo","12345")
+                self.send_keys(By.ID, "PaymentPaidTo","VIJAY ENTERPRISES")
 
-            except Exception as e:
-                print(f"Failed to process Vehicle_No {row['Vehicle_No']}: {str(e)}")
+            #Submit Payment
+            self.click_element(By.ID, "mysubmit")
+            print("Advanced Payment submitted successfully.")
+
 
     @classmethod
     def tearDownClass(cls):
