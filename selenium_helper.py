@@ -189,3 +189,16 @@ class SeleniumHelper:
             print(f"Popup with button '{button_text}' not found.")
             return False
 
+    def send_keys_alert(self,by,value,text):
+        for attempt in range(3):
+            try:
+                print(f"[INFO] Attempt {attempt + 1}: Entering text...")
+                element = self.wait.until(EC.visibility_of_element_located((by, value)))
+                element.clear()
+                element.send_keys(text)
+                print(f"Entered text: {text}")
+                time.sleep(1)  # Short delay to allow processing
+                break
+            except ex.UnexpectedAlertPresentException:
+                print("[ERROR] Unexpected alert appeared while entering text... Waiting for alert...")
+
