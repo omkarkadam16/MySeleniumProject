@@ -104,11 +104,11 @@ class SundryCreditors(unittest.TestCase):
                     if self.switch_frames("LocationTypeId"):
                         self.select_dropdown(By.ID, "LocationTypeId", "BRANCH OFFICE")
                         self.autocomplete_select(By.ID, "OrganizationLocationId-select", i["Location"])
-                        self.autocomplete_select(By.ID, "LedgerId-select", "Sundry Creditors (Market)")
-                        self.click_element(By.ID, "LocationTypeId")
+                        self.autocomplete_select(By.ID, "AccountGroupId-select", "Sundry Creditors")
+                        #self.click_element(By.ID, "LocationTypeId")
                         self.click_element(By.ID, "btnSave-FinanceRuleConfigSession")
                         time.sleep(2)
-                        print("Finance Rule Sundry Creditors (Market) saved", i["Location"])
+                        print("Finance Rule Sundry Creditors saved", i["Location"])
 
     @classmethod
     def tearDownClass(cls):

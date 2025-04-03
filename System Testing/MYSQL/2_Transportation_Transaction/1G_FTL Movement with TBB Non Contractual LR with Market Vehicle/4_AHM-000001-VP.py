@@ -11,7 +11,7 @@ import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class Booking(unittest.TestCase):
+class Payment(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -89,13 +89,14 @@ class Booking(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
-    def test_Master(self):
+    def test_Payment_Master(self):
+        """Main test case"""
         driver = self.driver
-        driver.get("http://192.168.0.72/Rlogic9RLS/")
+        driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
         print("Logging in...")
-        self.send_keys(By.ID, "Login", "Riddhi")
-        self.send_keys(By.ID, "Password", "omsgn9")
+        self.send_keys(By.ID, "Login", "admin")
+        self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
@@ -129,16 +130,25 @@ class Booking(unittest.TestCase):
                 self.click_element(By.ID, "IsSelectOperationalBillSearchSessionName6671")
                 self.click_element(By.ID, "btn_OperationalBillReference")
 
+            # Petrol Slip
+            if self.switch_frames("FuelSlipTypeId"):
+                self.select_dropdown(By.ID, "FuelSlipTypeId", "FuelCard")
+                self.autocomplete_select(By.ID, "FuelVendorId-select", "IOCL FUEL PUMP")
+                self.autocomplete_select(By.ID, "FuelCardId-select", "F-9212")
+                self.send_keys(By.ID, "Rate", "5000")
+                self.click_element(By.ID, "btnSave-FuelSlipConsumptionSession667")
+
             #Payment Detail
             if self.switch_frames("PaymentModeId"):
                 self.select_dropdown(By.ID, "PaymentModeId","Cheque")
-                self.select_dropdown(By.ID, "BankId","HDFC")
+                self.select_dropdown(By.ID, "BankId","HDFC Bank")
                 self.send_keys(By.ID, "ChequeNo","12345")
                 self.send_keys(By.ID, "PaymentPaidTo","VIJAY ENTERPRISES")
 
             #Submit Payment
             self.click_element(By.ID, "mysubmit")
             print("Advanced Payment submitted successfully.")
+            time.sleep(2)
 
 
     @classmethod

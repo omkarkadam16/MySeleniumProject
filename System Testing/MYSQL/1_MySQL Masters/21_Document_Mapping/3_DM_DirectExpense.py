@@ -135,6 +135,19 @@ class DMDirectExpense(unittest.TestCase):
                     self.click_element(By.ID, "btnSave-FinanceRuleConfigSession")
                     print("Finance Rule Payment Voucher saved")
 
+                    # Finance Rule Vehicle Trip
+                    if self.switch_frames("Sign"):
+                        self.select_dropdown(By.ID, "Sign", "Cr")
+                        self.select_dropdown(By.ID, "ProcessId", "Vehicle Trip")
+                        self.autocomplete_select(By.ID, "AccountGroupId-select", "Direct Expense")
+                        self.click_element(By.ID, "btnSave-FinanceRuleConfigSession")
+                        time.sleep(2)
+                        self.select_dropdown(By.ID, "Sign", "Dr")
+                        self.select_dropdown(By.ID, "ProcessId", "Vehicle Trip")
+                        self.autocomplete_select(By.ID, "AccountGroupId-select", "Direct Expense")
+                        self.click_element(By.ID, "btnSave-FinanceRuleConfigSession")
+                        print("Finance Rule Vehicle Trip saved")
+
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()

@@ -113,6 +113,19 @@ class DocumentMappingSC(unittest.TestCase):
                     self.click_element(By.ID, "btnSave-FinanceRuleConfigSession")
                     print("Finance Rule saved")
 
+                    # Vendor Payment
+                    if self.switch_frames("Sign"):
+                        self.select_dropdown(By.ID, "Sign", "Cr")
+                        self.select_dropdown(By.ID, "ProcessId", "Vendor Payment")
+                        self.autocomplete_select(By.ID, "AccountGroupId-select", "Sundry Creditors")
+                        self.click_element(By.ID, "btnSave-FinanceRuleConfigSession")
+                        time.sleep(2)
+                        self.select_dropdown(By.ID, "Sign", "Dr")
+                        self.select_dropdown(By.ID, "ProcessId", "Vendor Payment")
+                        self.autocomplete_select(By.ID, "AccountGroupId-select", "Sundry Creditors")
+                        self.click_element(By.ID, "btnSave-FinanceRuleConfigSession")
+                        print("Vendor Payment saved")
+
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()

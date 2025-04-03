@@ -145,7 +145,8 @@ class Booking(unittest.TestCase):
                     self.send_keys(By.ID, "UnLadenWeight", row["Unladen_Wt"])
                     self.send_keys(By.ID, "WheelBase", row["Wheel_Base"])
                     self.send_keys(By.ID, "Height", row["Height"])
-                    self.send_keys(By.ID, "CustomField1", row["Power_bhp"]) #Power BHP
+                    if pd.notna(row["Power_bhp"]):
+                        self.send_keys(By.ID, "CustomField1", row["Power_bhp"]) #Power BHP
 
                 #if self.switch_frames("mysubmit"):
                     #self.click_element(By.ID, "mysubmit")
