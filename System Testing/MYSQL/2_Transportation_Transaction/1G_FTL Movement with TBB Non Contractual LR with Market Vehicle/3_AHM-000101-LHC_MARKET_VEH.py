@@ -36,16 +36,17 @@ class LHC(unittest.TestCase):
 
     def send_keys(self, by, value, text):
         """Send keys after checking visibility"""
-        try:
-            element = self.wait.until(EC.visibility_of_element_located((by, value)))
-            element.is_enabled()
-            element.clear()
-            element.send_keys(text)
-            print("Sent keys", text)
-            return True
-        except ex.NoSuchElementException:
-            print(f"Element not found: {value}")
-            return False
+        for attempt in range(3):
+            try:
+                print(f"[INFO] Attempt {attempt + 1}: Entering text...")
+                element = self.wait.until(EC.visibility_of_element_located((by, value)))
+                element.is_enabled()
+                element.clear()
+                element.send_keys(text)
+                print("Sent keys", text)
+                return True
+            except (ex.NoSuchElementException, ex.UnexpectedAlertPresentException, ex.TimeoutException,ex.StaleElementReferenceException) as e:
+                print(f"[WARNING]Error : {type(e)} occurred. Retrying...")
 
     def switch_frames(self, element_id):
         """Switch frames dynamically"""
@@ -157,30 +158,7 @@ class LHC(unittest.TestCase):
         # Hire Charges Details
         self.select_dropdown(By.ID, "FreightUnitId", "Fixed")
         time.sleep(2)
-
-        if self.handle_alert():
-            print("[INFO] Alert handled before entering FreightRate.")
-
-        # Retry entering Freight Rate if needed
-        for attempt in range(3):
-            try:
-                freight_rate_field = self.wait.until(EC.visibility_of_element_located((By.ID, "FreightRate")))
-                freight_rate_field.clear()
-                freight_rate_field.send_keys("15000")
-                print("[INFO] FreightRate entered successfully.")
-                time.sleep(1)  # Short delay to allow processing
-
-                # ✅ Verify if the value is correctly entered
-                entered_value = freight_rate_field.get_attribute("value")
-                if entered_value == "15000":
-                    print(f"[SUCCESS] FreightRate successfully set to {entered_value}")
-                    break
-                else:
-                    print(f"[WARNING] Entered FreightRate not retained, retrying... ({attempt + 1}/3)")
-            except ex.UnexpectedAlertPresentException:
-                print("[ERROR] Unexpected alert appeared while entering FreightRate. Waiting for alert...")
-
-
+        self.send_keys(By.ID, "FreightRate", "15000")
         self.click_element(By.ID, "FreightUnitId")
         time.sleep(2)
         self.handle_alert()

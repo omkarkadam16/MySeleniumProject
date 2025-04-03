@@ -189,16 +189,29 @@ class SeleniumHelper:
             print(f"Popup with button '{button_text}' not found.")
             return False
 
-    def send_keys_alert(self,by,value,text):
+    def send_keys_alert(self, by, value, text):
         for attempt in range(3):
             try:
                 print(f"[INFO] Attempt {attempt + 1}: Entering text...")
                 element = self.wait.until(EC.visibility_of_element_located((by, value)))
                 element.clear()
                 element.send_keys(text)
-                print(f"Entered text: {text}")
-                time.sleep(1)  # Short delay to allow processing
-                break
-            except ex.UnexpectedAlertPresentException:
-                print("[ERROR] Unexpected alert appeared while entering text... Waiting for alert...")
+                print("Sent keys", text)
+                return True
+            except (ex.NoSuchElementException, ex.UnexpectedAlertPresentException, ex.TimeoutException,
+                    ex.StaleElementReferenceException) as e:
+                print(f"[WARNING]Error : {type(e)} occurred. Retrying...")
+
+    def handle_alert(self):
+        """Check for an alert and handle it if present."""
+        try:
+            time.sleep(2)  # Small delay to allow alert to appear
+            alert = self.driver.switch_to.alert
+            print(f"[ALERT] Detected: {alert.text}")
+            alert.accept()
+            print("[ALERT] Alert accepted.")
+            return True
+        except ex.NoAlertPresentException:
+            print("[INFO] No alert found. Continuing execution...")
+            return False
 
