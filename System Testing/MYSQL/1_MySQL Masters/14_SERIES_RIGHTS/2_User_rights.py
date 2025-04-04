@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-class TransportGST(unittest.TestCase):
+class ProfileRights(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -78,8 +78,19 @@ class TransportGST(unittest.TestCase):
         input_text.send_keys(Keys.DOWN)
         input_text.send_keys(Keys.ENTER)
 
+    def handle_popup(self):
+        try:
+            # Wait for the popup to appear
+            popup_ok_button = self.wait.until(
+                EC.element_to_be_clickable((By.XPATH, "//div[@class='ui-dialog-buttonset']/button[text()='OK']")))
+            popup_ok_button.click()
+            print("Popup handled successfully.")
+            return True
+        except ex.TimeoutException:
+            print("Popup not found.")
+            return False
 
-    def test_Transport_GST(self):
+    def test_profile_rights(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
@@ -87,26 +98,89 @@ class TransportGST(unittest.TestCase):
         self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
 
-        menus = ["Transportation", "Transportation Master »", "Common Masters »", "Transport GST Charge"]
+        menus = ["Administration", "User Config »", "User Rights"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
         data = [
-            {"GST": "FCM","State": "RAJASTHAN"},
-            {"GST": "RCM","State": "MANIPUR"},
+            {"Group": "User Config"},
+            {"Group": "Grid Config"},
+            {"Group": "Implementation"},
+            {"Group": "Link"},
+            {"Group": "Geographical Hierarchy"},
+            {"Group": "Charge Head"},
+            {"Group": "Custom Field"},
+            {"Group": "Organisational Hierarchy"},
+            {"Group": "Document Setup"},
+            {"Group": "GST Master"},
+            {"Group": "GST Configuration"},
+            {"Group": "Inventory Transaction"},
+            {"Group": "Inventory Master"},
+            {"Group": "Ledger Creation"},
+            {"Group": "Account Master"},
+            {"Group": "Bank Master"},
+            {"Group": "Finacial Post"},
+            {"Group": "Ledger Mapping"},
+            {"Group": "Operational Payment"},
+            {"Group": "Operational Receipt"},
+            {"Group": "Purchase Voucher"},
+            {"Group": "Contra"},
+            {"Group": "Sales Vouchers"},
+            {"Group": "Ledger Openings"},
+            {"Group": "Receipt Voucher"},
+            {"Group": "Payment Voucher"},
+            {"Group": "Journal Voucher"},
+            {"Group": "Fund Transfer"},
+            {"Group": "Bank Reconciliation"},
+            {"Group": "Other Transaction"},
+            {"Group": "Booking"},
+            {"Group": "Indent / Placement"},
+            {"Group": "Outward"},
+            {"Group": "Inward"},
+            {"Group": "Delivery"},
+            {"Group": "Trip Management"},
+            {"Group": "Inter Office Memo"},
+            {"Group": "Bill"},
+            {"Group": "Money Receipt"},
+            {"Group": "Contract"},
+            {"Group": "Purchase Bill"},
+            {"Group": "Track N Trace Reports"},
+            {"Group": "Transport SAC HSN Mapping"},
+            {"Group": "Common Masters"},
+            {"Group": "Party"},
+            {"Group": "Customer"},
+            {"Group": "Vendor"},
+            {"Group": "Consignor/Consignee"},
+            {"Group": "Route"},
+            {"Group": "Vehicle"},
+            {"Group": "Fuel"},
+            {"Group": "Preventive Maintainance"},
+            {"Group": "Driver"},
+            {"Group": "Tyre"},
+            {"Group": "Loan"},
+            {"Group": "Job Work"},
+            {"Group": "Tyre Movement"},
+            {"Group": "Renewals"},
+            {"Group": "Purchase"},
         ]
 
         for i in data:
-            if self.switch_frames("btn_NewRecord"):
-                self.click_element(By.ID, "btn_NewRecord")
-            # Field Detail
-                if self.switch_frames("TrpGSTChargeTypeId"):
-                    self.select_dropdown(By.ID, "TrpGSTChargeTypeId", i["GST"])
-                    self.select_dropdown(By.ID, "StateId", i["State"])
-                    self.send_keys(By.ID, "WEFDate", "01-04-2018")
-                    self.click_element(By.ID, "mysubmit")
-                    time.sleep(1)
-                    print(i["GST"],i["State"] ,"Transport GST Charge saved")
+            # General Details
+            if self.switch_frames("UserId"):
+                self.select_dropdown(By.ID, "UserId", "admin")
+                self.select_dropdown(By.ID, "GroupId", i["Group"])
+                time.sleep(5)
+                self.click_element(By.ID, "LinkchkIsSelectAll")
+                self.click_element(By.ID, "btnLinkRightsSave")
+                time.sleep(1)
+
+                # Handle the popup
+                self.handle_popup()
+
+                print(i["Group"],"Rights saved")
+
+        print("All routes created successfully.")
+
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
