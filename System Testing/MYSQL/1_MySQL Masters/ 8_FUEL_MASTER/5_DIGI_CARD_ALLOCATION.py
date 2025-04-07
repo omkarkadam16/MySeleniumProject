@@ -134,7 +134,7 @@ class DigiCardAllocation(unittest.TestCase):
             {
                 "DigiCardNo": "D-9219",
                 "DigiCardAllocationType": "Location",
-                "LocationId": "JAIPUR",
+                "LocationId": "DELHI",
             }
         ]
 
