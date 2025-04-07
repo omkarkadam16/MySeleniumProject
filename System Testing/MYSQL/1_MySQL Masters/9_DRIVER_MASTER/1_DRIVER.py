@@ -70,7 +70,7 @@ class DriverMaster(unittest.TestCase):
         input_text.clear()
         input_text.send_keys(text)
         time.sleep(1)
-        suggest = self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "ui-menu-item")))
+        suggest = self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "ui-corner-all")))
         for i in suggest:
             if text.upper() in i.text.upper():
                 i.click()

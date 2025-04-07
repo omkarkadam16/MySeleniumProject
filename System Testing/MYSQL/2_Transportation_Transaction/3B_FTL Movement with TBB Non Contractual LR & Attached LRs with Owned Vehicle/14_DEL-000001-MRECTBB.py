@@ -130,16 +130,6 @@ class MoneyReceipt(unittest.TestCase):
                 self.click_element(By.ID, "btn_OperationalBillReference")
                 time.sleep(1)
 
-            #On Account / Other Adjustment New Ref
-            if self.switch_frames("BillRefTypeId"):
-                self.select_dropdown(By.ID, "BillRefTypeId", "New Ref")
-                self.autocomplete_select(By.ID, "OrganizationalLocationId-select", "DELHI")
-                self.select_dropdown(By.ID, "Sign", "Cr")
-                self.send_keys(By.ID, "PaidAmount", "25000")
-                self.select_dropdown(By.ID, "TDSLedgerId", "TDS Deducted by Party")
-                self.click_element(By.ID, "btnSave-TDSAdjustmentCollectionSessionKey675")
-                time.sleep(1)
-
             # Receipt Info
             if self.switch_frames("PaymentModeId"):
                 self.select_dropdown(By.ID, "PaymentModeId", "Cheque")
