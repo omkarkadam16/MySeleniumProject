@@ -110,8 +110,8 @@ class Booking(unittest.TestCase):
 
     #Document Details
         if self.switch_frames("OrganizationId"):
-            self.select_dropdown(By.ID,"OrganizationId","DELHI")
-            self.select_dropdown(By.ID,"SeriesId","DELHI - 501 To 1000")
+            self.select_dropdown(By.ID,"OrganizationId","AHMEDABAD")
+            self.select_dropdown(By.ID,"SeriesId","AHMEDABAD - 501 To 1000")
             #Calendor
             self.click_element(By.CLASS_NAME,"ui-datepicker-trigger")
             self.select_dropdown(By.CLASS_NAME,"ui-datepicker-month","Jun")
@@ -120,7 +120,7 @@ class Booking(unittest.TestCase):
 
     #Booking Details
         self.select_dropdown(By.ID, "FreightOnId", "Fixed")
-        self.select_dropdown(By.ID,"PaymentTypeId","To Be Billed")
+        self.select_dropdown(By.ID,"PaymentTypeId","Paid")
         self.select_dropdown(By.ID,"BookingTypeId","FTL")
         self.select_dropdown(By.ID,"BookingModeId","Road")
         self.select_dropdown(By.ID, "DeliveryTypeId", "Door")
@@ -130,30 +130,29 @@ class Booking(unittest.TestCase):
         self.click_element(By.ID, "IsPOD")
 
     #Route Details
-        self.autocomplete_select(By.ID, "FromServiceNetworkId-select", "DELHI")
-        self.autocomplete_select(By.ID, "ToServiceNetworkId-select", "HYDERABAD")
-        self.autocomplete_select(By.ID, "VehicleId-select", "MH04TT9008")
+        self.autocomplete_select(By.ID, "FromServiceNetworkId-select", "AHMEDABAD")
+        self.autocomplete_select(By.ID, "ToServiceNetworkId-select", "DELHI")
+        self.autocomplete_select(By.ID, "VehicleId-select", "MH04AA7007")
 
-    #Consignor/Consignee Details(selectedtext="P M Enterprises Pvt. LTD")
+    #Consignor/Consignee Details
         self.autocomplete_select(By.ID, "ConsignorId-select", "Adani Wilmar")
-        self.autocomplete_select(By.ID, "ConsigneeId-select", "P M Enterprise")
-        self.select_dropdown(By.ID, "BillingOnId", "Consignor")
+        self.autocomplete_select(By.ID, "ConsigneeId-select", "Prasad Industries")
 
     #Item Details
         self.autocomplete_select(By.ID, "ItemId-select", "Coal")
         self.select_dropdown(By.ID, "PackingTypeId", "BAGS")
         self.autocomplete_select(By.ID, "Packets", "500")
-        self.send_keys(By.ID, "UnitWeight", "14000")
-        self.send_keys(By.ID, "BasicFreight", "40000")
+        self.send_keys(By.ID, "UnitWeight", "6")
+        self.send_keys(By.ID, "BasicFreight", "15000")
         self.click_element(By.ID, "btnSave-BookingItemSession633")
         time.sleep(1)
         self.click_element(By.ID, "RFRSGSTDetails")
 
-    #Invoice Details
-        self.send_keys(By.ID, "InvoiceNo", "12121")
+    # Invoice Details
+        self.send_keys(By.ID, "InvoiceNo", "1")
         self.send_keys(By.ID, "InvoiceDate", "01-06-2024")
-        self.send_keys(By.ID, "InvoiceValue", "1212121")
-        self.click_element(By.ID,"btnSave-BookingInvoiceSession633")
+        self.send_keys(By.ID, "InvoiceValue", "1")
+        self.click_element(By.ID, "btnSave-BookingInvoiceSession633")
         time.sleep(1)
 
     #Submit Details

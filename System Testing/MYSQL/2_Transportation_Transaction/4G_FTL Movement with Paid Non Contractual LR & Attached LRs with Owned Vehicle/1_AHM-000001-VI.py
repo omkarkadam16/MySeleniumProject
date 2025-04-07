@@ -11,7 +11,7 @@ import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class Booking(unittest.TestCase):
+class Indent(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -47,18 +47,18 @@ class Booking(unittest.TestCase):
                 driver.switch_to.default_content()
         return False
 
-    def send_keys(self,by,value,text):
+    def send_keys(self, by, value, text):
         try:
             element = self.wait.until(EC.visibility_of_element_located((by, value)))
             element.clear()
             element.send_keys(text)
-            print(f'Sent keys {text} to {by} with value {value}')
+            print("Sent keys", text)
             return True
         except ex.NoSuchElementException:
-            print(f'Element not found: {value}')
+            print(f"Element not found: {value}")
             return False
 
-    def select_dropdown(self,by,value,text):
+    def select_dropdown(self, by, value, text):
         try:
             e = self.wait.until(EC.element_to_be_clickable((by, value)))
             e.is_enabled()
@@ -88,7 +88,7 @@ class Booking(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
-    def test_booking(self):
+    def test_Indent_Master(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
@@ -99,66 +99,43 @@ class Booking(unittest.TestCase):
         print("Login successful.")
 
         for i in ("Transportation",
-            "Transportation Transaction »",
-            "Booking »",
-            "Consignment Note",):
+                  "Transportation Transaction »",
+                  "Indent / Placement »",
+                  "Vehicle Indent",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
         if self.switch_frames("btn_NewRecord"):
             self.click_element(By.ID, "btn_NewRecord")
 
-    #Document Details
-        if self.switch_frames("OrganizationId"):
-            self.select_dropdown(By.ID,"OrganizationId","DELHI")
-            self.select_dropdown(By.ID,"SeriesId","DELHI - 501 To 1000")
-            #Calendor
-            self.click_element(By.CLASS_NAME,"ui-datepicker-trigger")
-            self.select_dropdown(By.CLASS_NAME,"ui-datepicker-month","Jun")
-            self.select_dropdown(By.CLASS_NAME,"ui-datepicker-year","2024")
-            self.click_element(By.XPATH,"//a[text()='1']")
+            # Document Details
+            if self.switch_frames("OrganizationId"):
+                self.select_dropdown(By.ID, "OrganizationId", "AHMEDABAD")
+                # Calendar
+                self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
+                self.click_element(By.XPATH, "//a[text()='1']")
 
-    #Booking Details
-        self.select_dropdown(By.ID, "FreightOnId", "Fixed")
-        self.select_dropdown(By.ID,"PaymentTypeId","To Be Billed")
-        self.select_dropdown(By.ID,"BookingTypeId","FTL")
-        self.select_dropdown(By.ID,"BookingModeId","Road")
-        self.select_dropdown(By.ID, "DeliveryTypeId", "Door")
-        self.select_dropdown(By.ID, "PickupTypeId", "Door")
-        self.select_dropdown(By.ID, "RiskTypeId", "Owners Risk")
-        self.select_dropdown(By.ID, "ConsigneeCopyWithId", "Consignor")
-        self.click_element(By.ID, "IsPOD")
+            #Indent Details
+            self.select_dropdown(By.ID, "VehicleIndentTypeId","Non-Contractual")
+            self.select_dropdown(By.ID, "CommChannelId", "Phone")
+            self.send_keys(By.ID, "VehicleRequiredOn","01-06-2024")
+            self.select_dropdown(By.ID, "VehicleTypeId", "20 MT")
+            self.send_keys(By.ID, "VehicleCount", "1")
+            self.send_keys(By.ID, "ExpiryDate", "01-06-2025")
+            self.autocomplete_select(By.ID, "FromServiceNetworkId-select", "AHMEDABAD")
+            self.autocomplete_select(By.ID, "ToServiceNetworkId-select", "DELHI")
+            self.autocomplete_select(By.ID, "TransportItemId-select", "Cotton")
+            self.autocomplete_select(By.ID, "ConsignorId-select", "Adani Wilmar")
+            self.autocomplete_select(By.ID, "ConsigneeId-select", "Prasad Industries")
+            self.send_keys(By.ID, "Weight", "6")
+            self.autocomplete_select(By.ID, "PartyId-select", "Adani Wilmar")
+            self.send_keys(By.ID, "Packets", "500")
 
-    #Route Details
-        self.autocomplete_select(By.ID, "FromServiceNetworkId-select", "DELHI")
-        self.autocomplete_select(By.ID, "ToServiceNetworkId-select", "HYDERABAD")
-        self.autocomplete_select(By.ID, "VehicleId-select", "MH04TT9008")
-
-    #Consignor/Consignee Details(selectedtext="P M Enterprises Pvt. LTD")
-        self.autocomplete_select(By.ID, "ConsignorId-select", "Adani Wilmar")
-        self.autocomplete_select(By.ID, "ConsigneeId-select", "P M Enterprise")
-        self.select_dropdown(By.ID, "BillingOnId", "Consignor")
-
-    #Item Details
-        self.autocomplete_select(By.ID, "ItemId-select", "Coal")
-        self.select_dropdown(By.ID, "PackingTypeId", "BAGS")
-        self.autocomplete_select(By.ID, "Packets", "500")
-        self.send_keys(By.ID, "UnitWeight", "14000")
-        self.send_keys(By.ID, "BasicFreight", "40000")
-        self.click_element(By.ID, "btnSave-BookingItemSession633")
-        time.sleep(1)
-        self.click_element(By.ID, "RFRSGSTDetails")
-
-    #Invoice Details
-        self.send_keys(By.ID, "InvoiceNo", "12121")
-        self.send_keys(By.ID, "InvoiceDate", "01-06-2024")
-        self.send_keys(By.ID, "InvoiceValue", "1212121")
-        self.click_element(By.ID,"btnSave-BookingInvoiceSession633")
-        time.sleep(1)
-
-    #Submit Details
-        self.click_element(By.ID, "mysubmit")
-        time.sleep(1)
+            # Submit Details
+            self.click_element(By.ID, "mysubmit")
+            time.sleep(1)
 
     @classmethod
     def tearDownClass(cls):
@@ -167,4 +144,3 @@ class Booking(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

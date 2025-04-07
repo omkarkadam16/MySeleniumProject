@@ -11,7 +11,7 @@ import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class Booking(unittest.TestCase):
+class MoneyReceipt(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -47,18 +47,19 @@ class Booking(unittest.TestCase):
                 driver.switch_to.default_content()
         return False
 
-    def send_keys(self,by,value,text):
+    def send_keys(self, by, value, text):
         try:
             element = self.wait.until(EC.visibility_of_element_located((by, value)))
+            element.is_enabled()
             element.clear()
             element.send_keys(text)
-            print(f'Sent keys {text} to {by} with value {value}')
+            print("Sent keys", text)
             return True
         except ex.NoSuchElementException:
-            print(f'Element not found: {value}')
+            print(f"Element not found: {value}")
             return False
 
-    def select_dropdown(self,by,value,text):
+    def select_dropdown(self, by, value, text):
         try:
             e = self.wait.until(EC.element_to_be_clickable((by, value)))
             e.is_enabled()
@@ -88,7 +89,8 @@ class Booking(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
-    def test_booking(self):
+    def test_MoneyReceipt_Master(self):
+        """Main test case"""
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
@@ -98,67 +100,58 @@ class Booking(unittest.TestCase):
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
-        for i in ("Transportation",
-            "Transportation Transaction »",
-            "Booking »",
-            "Consignment Note",):
+        for i in ("Finance",
+                  "Finance Transaction »",
+                  "Operational Receipt »",
+                  "Money Receipt (To Be Billed)",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
         if self.switch_frames("btn_NewRecord"):
             self.click_element(By.ID, "btn_NewRecord")
 
-    #Document Details
-        if self.switch_frames("OrganizationId"):
-            self.select_dropdown(By.ID,"OrganizationId","DELHI")
-            self.select_dropdown(By.ID,"SeriesId","DELHI - 501 To 1000")
-            #Calendor
-            self.click_element(By.CLASS_NAME,"ui-datepicker-trigger")
-            self.select_dropdown(By.CLASS_NAME,"ui-datepicker-month","Jun")
-            self.select_dropdown(By.CLASS_NAME,"ui-datepicker-year","2024")
-            self.click_element(By.XPATH,"//a[text()='1']")
+            # Document Details
+            if self.switch_frames("OrganizationId"):
+                self.select_dropdown(By.ID, "OrganizationId", "DELHI")
+                time.sleep(1)
+                # Calendar
+                self.send_keys(By.ID, "DocumentDate", "01-06-2024")
 
-    #Booking Details
-        self.select_dropdown(By.ID, "FreightOnId", "Fixed")
-        self.select_dropdown(By.ID,"PaymentTypeId","To Be Billed")
-        self.select_dropdown(By.ID,"BookingTypeId","FTL")
-        self.select_dropdown(By.ID,"BookingModeId","Road")
-        self.select_dropdown(By.ID, "DeliveryTypeId", "Door")
-        self.select_dropdown(By.ID, "PickupTypeId", "Door")
-        self.select_dropdown(By.ID, "RiskTypeId", "Owners Risk")
-        self.select_dropdown(By.ID, "ConsigneeCopyWithId", "Consignor")
-        self.click_element(By.ID, "IsPOD")
+            # Customer Info
+            if self.switch_frames("CustomerId-select"):
+                self.autocomplete_select(By.ID, "CustomerId-select", "Adani Wilmar")
 
-    #Route Details
-        self.autocomplete_select(By.ID, "FromServiceNetworkId-select", "DELHI")
-        self.autocomplete_select(By.ID, "ToServiceNetworkId-select", "HYDERABAD")
-        self.autocomplete_select(By.ID, "VehicleId-select", "MH04TT9008")
+            # Operation Bill Reference Info
+            self.click_element(By.ID, "btn_Pick_OperationaBillReference")
+            if self.switch_frames("btn_GetOperationalBillReference"):
+                self.click_element(By.ID, "btn_GetOperationalBillReference")
+                time.sleep(2)
+                self.click_element(By.ID, "IsSelectOperationalBillSearchCollectionSessionName6751")
+                self.click_element(By.ID, "btn_OperationalBillReference")
+                time.sleep(1)
 
-    #Consignor/Consignee Details(selectedtext="P M Enterprises Pvt. LTD")
-        self.autocomplete_select(By.ID, "ConsignorId-select", "Adani Wilmar")
-        self.autocomplete_select(By.ID, "ConsigneeId-select", "P M Enterprise")
-        self.select_dropdown(By.ID, "BillingOnId", "Consignor")
+            #On Account / Other Adjustment New Ref
+            if self.switch_frames("BillRefTypeId"):
+                self.select_dropdown(By.ID, "BillRefTypeId", "New Ref")
+                self.autocomplete_select(By.ID, "OrganizationalLocationId-select", "DELHI")
+                self.select_dropdown(By.ID, "Sign", "Cr")
+                self.send_keys(By.ID, "PaidAmount", "25000")
+                self.select_dropdown(By.ID, "TDSLedgerId", "TDS Deducted by Party")
+                self.click_element(By.ID, "btnSave-TDSAdjustmentCollectionSessionKey675")
+                time.sleep(1)
 
-    #Item Details
-        self.autocomplete_select(By.ID, "ItemId-select", "Coal")
-        self.select_dropdown(By.ID, "PackingTypeId", "BAGS")
-        self.autocomplete_select(By.ID, "Packets", "500")
-        self.send_keys(By.ID, "UnitWeight", "14000")
-        self.send_keys(By.ID, "BasicFreight", "40000")
-        self.click_element(By.ID, "btnSave-BookingItemSession633")
-        time.sleep(1)
-        self.click_element(By.ID, "RFRSGSTDetails")
+            # Receipt Info
+            if self.switch_frames("PaymentModeId"):
+                self.select_dropdown(By.ID, "PaymentModeId", "Cheque")
+                self.select_dropdown(By.ID, "BankId", "HDFC Bank")
+                self.send_keys(By.ID, "ChequeNo", "12345")
+                self.send_keys(By.ID, "PaymentReceivedFrom", "Adani Wilmar Pvt. LTD")
+                time.sleep(1)
 
-    #Invoice Details
-        self.send_keys(By.ID, "InvoiceNo", "12121")
-        self.send_keys(By.ID, "InvoiceDate", "01-06-2024")
-        self.send_keys(By.ID, "InvoiceValue", "1212121")
-        self.click_element(By.ID,"btnSave-BookingInvoiceSession633")
-        time.sleep(1)
-
-    #Submit Details
-        self.click_element(By.ID, "mysubmit")
-        time.sleep(1)
+            # Submit Money Receipt
+            self.click_element(By.ID, "mysubmit")
+            print("Bill submitted successfully.")
+            time.sleep(2)
 
     @classmethod
     def tearDownClass(cls):
@@ -167,4 +160,3 @@ class Booking(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

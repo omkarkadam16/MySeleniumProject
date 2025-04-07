@@ -128,6 +128,7 @@ class MoneyReceipt(unittest.TestCase):
                 time.sleep(2)
                 self.click_element(By.ID, "IsSelectOperationalBillSearchCollectionSessionName6751")
                 self.click_element(By.ID, "btn_OperationalBillReference")
+                time.sleep(1)
 
             # Receipt Info
             if self.switch_frames("PaymentModeId"):
@@ -135,6 +136,7 @@ class MoneyReceipt(unittest.TestCase):
                 self.select_dropdown(By.ID, "BankId", "HDFC Bank")
                 self.send_keys(By.ID, "ChequeNo", "12345")
                 self.send_keys(By.ID, "PaymentReceivedFrom", "P M Enterprises Pvt. LTD")
+                time.sleep(1)
 
             # Submit Money Receipt
             self.click_element(By.ID, "mysubmit")

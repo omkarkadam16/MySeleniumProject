@@ -10,8 +10,8 @@ import time
 import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
-
-class TripSheet(unittest.TestCase):
+#Please Restart IDE before running the script
+class Placement(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -48,30 +48,31 @@ class TripSheet(unittest.TestCase):
         return False
 
     def send_keys(self, by, value, text):
-        try:
-            element = self.wait.until(EC.visibility_of_element_located((by, value)))
-            element.is_enabled()
-            element.clear()
-            element.send_keys(text)
-            print("Sent keys", text)
-            return True
-        except ex.NoSuchElementException:
-            print(f"Element not found: {value}")
-            return False
+        for retry in range(3):
+            try:
+                element = self.wait.until(EC.visibility_of_element_located((by, value)))
+                element.clear()
+                element.send_keys(text)
+                print("Sent keys", text)
+                return True
+            except(ex.ElementClickInterceptedException, ex.StaleElementReferenceException, ex.TimeoutException):
+                print(f"Element not found: {value}")
+
 
     def select_dropdown(self, by, value, text):
-        try:
-            e = self.wait.until(EC.element_to_be_clickable((by, value)))
-            e.is_enabled()
-            e.click()
-            print("[SUCCESS] Clicked dropdown")
-            self.wait.until(EC.visibility_of_element_located((by, value)))
-            element = Select(self.driver.find_element(by, value))
-            element.select_by_visible_text(text)
-            print(f"[SUCCESS] Selected dropdown option: {text}")
-            return True
-        except (ex.NoSuchElementException, ex.ElementClickInterceptedException, ex.TimeoutException):
-            return False
+        for retry in range(2):
+            try:
+                e = self.wait.until(EC.element_to_be_clickable((by, value)))
+                e.is_enabled()
+                e.click()
+                print("[SUCCESS] Clicked dropdown")
+                self.wait.until(EC.visibility_of_element_located((by, value)))
+                element = Select(self.driver.find_element(by, value))
+                element.select_by_visible_text(text)
+                print(f"[SUCCESS] Selected dropdown option: {text}")
+                return True
+            except (ex.StaleElementReferenceException, ex.NoSuchElementException, ex.TimeoutException):
+                return False
 
     def autocomplete_select(self,by,value,text):
         input_text=self.wait.until(EC.visibility_of_element_located((by,value)))
@@ -89,8 +90,26 @@ class TripSheet(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
-    def test_TripSheet_Master(self):
-        """Main test case"""
+    def select_dropdown1(self, by, value, text):
+        for retry in range(2):
+            try:
+                self.wait.until(EC.element_to_be_clickable((by, value))).click()
+                print("[SUCCESS] Clicked dropdown")
+                self.wait.until(EC.visibility_of_element_located((by, value)))
+
+                # Re-locating the element to prevent StaleElementReferenceException
+                element = Select(self.driver.find_element(by, value))
+                element.select_by_visible_text(text)
+                print(f"[SUCCESS] Selected dropdown option: {text}")
+                return True
+            except (ex.StaleElementReferenceException, ex.NoSuchElementException, ex.TimeoutException):
+                print(f"[RETRY] StaleElementReferenceException occurred for {value}, retrying...")
+                time.sleep(1)
+                continue  # Retry the loop
+        return False
+
+
+    def test_Placement_Master(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
@@ -102,8 +121,8 @@ class TripSheet(unittest.TestCase):
 
         for i in ("Transportation",
                   "Transportation Transaction »",
-                  "Inter Office Memo »",
-                  "IOM Dispatch (POD)",):
+                  "Indent / Placement »",
+                  "Vehicle Placement",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
@@ -112,27 +131,26 @@ class TripSheet(unittest.TestCase):
 
             # Document Details
             if self.switch_frames("OrganizationId"):
-                self.select_dropdown(By.ID, "OrganizationId", "HYDERABAD")
+                self.select_dropdown(By.ID, "OrganizationId", "AHMEDABAD")
+
                 # Calendar
-                self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
-                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
-                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
-                self.click_element(By.XPATH, "//a[text()='1']")
+                self.send_keys(By.ID, "DocumentDate", "01-06-2024")
+                time.sleep(1)
 
-            # General
-            self.select_dropdown(By.ID, "ExpenseTypeId", "Trip")
-            self.autocomplete_select(By.ID, "VehicleId-select", "MH04TT9008")
-            self.send_keys(By.ID, "FromDate","01-06-2024")
-            self.send_keys(By.ID, "ToDate", "01-06-2024")
-            self.click_element(By.ID,"btn_PickTrip")
-            time.sleep(1)
-            self.click_element(By.ID, "IsSelectTripExpenseInfoSessionName8841")
-            time.sleep(1)
+                # Indent Details
+                self.select_dropdown1(By.ID, "VehicleIndentId", "AHM-000001-VI")
+                time.sleep(2)
 
-            # Submit Trip
+                # Vehicle Placement Details
+                self.autocomplete_select(By.ID, "VehicleId-select", "MH04AA7007")
+                self.select_dropdown(By.ID, "FreightUnitId", "Fixed")
+                self.send_keys(By.ID, "AdvanceAmount", "12000")
+
+
+
+            # Submit Details
             self.click_element(By.ID, "mysubmit")
-            print("Trip submitted successfully.")
-            time.sleep(3)
+            time.sleep(1)
 
     @classmethod
     def tearDownClass(cls):
