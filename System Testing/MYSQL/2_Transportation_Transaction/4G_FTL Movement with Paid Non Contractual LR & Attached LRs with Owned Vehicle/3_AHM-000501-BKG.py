@@ -10,6 +10,7 @@ import time
 import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
+#Paid Freight Receivable Document Mapping error = Add Cr and Dr for Booking(Sundry Debtors)
 
 class Booking(unittest.TestCase):
     @classmethod
@@ -157,7 +158,7 @@ class Booking(unittest.TestCase):
 
     #Submit Details
         self.click_element(By.ID, "mysubmit")
-        time.sleep(1)
+        time.sleep(3)
 
     @classmethod
     def tearDownClass(cls):

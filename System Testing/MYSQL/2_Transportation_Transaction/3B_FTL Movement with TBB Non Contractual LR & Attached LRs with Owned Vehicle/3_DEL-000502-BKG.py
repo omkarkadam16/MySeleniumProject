@@ -111,6 +111,7 @@ class Booking2(unittest.TestCase):
             self.autocomplete_select(By.ID,"BookingId-select","DEL-000501-BKG")
             self.select_dropdown(By.ID,"SeriesId","DELHI - 501 To 1000")
             self.click_element(By.ID,"btn_GetDocumentNoSearch")
+            time.sleep(1)
 
             # Calendor
         if self.switch_frames("DocumentDate"):

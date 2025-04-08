@@ -107,13 +107,13 @@ class Booking2(unittest.TestCase):
 
     #Attach LR
         if self.switch_frames("LocationId-select"):
-            self.autocomplete_select(By.ID,"LocationId-select","DELHI")
-            self.autocomplete_select(By.ID,"BookingId-select","DEL-000501-BKG")
-            self.select_dropdown(By.ID,"SeriesId","DELHI - 501 To 1000")
+            self.autocomplete_select(By.ID,"LocationId-select","AHMEDABAD")
+            self.autocomplete_select(By.ID,"BookingId-select","AHM-000501-BKG")
+            self.select_dropdown(By.ID,"SeriesId","AHMEDABAD - 501 To 1000")
             self.click_element(By.ID,"btn_GetDocumentNoSearch")
             time.sleep(1)
 
-            # Calendor
+            # Calendar
         if self.switch_frames("DocumentDate"):
             self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
             self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
@@ -123,17 +123,18 @@ class Booking2(unittest.TestCase):
         #Item Details
             self.autocomplete_select(By.ID, "ItemId-select", "Cotton")
             self.select_dropdown(By.ID, "PackingTypeId", "BOX")
-            self.autocomplete_select(By.ID, "Packets", "100")
-            self.send_keys(By.ID, "UnitWeight", "1000")
-            self.send_keys(By.ID, "BasicFreight", "0")
+            self.autocomplete_select(By.ID, "Packets", "500")
+            self.send_keys(By.ID, "UnitWeight", "6")
+            self.send_keys(By.ID, "BasicFreight", "15000")
             self.click_element(By.ID, "btnSave-BookingItemSession633")
             time.sleep(1)
             self.click_element(By.ID, "RFRSGSTDetails")
 
         #Invoice Details
+            self.send_keys(By.ID, "InvoiceNo", "1")
             self.send_keys(By.ID, "InvoiceDate", "01-06-2024")
-            self.click_element(By.ID, "IsNVC")
-            self.click_element(By.ID, "btnSave-BookingInvoiceSession633")
+            self.send_keys(By.ID, "InvoiceValue", "1")
+            self.click_element(By.ID,"btnSave-BookingInvoiceSession633")
             time.sleep(1)
 
         #Submit Details
