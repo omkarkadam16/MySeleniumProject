@@ -11,7 +11,7 @@ import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class MoneyReceipt(unittest.TestCase):
+class TripSettlement(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -89,7 +89,7 @@ class MoneyReceipt(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
-    def test_MoneyReceipt_Master(self):
+    def test_trip_Master(self):
         """Main test case"""
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
@@ -100,10 +100,10 @@ class MoneyReceipt(unittest.TestCase):
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
-        for i in ("Finance",
-                  "Finance Transaction »",
-                  "Operational Receipt »",
-                  "Money Receipt (To Pay)",):
+        for i in ("Transportation",
+                  "Transportation Transaction »",
+                  "Trip Management »",
+                  "Trip Settlement",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
@@ -112,39 +112,27 @@ class MoneyReceipt(unittest.TestCase):
 
             # Document Details
             if self.switch_frames("OrganizationId"):
-                self.select_dropdown(By.ID, "OrganizationId", "DELHI")
-                time.sleep(1)
+                self.select_dropdown(By.ID, "OrganizationId", "BHIWANDI")
                 # Calendar
-                self.send_keys(By.ID, "DocumentDate", "01-06-2024")
+                self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
+                self.click_element(By.XPATH, "//a[text()='1']")
 
-            # Customer Info
-            if self.switch_frames("CustomerId-select"):
-                self.autocomplete_select(By.ID, "CustomerId-select", "Adani Wilmar")
-                self.select_dropdown(By.ID,"PaymentTypeId","Received")
-
-            # Operation Bill Reference Info
-            self.click_element(By.ID, "btn_Pick_OperationaBillReference")
-            if self.switch_frames("btn_GetOperationalBillReference"):
-                self.click_element(By.ID, "btn_GetOperationalBillReference")
-                time.sleep(2)
-                self.click_element(By.ID, "IsSelectOperationalBillSearchCollectionSessionName6761")
-                self.click_element(By.ID, "IsSelectOperationalBillSearchCollectionSessionName6762")
-                self.click_element(By.ID, "IsSelectOperationalBillSearchCollectionSessionName6763")
-                self.click_element(By.ID, "btn_OperationalBillReference")
-                time.sleep(1)
-
-            # Receipt Info
-            if self.switch_frames("PaymentModeId"):
-                self.select_dropdown(By.ID, "PaymentModeId", "Cheque")
-                self.select_dropdown(By.ID, "BankId", "HDFC Bank")
-                self.send_keys(By.ID, "ChequeNo", "12345")
-                self.send_keys(By.ID, "PaymentReceivedFrom", "	Prasad Industries Ltd.")
-                time.sleep(1)
-
-            # Submit Money Receipt
-            self.click_element(By.ID, "mysubmit")
-            print("Bill submitted successfully.")
+            # General
+            self.autocomplete_select(By.ID, "VehicleId-select", "MH18AC0358")
+            self.select_dropdown(By.ID, "VehicleTripId", "DEL-000101-LHC")
             time.sleep(2)
+
+            # Balance / Payment Slip Details
+            self.autocomplete_select(By.ID, "OrganizationalLocationId-select", "BHIWANDI")
+            self.send_keys(By.ID, "AdvanceAmount", "9000")
+            self.click_element(By.ID, "btnSave-VehicleTripAdvanceVehicleTripSessionName658")
+
+            # Submit Trip
+            self.click_element(By.ID, "mysubmit")
+            time.sleep(1)
+            print("Trip submitted successfully.")
 
     @classmethod
     def tearDownClass(cls):

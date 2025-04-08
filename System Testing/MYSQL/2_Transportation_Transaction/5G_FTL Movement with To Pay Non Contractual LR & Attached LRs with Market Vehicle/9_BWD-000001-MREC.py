@@ -112,14 +112,14 @@ class MoneyReceipt(unittest.TestCase):
 
             # Document Details
             if self.switch_frames("OrganizationId"):
-                self.select_dropdown(By.ID, "OrganizationId", "DELHI")
+                self.select_dropdown(By.ID, "OrganizationId", "BHIWANDI")
                 time.sleep(1)
                 # Calendar
                 self.send_keys(By.ID, "DocumentDate", "01-06-2024")
 
             # Customer Info
             if self.switch_frames("CustomerId-select"):
-                self.autocomplete_select(By.ID, "CustomerId-select", "Adani Wilmar")
+                self.autocomplete_select(By.ID, "CustomerId-select", "Food Corp")
                 self.select_dropdown(By.ID,"PaymentTypeId","Received")
 
             # Operation Bill Reference Info
@@ -138,7 +138,7 @@ class MoneyReceipt(unittest.TestCase):
                 self.select_dropdown(By.ID, "PaymentModeId", "Cheque")
                 self.select_dropdown(By.ID, "BankId", "HDFC Bank")
                 self.send_keys(By.ID, "ChequeNo", "12345")
-                self.send_keys(By.ID, "PaymentReceivedFrom", "	Prasad Industries Ltd.")
+                self.send_keys(By.ID, "PaymentReceivedFrom", "Food Corp")
                 time.sleep(1)
 
             # Submit Money Receipt
