@@ -146,6 +146,5 @@ class Dispatch(unittest.TestCase):
     def tearDownClass(cls):
         cls.driver.quit()
 
-
 if __name__ == "__main__":
     unittest.main()
