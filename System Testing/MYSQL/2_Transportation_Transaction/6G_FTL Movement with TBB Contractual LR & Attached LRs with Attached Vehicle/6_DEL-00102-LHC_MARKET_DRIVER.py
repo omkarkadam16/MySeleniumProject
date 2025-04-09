@@ -136,11 +136,11 @@ class LHC(unittest.TestCase):
             time.sleep(1)
 
         # Route Details
-        self.auto_select(By.ID, "ServiceNetworkId-select", "BHIWANDI")
+        self.auto_select(By.ID, "ServiceNetworkId-select", "AHMEDABAD")
         self.send_keys(By.ID, "ScheduleTime", "01-06-2024")
         self.click_element(By.ID, "btnSave-VehicleTripRouteVehicleTripSessionName661")
 
-        self.select_dropdown(By.ID, "VehiclePlacementId", "DEL-000002-Vehicle Placement")
+        self.select_dropdown(By.ID, "VehiclePlacementId", "DEL-000003-Vehicle Placement")
 
         # Wait for memo-related element to be visible (update with the correct ID or class)
         try:
@@ -148,12 +148,14 @@ class LHC(unittest.TestCase):
             print("[INFO] Memo section loaded.")
         except ex.TimeoutException:
             print("[WARNING] Memo section did not load in time.")
+        time.sleep(2)
 
         # Hire Details
         self.send_keys(By.ID, "DriverName", "Shailesh Gothal")
         self.send_keys(By.ID, "LicenseExpDate", "31-12-2027")
         self.send_keys(By.ID, "LicenseNo", "98765")
         self.send_keys(By.ID, "ContactNo", "9863575754")
+        self.auto_select(By.ID,"BalanceLocationId-select","AHMEDABAD")
 
 
         # Booking movement
@@ -163,16 +165,10 @@ class LHC(unittest.TestCase):
         # Hire Charges Details
         self.select_dropdown(By.ID, "FreightUnitId", "Fixed")
         time.sleep(2)
-        self.send_keys(By.ID, "FreightRate", "30000")
+        self.send_keys(By.ID, "FreightRate", "20000")
         self.click_element(By.ID, "FreightUnitId")
         time.sleep(2)
         self.handle_alert()
-
-        if self.switch_frames("OrganizationalLocationId-select"):
-            self.auto_select(By.ID, "OrganizationalLocationId-select", "AHMEDABAD")
-            self.send_keys(By.ID, "AdvanceAmount", "7000")
-            self.click_element(By.ID, "btnSave-VehicleTripAdvanceVehicleTripSessionName661")
-            time.sleep(1)
 
         # Submit Details
         self.click_element(By.ID, "mysubmit")

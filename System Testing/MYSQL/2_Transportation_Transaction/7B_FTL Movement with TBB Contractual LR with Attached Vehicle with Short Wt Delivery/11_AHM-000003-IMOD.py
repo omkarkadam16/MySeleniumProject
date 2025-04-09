@@ -11,7 +11,7 @@ import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class MoneyReceipt(unittest.TestCase):
+class Dispatch(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -62,7 +62,6 @@ class MoneyReceipt(unittest.TestCase):
     def select_dropdown(self, by, value, text):
         try:
             e = self.wait.until(EC.element_to_be_clickable((by, value)))
-            e.is_enabled()
             e.click()
             print("[SUCCESS] Clicked dropdown")
             self.wait.until(EC.visibility_of_element_located((by, value)))
@@ -89,7 +88,7 @@ class MoneyReceipt(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
-    def test_MoneyReceipt_Master(self):
+    def test_Dispatch_Master(self):
         """Main test case"""
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
@@ -100,10 +99,10 @@ class MoneyReceipt(unittest.TestCase):
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
-        for i in ("Finance",
-                  "Finance Transaction »",
-                  "Operational Receipt »",
-                  "Money Receipt (To Pay)",):
+        for i in ("Transportation",
+                  "Transportation Transaction »",
+                  "Inter Office Memo »",
+                  "IOM Dispatch (POD)",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
@@ -112,44 +111,37 @@ class MoneyReceipt(unittest.TestCase):
 
             # Document Details
             if self.switch_frames("OrganizationId"):
-                self.select_dropdown(By.ID, "OrganizationId", "BHIWANDI")
-                time.sleep(1)
+                self.select_dropdown(By.ID, "OrganizationId", "AHMEDABAD")
                 # Calendar
-                self.send_keys(By.ID, "DocumentDate", "01-06-2024")
+                self.click_element(By.ID, "DocumentDate")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
+                self.click_element(By.XPATH, "//a[text()='1']")
 
-            # Customer Info
-            if self.switch_frames("CustomerId-select"):
-                self.autocomplete_select(By.ID, "CustomerId-select", "Food Corp")
-                self.select_dropdown(By.ID,"PaymentTypeId","Received")
-
-            # Operation Bill Reference Info
-            self.click_element(By.ID, "btn_Pick_OperationaBillReference")
-            if self.switch_frames("btn_GetOperationalBillReference"):
-                self.click_element(By.ID, "btn_GetOperationalBillReference")
+            # Dispatch Info
+            self.autocomplete_select(By.ID, "ToLocationId-select", "BHIWANDI")
+            self.select_dropdown(By.ID, "DispatchThroughId", "Courier")
+            self.send_keys(By.ID, "CourierName", "DTDC")
+            self.send_keys(By.ID, "DocketNo", "12345")
+            self.send_keys(By.ID, "DocketDate", "01-06-2024")
+            self.send_keys(By.ID, "EDD", "01-06-2024")
+            self.click_element(By.ID,"btn_Pick_Booking")
+            if self.switch_frames("btn_GetBookingStock"):
+                self.click_element(By.ID, "btn_GetBookingStock")
                 time.sleep(2)
-                self.click_element(By.ID, "IsSelectOperationalBillSearchCollectionSessionName6761")
-                self.click_element(By.ID, "IsSelectOperationalBillSearchCollectionSessionName6762")
-                self.click_element(By.ID, "IsSelectOperationalBillSearchCollectionSessionName6763")
-                self.click_element(By.ID, "btn_OperationalBillReference")
-                time.sleep(1)
+                self.click_element(By.ID, "IsSelectBookingSnapSearchSessionName8141")
+                self.click_element(By.ID, "btn_PickSelectedBookingStock")
+                time.sleep(2)
 
-            # Receipt Info
-            if self.switch_frames("PaymentModeId"):
-                self.select_dropdown(By.ID, "PaymentModeId", "Cheque")
-                self.select_dropdown(By.ID, "BankId", "HDFC Bank")
-                self.send_keys(By.ID, "ChequeNo", "12345")
-                self.send_keys(By.ID, "PaymentReceivedFrom", "Food Corp")
-                time.sleep(1)
-
-            # Submit Money Receipt
-            self.click_element(By.ID, "mysubmit")
-            print("Bill submitted successfully.")
-            time.sleep(2)
+            # Submit Trip
+            if self.switch_frames("mysubmit"):
+                self.click_element(By.ID, "mysubmit")
+                print("Trip submitted successfully.")
+                time.sleep(2)
 
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
-
 
 if __name__ == "__main__":
     unittest.main()

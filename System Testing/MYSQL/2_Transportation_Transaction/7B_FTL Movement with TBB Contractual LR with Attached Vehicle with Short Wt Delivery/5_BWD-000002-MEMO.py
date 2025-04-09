@@ -109,7 +109,7 @@ class Memo(unittest.TestCase):
 
         # Document Info
             if self.switch_frames("OrganizationId"):
-                self.select_dropdown(By.ID, "OrganizationId", "DELHI")
+                self.select_dropdown(By.ID, "OrganizationId", "BHIWANDI")
                 # Calendar
                 self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
                 self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
@@ -118,8 +118,8 @@ class Memo(unittest.TestCase):
 
             # Memo Info
             self.select_dropdown(By.ID, "MemoTypeId", "Direct Door Delivery")
-            self.autocomplete_select(By.ID,"VehicleId-select","MH18AC0358")
-            self.autocomplete_select(By.ID,"ToServiceNetworkId-select","BHIWANDI")
+            self.autocomplete_select(By.ID,"VehicleId-select","MH06RR1006")
+            self.autocomplete_select(By.ID,"ToServiceNetworkId-select","AHMEDABAD")
             time.sleep(1)
 
             #Memo Booking
@@ -137,6 +137,7 @@ class Memo(unittest.TestCase):
 
             #Save Memo
             self.click_element(By.ID, "mysubmit")
+            time.sleep(1)
 
     @classmethod
     def tearDownClass(cls):

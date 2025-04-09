@@ -118,8 +118,8 @@ class Memo(unittest.TestCase):
 
             # Memo Info
             self.select_dropdown(By.ID, "MemoTypeId", "Direct Door Delivery")
-            self.autocomplete_select(By.ID,"VehicleId-select","MH18AC0358")
-            self.autocomplete_select(By.ID,"ToServiceNetworkId-select","BHIWANDI")
+            self.autocomplete_select(By.ID,"VehicleId-select","MH05SA101")
+            self.autocomplete_select(By.ID,"ToServiceNetworkId-select","AHMEDABAD")
             time.sleep(1)
 
             #Memo Booking
@@ -137,6 +137,7 @@ class Memo(unittest.TestCase):
 
             #Save Memo
             self.click_element(By.ID, "mysubmit")
+            time.sleep(1)
 
     @classmethod
     def tearDownClass(cls):

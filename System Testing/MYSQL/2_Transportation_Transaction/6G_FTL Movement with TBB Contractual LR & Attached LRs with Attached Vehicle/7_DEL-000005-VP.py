@@ -11,7 +11,7 @@ import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class MoneyReceipt(unittest.TestCase):
+class Payment(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -89,7 +89,7 @@ class MoneyReceipt(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
-    def test_MoneyReceipt_Master(self):
+    def test_Payment_Master(self):
         """Main test case"""
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
@@ -102,49 +102,47 @@ class MoneyReceipt(unittest.TestCase):
 
         for i in ("Finance",
                   "Finance Transaction »",
-                  "Operational Receipt »",
-                  "Money Receipt (To Pay)",):
+                  "Operational Payment »",
+                  "Operational Payment (Vendor)",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
         if self.switch_frames("btn_NewRecord"):
             self.click_element(By.ID, "btn_NewRecord")
 
-            # Document Details
             if self.switch_frames("OrganizationId"):
-                self.select_dropdown(By.ID, "OrganizationId", "BHIWANDI")
-                time.sleep(1)
+                self.select_dropdown(By.ID, "OrganizationId", "DELHI")
                 # Calendar
-                self.send_keys(By.ID, "DocumentDate", "01-06-2024")
+                self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
+                self.click_element(By.XPATH, "//a[text()='1']")
 
-            # Customer Info
-            if self.switch_frames("CustomerId-select"):
-                self.autocomplete_select(By.ID, "CustomerId-select", "Food Corp")
-                self.select_dropdown(By.ID,"PaymentTypeId","Received")
-
-            # Operation Bill Reference Info
+            # general Details
+            self.autocomplete_select(By.ID,"VendorId-select","BAJAJ CORPORATION")
+            self.click_element(By.ID, "btnSave-VendorPaymentOnSession667")
             self.click_element(By.ID, "btn_Pick_OperationaBillReference")
+            time.sleep(2)
+
+            #Trip Reference Info
             if self.switch_frames("btn_GetOperationalBillReference"):
                 self.click_element(By.ID, "btn_GetOperationalBillReference")
-                time.sleep(2)
-                self.click_element(By.ID, "IsSelectOperationalBillSearchCollectionSessionName6761")
-                self.click_element(By.ID, "IsSelectOperationalBillSearchCollectionSessionName6762")
-                self.click_element(By.ID, "IsSelectOperationalBillSearchCollectionSessionName6763")
+                self.click_element(By.ID, "IsSelectOperationalBillSearchSessionName6671")
                 self.click_element(By.ID, "btn_OperationalBillReference")
-                time.sleep(1)
+                time.sleep(2)
 
-            # Receipt Info
+            #Payment Detail
             if self.switch_frames("PaymentModeId"):
-                self.select_dropdown(By.ID, "PaymentModeId", "Cheque")
-                self.select_dropdown(By.ID, "BankId", "HDFC Bank")
-                self.send_keys(By.ID, "ChequeNo", "12345")
-                self.send_keys(By.ID, "PaymentReceivedFrom", "Food Corp")
-                time.sleep(1)
+                self.select_dropdown(By.ID, "PaymentModeId","Cheque")
+                self.select_dropdown(By.ID, "BankId","HDFC Bank")
+                self.send_keys(By.ID, "ChequeNo","12345")
+                self.send_keys(By.ID, "PaymentPaidTo","BAJAJ CORPORATION")
 
-            # Submit Money Receipt
+            #Submit Payment
             self.click_element(By.ID, "mysubmit")
-            print("Bill submitted successfully.")
+            print("Advanced Payment submitted successfully.")
             time.sleep(2)
+
 
     @classmethod
     def tearDownClass(cls):

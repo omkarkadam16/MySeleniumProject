@@ -103,7 +103,7 @@ class MoneyReceipt(unittest.TestCase):
         for i in ("Finance",
                   "Finance Transaction »",
                   "Operational Receipt »",
-                  "Money Receipt (To Pay)",):
+                  "Money Receipt (To Be Billed)",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
@@ -119,17 +119,14 @@ class MoneyReceipt(unittest.TestCase):
 
             # Customer Info
             if self.switch_frames("CustomerId-select"):
-                self.autocomplete_select(By.ID, "CustomerId-select", "Food Corp")
-                self.select_dropdown(By.ID,"PaymentTypeId","Received")
+                self.autocomplete_select(By.ID, "CustomerId-select", "Adani Wilmar")
 
             # Operation Bill Reference Info
             self.click_element(By.ID, "btn_Pick_OperationaBillReference")
             if self.switch_frames("btn_GetOperationalBillReference"):
                 self.click_element(By.ID, "btn_GetOperationalBillReference")
                 time.sleep(2)
-                self.click_element(By.ID, "IsSelectOperationalBillSearchCollectionSessionName6761")
-                self.click_element(By.ID, "IsSelectOperationalBillSearchCollectionSessionName6762")
-                self.click_element(By.ID, "IsSelectOperationalBillSearchCollectionSessionName6763")
+                self.click_element(By.ID, "IsSelectOperationalBillSearchCollectionSessionName6751")
                 self.click_element(By.ID, "btn_OperationalBillReference")
                 time.sleep(1)
 
@@ -138,7 +135,7 @@ class MoneyReceipt(unittest.TestCase):
                 self.select_dropdown(By.ID, "PaymentModeId", "Cheque")
                 self.select_dropdown(By.ID, "BankId", "HDFC Bank")
                 self.send_keys(By.ID, "ChequeNo", "12345")
-                self.send_keys(By.ID, "PaymentReceivedFrom", "Food Corp")
+                self.send_keys(By.ID, "PaymentReceivedFrom", "Adani Wilmar")
                 time.sleep(1)
 
             # Submit Money Receipt
