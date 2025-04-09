@@ -137,6 +137,8 @@ class Placement(unittest.TestCase):
                 time.sleep(1)
 
                 # Indent Details
+                self.select_dropdown(By.ID, "VehicleIndentId", "Select One")
+                time.sleep(2)
                 self.select_dropdown1(By.ID, "VehicleIndentId", "DEL-000001-VI")
                 time.sleep(2)
 

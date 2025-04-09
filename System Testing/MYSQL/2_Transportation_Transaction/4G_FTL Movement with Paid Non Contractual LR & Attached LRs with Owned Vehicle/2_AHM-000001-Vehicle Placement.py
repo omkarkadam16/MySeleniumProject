@@ -90,24 +90,6 @@ class Placement(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
-    def select_dropdown1(self, by, value, text):
-        for retry in range(2):
-            try:
-                self.wait.until(EC.element_to_be_clickable((by, value))).click()
-                print("[SUCCESS] Clicked dropdown")
-                self.wait.until(EC.visibility_of_element_located((by, value)))
-
-                # Re-locating the element to prevent StaleElementReferenceException
-                element = Select(self.driver.find_element(by, value))
-                element.select_by_visible_text(text)
-                print(f"[SUCCESS] Selected dropdown option: {text}")
-                return True
-            except (ex.StaleElementReferenceException, ex.NoSuchElementException, ex.TimeoutException):
-                print(f"[RETRY] StaleElementReferenceException occurred for {value}, retrying...")
-                time.sleep(1)
-                continue  # Retry the loop
-        return False
-
 
     def test_Placement_Master(self):
         driver = self.driver
@@ -138,7 +120,9 @@ class Placement(unittest.TestCase):
                 time.sleep(1)
 
                 # Indent Details
-                self.select_dropdown1(By.ID, "VehicleIndentId", "AHM-000001-VI")
+                self.select_dropdown(By.ID, "VehicleIndentId", "Select One")
+                time.sleep(2)
+                self.select_dropdown(By.ID, "VehicleIndentId", "AHM-000001-VI")
                 time.sleep(2)
 
                 # Vehicle Placement Details

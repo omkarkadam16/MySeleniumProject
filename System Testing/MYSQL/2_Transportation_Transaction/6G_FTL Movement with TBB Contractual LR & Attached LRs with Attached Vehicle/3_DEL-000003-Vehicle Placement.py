@@ -2,14 +2,16 @@ from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait, Select
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import unittest, time
+import unittest
+import time
 import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
-
-class Indent(unittest.TestCase):
+#Please Restart IDE before running the script
+class Placement(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -46,32 +48,31 @@ class Indent(unittest.TestCase):
         return False
 
     def send_keys(self, by, value, text):
-        """Send keys after checking visibility"""
-        for attempt in range(3):
+        for retry in range(3):
             try:
-                print(f"[INFO] Attempt {attempt + 1}: Entering text...")
                 element = self.wait.until(EC.visibility_of_element_located((by, value)))
                 element.clear()
                 element.send_keys(text)
                 print("Sent keys", text)
                 return True
-            except (ex.NoSuchElementException, ex.UnexpectedAlertPresentException, ex.TimeoutException,
-                    ex.StaleElementReferenceException) as e:
-                print(f"[WARNING]Error : {type(e)} occurred. Retrying...")
+            except(ex.ElementClickInterceptedException, ex.StaleElementReferenceException, ex.TimeoutException):
+                print(f"Element not found: {value}")
+
 
     def select_dropdown(self, by, value, text):
-        try:
-            e = self.wait.until(EC.element_to_be_clickable((by, value)))
-            e.is_enabled()
-            e.click()
-            print("[SUCCESS] Clicked dropdown")
-            self.wait.until(EC.visibility_of_element_located((by, value)))
-            element = Select(self.driver.find_element(by, value))
-            element.select_by_visible_text(text)
-            print(f"[SUCCESS] Selected dropdown option: {text}")
-            return True
-        except (ex.NoSuchElementException, ex.ElementClickInterceptedException, ex.TimeoutException):
-            return False
+        for retry in range(2):
+            try:
+                e = self.wait.until(EC.element_to_be_clickable((by, value)))
+                e.is_enabled()
+                e.click()
+                print("[SUCCESS] Clicked dropdown")
+                self.wait.until(EC.visibility_of_element_located((by, value)))
+                element = Select(self.driver.find_element(by, value))
+                element.select_by_visible_text(text)
+                print(f"[SUCCESS] Selected dropdown option: {text}")
+                return True
+            except (ex.NoSuchElementException, ex.ElementClickInterceptedException, ex.TimeoutException):
+                return False
 
     def autocomplete_select(self,by,value,text):
         input_text=self.wait.until(EC.visibility_of_element_located((by,value)))
@@ -89,7 +90,7 @@ class Indent(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
-    def test_Indent_Master(self):
+    def test_Placement_Master(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
@@ -102,7 +103,7 @@ class Indent(unittest.TestCase):
         for i in ("Transportation",
                   "Transportation Transaction »",
                   "Indent / Placement »",
-                  "Vehicle Indent",):
+                  "Vehicle Placement",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
@@ -112,27 +113,26 @@ class Indent(unittest.TestCase):
             # Document Details
             if self.switch_frames("OrganizationId"):
                 self.select_dropdown(By.ID, "OrganizationId", "DELHI")
+
                 # Calendar
                 self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
                 self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
                 self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
                 self.click_element(By.XPATH, "//a[text()='1']")
+                time.sleep(1)
 
-            #Indent Details
-            self.select_dropdown(By.ID, "VehicleIndentTypeId","Non-Contractual")
-            self.select_dropdown(By.ID, "CommChannelId", "Email")
-            self.send_keys(By.ID, "VehicleRequiredOn","01-06-2024")
-            self.select_dropdown(By.ID, "VehicleTypeId", "20 MT")
-            self.send_keys(By.ID, "VehicleCount", "1")
-            self.send_keys(By.ID, "ExpiryDate", "01-06-2025")
-            self.autocomplete_select(By.ID, "FromServiceNetworkId-select", "DELHI")
-            self.autocomplete_select(By.ID, "ToServiceNetworkId-select", "BHIWANDI")
-            self.autocomplete_select(By.ID, "TransportItemId-select", "Cotton")
-            self.autocomplete_select(By.ID, "ConsignorId-select", "Adani Wilmar")
-            self.autocomplete_select(By.ID, "ConsigneeId-select", "Food Corp")
-            self.send_keys(By.ID, "Weight", "6")
-            self.autocomplete_select(By.ID, "PartyId-select", "Adani Wilmar")
-            self.send_keys(By.ID, "Packets", "500")
+                # Indent Details
+                self.select_dropdown(By.ID, "VehicleIndentId", "Select One")
+                time.sleep(2)
+                self.switch_frames("VehicleIndentId")
+                self.select_dropdown(By.ID, "VehicleIndentId", "DEL-000003-VI")
+                time.sleep(2)
+                # Vehicle Placement Details
+                self.autocomplete_select(By.ID, "VehicleId-select", "MH05SA101")
+                self.select_dropdown(By.ID, "FreightUnitId", "Fixed")
+                self.send_keys(By.ID, "AdvanceAmount", "12000")
+
+
 
             # Submit Details
             self.click_element(By.ID, "mysubmit")

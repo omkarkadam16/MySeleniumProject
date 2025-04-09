@@ -2,14 +2,15 @@ from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait, Select
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import unittest, time
+import unittest
+import time
 import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
-
-class Indent(unittest.TestCase):
+class Booking(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -45,21 +46,18 @@ class Indent(unittest.TestCase):
                 driver.switch_to.default_content()
         return False
 
-    def send_keys(self, by, value, text):
-        """Send keys after checking visibility"""
-        for attempt in range(3):
-            try:
-                print(f"[INFO] Attempt {attempt + 1}: Entering text...")
-                element = self.wait.until(EC.visibility_of_element_located((by, value)))
-                element.clear()
-                element.send_keys(text)
-                print("Sent keys", text)
-                return True
-            except (ex.NoSuchElementException, ex.UnexpectedAlertPresentException, ex.TimeoutException,
-                    ex.StaleElementReferenceException) as e:
-                print(f"[WARNING]Error : {type(e)} occurred. Retrying...")
+    def send_keys(self,by,value,text):
+        try:
+            element = self.wait.until(EC.visibility_of_element_located((by, value)))
+            element.clear()
+            element.send_keys(text)
+            print(f'Sent keys {text} to {by} with value {value}')
+            return True
+        except (ex.NoSuchElementException, ex.StaleElementReferenceException):
+            print(f'Element not found: {value}')
+            return False
 
-    def select_dropdown(self, by, value, text):
+    def select_dropdown(self,by,value,text):
         try:
             e = self.wait.until(EC.element_to_be_clickable((by, value)))
             e.is_enabled()
@@ -89,7 +87,7 @@ class Indent(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
-    def test_Indent_Master(self):
+    def test_booking(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
@@ -100,43 +98,63 @@ class Indent(unittest.TestCase):
         print("Login successful.")
 
         for i in ("Transportation",
-                  "Transportation Transaction »",
-                  "Indent / Placement »",
-                  "Vehicle Indent",):
+            "Transportation Transaction »",
+            "Booking »",
+            "Consignment Note",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
         if self.switch_frames("btn_NewRecord"):
             self.click_element(By.ID, "btn_NewRecord")
 
-            # Document Details
-            if self.switch_frames("OrganizationId"):
-                self.select_dropdown(By.ID, "OrganizationId", "DELHI")
-                # Calendar
-                self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
-                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
-                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
-                self.click_element(By.XPATH, "//a[text()='1']")
+    #Document Details
+        if self.switch_frames("OrganizationId"):
+            self.select_dropdown(By.ID,"OrganizationId","DELHI")
+            self.select_dropdown(By.ID,"SeriesId","DELHI - 101 To 500")
+            #Calendor
+            self.click_element(By.CLASS_NAME,"ui-datepicker-trigger")
+            self.select_dropdown(By.CLASS_NAME,"ui-datepicker-month","Jun")
+            self.select_dropdown(By.CLASS_NAME,"ui-datepicker-year","2024")
+            self.click_element(By.XPATH,"//a[text()='1']")
 
-            #Indent Details
-            self.select_dropdown(By.ID, "VehicleIndentTypeId","Non-Contractual")
-            self.select_dropdown(By.ID, "CommChannelId", "Email")
-            self.send_keys(By.ID, "VehicleRequiredOn","01-06-2024")
-            self.select_dropdown(By.ID, "VehicleTypeId", "20 MT")
-            self.send_keys(By.ID, "VehicleCount", "1")
-            self.send_keys(By.ID, "ExpiryDate", "01-06-2025")
-            self.autocomplete_select(By.ID, "FromServiceNetworkId-select", "DELHI")
-            self.autocomplete_select(By.ID, "ToServiceNetworkId-select", "BHIWANDI")
-            self.autocomplete_select(By.ID, "TransportItemId-select", "Cotton")
-            self.autocomplete_select(By.ID, "ConsignorId-select", "Adani Wilmar")
-            self.autocomplete_select(By.ID, "ConsigneeId-select", "Food Corp")
-            self.send_keys(By.ID, "Weight", "6")
-            self.autocomplete_select(By.ID, "PartyId-select", "Adani Wilmar")
-            self.send_keys(By.ID, "Packets", "500")
+    #Booking Details
+        self.select_dropdown(By.ID, "ConsignmentTypeId", "Contractual")
+        self.autocomplete_select(By.ID, "ContractPartyId-select", "Bharat Earth")
+        time.sleep(1)
+        self.select_dropdown(By.ID, "ContractId", "Bharat - 001")
+        self.select_dropdown(By.ID, "PickupTypeId", "Door")
+        self.select_dropdown(By.ID, "RiskTypeId", "Owners Risk")
+        self.select_dropdown(By.ID, "ConsigneeCopyWithId", "Consignor")
+        self.click_element(By.ID, "IsPOD")
 
-            # Submit Details
-            self.click_element(By.ID, "mysubmit")
-            time.sleep(1)
+    #Route Details
+        self.autocomplete_select(By.ID, "FromServiceNetworkId-select", "DELHI")
+        self.autocomplete_select(By.ID, "ToServiceNetworkId-select", "AHMEDABAD")
+        self.autocomplete_select(By.ID, "VehicleId-select", "MH05SA101")
+
+    #Consignor/Consignee Details
+        self.autocomplete_select(By.ID, "ConsigneeId-select", "P M Enterprise")
+        self.select_dropdown(By.ID, "BillingOnId", "Consignor")
+
+    #Item Details
+        self.autocomplete_select(By.ID, "ItemId-select", "Copper")
+        self.select_dropdown(By.ID, "PackingTypeId", "BAGS")
+        self.autocomplete_select(By.ID, "Packets", "500")
+        self.send_keys(By.ID, "UnitWeight", "6")
+        self.click_element(By.ID, "btnSave-BookingItemSession633")
+        time.sleep(1)
+        self.click_element(By.ID, "RFRSGSTDetails")
+
+    # Invoice Details
+        self.send_keys(By.ID, "InvoiceNo", "1")
+        self.send_keys(By.ID, "InvoiceDate", "01-06-2024")
+        self.send_keys(By.ID, "InvoiceValue", "1")
+        self.click_element(By.ID, "btnSave-BookingInvoiceSession633")
+        time.sleep(1)
+
+    #Submit Details
+        self.click_element(By.ID, "mysubmit")
+        time.sleep(3)
 
     @classmethod
     def tearDownClass(cls):
@@ -145,3 +163,4 @@ class Indent(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

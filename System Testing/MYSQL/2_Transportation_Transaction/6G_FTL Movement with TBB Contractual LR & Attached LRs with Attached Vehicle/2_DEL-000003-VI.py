@@ -119,20 +119,19 @@ class Indent(unittest.TestCase):
                 self.click_element(By.XPATH, "//a[text()='1']")
 
             #Indent Details
-            self.select_dropdown(By.ID, "VehicleIndentTypeId","Non-Contractual")
-            self.select_dropdown(By.ID, "CommChannelId", "Email")
+            self.select_dropdown(By.ID, "VehicleIndentTypeId","Contractual")
+            self.select_dropdown(By.ID, "CommChannelId", "Phone")
             self.send_keys(By.ID, "VehicleRequiredOn","01-06-2024")
-            self.select_dropdown(By.ID, "VehicleTypeId", "20 MT")
             self.send_keys(By.ID, "VehicleCount", "1")
             self.send_keys(By.ID, "ExpiryDate", "01-06-2025")
             self.autocomplete_select(By.ID, "FromServiceNetworkId-select", "DELHI")
-            self.autocomplete_select(By.ID, "ToServiceNetworkId-select", "BHIWANDI")
-            self.autocomplete_select(By.ID, "TransportItemId-select", "Cotton")
-            self.autocomplete_select(By.ID, "ConsignorId-select", "Adani Wilmar")
-            self.autocomplete_select(By.ID, "ConsigneeId-select", "Food Corp")
+            self.autocomplete_select(By.ID, "ToServiceNetworkId-select", "AHMEDABAD")
+            self.autocomplete_select(By.ID, "ConsignorId-select", "Bharat Earth")
+            self.autocomplete_select(By.ID, "ConsigneeId-select", "P M Enterprise")
             self.send_keys(By.ID, "Weight", "6")
-            self.autocomplete_select(By.ID, "PartyId-select", "Adani Wilmar")
+            self.autocomplete_select(By.ID, "PartyId-select", "Bharat Earth")
             self.send_keys(By.ID, "Packets", "500")
+            self.select_dropdown(By.ID, "VehicleTypeId", "20 MT")
 
             # Submit Details
             self.click_element(By.ID, "mysubmit")

@@ -127,7 +127,7 @@ class MoneyReceipt(unittest.TestCase):
             if self.switch_frames("btn_GetOperationalBillReference"):
                 self.click_element(By.ID, "btn_GetOperationalBillReference")
                 time.sleep(2)
-                self.click_element(By.ID, "IsSelectOperationalBillSearchCollectionSessionName6761")
+                self.click_element(By.ID, "IsSelectOperationalBillSearchCollectionSessionName6764")
                 self.click_element(By.ID, "IsSelectOperationalBillSearchCollectionSessionName6762")
                 self.click_element(By.ID, "IsSelectOperationalBillSearchCollectionSessionName6763")
                 self.click_element(By.ID, "btn_OperationalBillReference")
