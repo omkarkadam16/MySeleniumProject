@@ -133,6 +133,7 @@ class Memo(unittest.TestCase):
                 self.click_element(By.ID, "btn_PickSelectedBookingStock")
 
             if self.switch_frames("CheckAll"):
+                self.wait.until(EC.visibility_of_element_located((By.ID, "MemoBookingMovementGrid")))
                 self.click_element(By.ID, "CheckAll")
 
             #Save Memo

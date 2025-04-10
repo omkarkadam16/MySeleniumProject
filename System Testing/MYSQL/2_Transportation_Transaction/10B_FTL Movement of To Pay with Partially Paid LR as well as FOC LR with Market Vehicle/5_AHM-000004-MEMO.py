@@ -109,7 +109,7 @@ class Memo(unittest.TestCase):
 
         # Document Info
             if self.switch_frames("OrganizationId"):
-                self.select_dropdown(By.ID, "OrganizationId", "DELHI")
+                self.select_dropdown(By.ID, "OrganizationId", "AHMEDABAD")
                 # Calendar
                 self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
                 self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
@@ -118,8 +118,8 @@ class Memo(unittest.TestCase):
 
             # Memo Info
             self.select_dropdown(By.ID, "MemoTypeId", "Direct Door Delivery")
-            self.autocomplete_select(By.ID,"VehicleId-select","MH05SA101")
-            self.autocomplete_select(By.ID,"ToServiceNetworkId-select","AHMEDABAD")
+            self.autocomplete_select(By.ID,"VehicleId-select","MH18AC0358")
+            self.autocomplete_select(By.ID,"ToServiceNetworkId-select","DELHI")
             time.sleep(1)
 
             #Memo Booking
@@ -129,16 +129,13 @@ class Memo(unittest.TestCase):
                 time.sleep(2)
                 self.click_element(By.ID, "IsSelectBookingSearchSessionName9061")
                 self.click_element(By.ID, "IsSelectBookingSearchSessionName9062")
-                self.click_element(By.ID, "IsSelectBookingSearchSessionName9063")
                 self.click_element(By.ID, "btn_PickSelectedBookingStock")
-            time.sleep(2)
             if self.switch_frames("CheckAll"):
                 self.wait.until(EC.visibility_of_element_located((By.ID, "MemoBookingMovementGrid")))
                 self.click_element(By.ID, "CheckAll")
 
             #Save Memo
             self.click_element(By.ID, "mysubmit")
-            time.sleep(1)
 
     @classmethod
     def tearDownClass(cls):
