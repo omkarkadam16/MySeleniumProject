@@ -10,8 +10,7 @@ import time
 import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
-
-class Delivery(unittest.TestCase):
+class Booking(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -47,19 +46,18 @@ class Delivery(unittest.TestCase):
                 driver.switch_to.default_content()
         return False
 
-    def send_keys(self, by, value, text):
+    def send_keys(self,by,value,text):
         try:
             element = self.wait.until(EC.visibility_of_element_located((by, value)))
-            element.is_enabled()
             element.clear()
             element.send_keys(text)
-            print("Sent keys", text)
+            print(f'Sent keys {text} to {by} with value {value}')
             return True
-        except ex.NoSuchElementException:
-            print(f"Element not found: {value}")
+        except (ex.NoSuchElementException, ex.StaleElementReferenceException):
+            print(f'Element not found: {value}')
             return False
 
-    def select_dropdown(self, by, value, text):
+    def select_dropdown(self,by,value,text):
         try:
             e = self.wait.until(EC.element_to_be_clickable((by, value)))
             e.is_enabled()
@@ -89,8 +87,7 @@ class Delivery(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
-    def test_Delivery_Master(self):
-        """Main test case"""
+    def test_booking(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
@@ -101,40 +98,63 @@ class Delivery(unittest.TestCase):
         print("Login successful.")
 
         for i in ("Transportation",
-                  "Transportation Transaction »",
-                  "Inward »",
-                  "Empty Unload",):
+            "Transportation Transaction »",
+            "Booking »",
+            "Consignment Note",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
         if self.switch_frames("btn_NewRecord"):
             self.click_element(By.ID, "btn_NewRecord")
 
-        # Document Info
+    #Document Details
         if self.switch_frames("OrganizationId"):
-            self.select_dropdown(By.ID, "OrganizationId", "DELHI")
-            # Calendor
-            self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
-            self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
-            self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
-            self.click_element(By.XPATH, "//a[text()='1']")
+            self.select_dropdown(By.ID,"OrganizationId","DELHI")
+            self.select_dropdown(By.ID,"SeriesId","DELHI - 101 To 500")
+            #Calendor
+            self.click_element(By.CLASS_NAME,"ui-datepicker-trigger")
+            self.select_dropdown(By.CLASS_NAME,"ui-datepicker-month","Jun")
+            self.select_dropdown(By.CLASS_NAME,"ui-datepicker-year","2024")
+            self.click_element(By.XPATH,"//a[text()='1']")
 
-        # Booking Detail
+    #Booking Details
+        self.select_dropdown(By.ID, "ConsignmentTypeId", "Contractual")
+        self.autocomplete_select(By.ID, "ContractPartyId-select", "Bharat Earth")
+        time.sleep(1)
+        self.select_dropdown(By.ID, "ContractId", "Bharat - 002")
+        self.select_dropdown(By.ID, "PickupTypeId", "Door")
+        self.select_dropdown(By.ID, "RiskTypeId", "Owners Risk")
+        self.select_dropdown(By.ID, "ConsigneeCopyWithId", "Consignor")
+        self.click_element(By.ID, "IsPOD")
+
+    #Route Details
+        self.autocomplete_select(By.ID, "FromServiceNetworkId-select", "DELHI")
+        self.autocomplete_select(By.ID, "ToServiceNetworkId-select", "AHMEDABAD")
         self.autocomplete_select(By.ID, "VehicleId-select", "MH18AC0358")
-        time.sleep(2)
-        self.select_dropdown(By.ID, "VehicleTripId", "BWD-000102-LHC")
-        time.sleep(2)
 
-        # Arrival Detail
-        self.click_element(By.XPATH, "(//img[@title='...'])[6]")
-        self.select_dropdown(By.XPATH, "(//select[@class='ui-datepicker-month'])[1]", "Jun")
-        self.select_dropdown(By.XPATH, "(//select[@class='ui-datepicker-year'])[1]", "2024")
-        self.click_element(By.XPATH, "(//a[normalize-space()='1'])[1]")
-        self.select_dropdown(By.ID, "ReasonDelayId", "TRAFFIC JAAM")
+    #Consignor/Consignee Details
+        self.autocomplete_select(By.ID, "ConsigneeId-select", "Adani Wilmar")
+        self.select_dropdown(By.ID, "BillingOnId", "Consignor")
 
-        # Submit form
+    #Item Details
+        self.autocomplete_select(By.ID, "ItemId-select", "Food Products")
+        self.select_dropdown(By.ID, "PackingTypeId", "BAGS")
+        self.autocomplete_select(By.ID, "Packets", "350")
+        self.send_keys(By.ID, "UnitWeight", "30")
+        self.click_element(By.ID, "btnSave-BookingItemSession633")
+        time.sleep(1)
+        self.click_element(By.ID, "RFRSGSTDetails")
+
+    # Invoice Details
+        self.send_keys(By.ID, "InvoiceNo", "1")
+        self.send_keys(By.ID, "InvoiceDate", "01-06-2024")
+        self.send_keys(By.ID, "InvoiceValue", "1")
+        self.click_element(By.ID, "btnSave-BookingInvoiceSession633")
+        time.sleep(1)
+
+    #Submit Details
         self.click_element(By.ID, "mysubmit")
-        print("Form submitted successfully.")
+        time.sleep(3)
 
     @classmethod
     def tearDownClass(cls):
@@ -143,3 +163,4 @@ class Delivery(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

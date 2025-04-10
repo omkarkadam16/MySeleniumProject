@@ -11,7 +11,7 @@ import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class Delivery(unittest.TestCase):
+class Dispatch(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -62,7 +62,6 @@ class Delivery(unittest.TestCase):
     def select_dropdown(self, by, value, text):
         try:
             e = self.wait.until(EC.element_to_be_clickable((by, value)))
-            e.is_enabled()
             e.click()
             print("[SUCCESS] Clicked dropdown")
             self.wait.until(EC.visibility_of_element_located((by, value)))
@@ -89,7 +88,7 @@ class Delivery(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
-    def test_Delivery_Master(self):
+    def test_Dispatch_Master(self):
         """Main test case"""
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
@@ -102,44 +101,48 @@ class Delivery(unittest.TestCase):
 
         for i in ("Transportation",
                   "Transportation Transaction »",
-                  "Inward »",
-                  "Empty Unload",):
+                  "Inter Office Memo »",
+                  "IOM Dispatch (POD)",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
         if self.switch_frames("btn_NewRecord"):
             self.click_element(By.ID, "btn_NewRecord")
 
-        # Document Info
-        if self.switch_frames("OrganizationId"):
-            self.select_dropdown(By.ID, "OrganizationId", "DELHI")
-            # Calendor
-            self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
-            self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
-            self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
-            self.click_element(By.XPATH, "//a[text()='1']")
+            # Document Details
+            if self.switch_frames("OrganizationId"):
+                self.select_dropdown(By.ID, "OrganizationId", "AHMEDABAD")
+                # Calendar
+                self.click_element(By.ID, "DocumentDate")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
+                self.click_element(By.XPATH, "//a[text()='1']")
 
-        # Booking Detail
-        self.autocomplete_select(By.ID, "VehicleId-select", "MH18AC0358")
-        time.sleep(2)
-        self.select_dropdown(By.ID, "VehicleTripId", "BWD-000102-LHC")
-        time.sleep(2)
+            # Dispatch Info
+            self.autocomplete_select(By.ID, "ToLocationId-select", "BHIWANDI")
+            self.select_dropdown(By.ID, "DispatchThroughId", "Courier")
+            self.send_keys(By.ID, "CourierName", "DTDC")
+            self.send_keys(By.ID, "DocketNo", "12345")
+            self.send_keys(By.ID, "DocketDate", "01-06-2024")
+            self.send_keys(By.ID, "EDD", "01-06-2024")
+            self.click_element(By.ID,"btn_Pick_Booking")
+            if self.switch_frames("btn_GetBookingStock"):
+                self.click_element(By.ID, "btn_GetBookingStock")
+                time.sleep(2)
+                self.click_element(By.ID, "IsSelectBookingSnapSearchSessionName8141")
+                self.click_element(By.ID, "IsSelectBookingSnapSearchSessionName8142")
+                self.click_element(By.ID, "btn_PickSelectedBookingStock")
+                time.sleep(2)
 
-        # Arrival Detail
-        self.click_element(By.XPATH, "(//img[@title='...'])[6]")
-        self.select_dropdown(By.XPATH, "(//select[@class='ui-datepicker-month'])[1]", "Jun")
-        self.select_dropdown(By.XPATH, "(//select[@class='ui-datepicker-year'])[1]", "2024")
-        self.click_element(By.XPATH, "(//a[normalize-space()='1'])[1]")
-        self.select_dropdown(By.ID, "ReasonDelayId", "TRAFFIC JAAM")
-
-        # Submit form
-        self.click_element(By.ID, "mysubmit")
-        print("Form submitted successfully.")
+            # Submit Trip
+            if self.switch_frames("mysubmit"):
+                self.click_element(By.ID, "mysubmit")
+                print("Trip submitted successfully.")
+                time.sleep(2)
 
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
-
 
 if __name__ == "__main__":
     unittest.main()

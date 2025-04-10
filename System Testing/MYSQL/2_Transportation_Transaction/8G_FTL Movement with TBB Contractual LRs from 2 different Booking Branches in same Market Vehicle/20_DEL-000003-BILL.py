@@ -11,7 +11,7 @@ import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class Delivery(unittest.TestCase):
+class Bill(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -89,7 +89,7 @@ class Delivery(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
-    def test_Delivery_Master(self):
+    def test_Bill_Master(self):
         """Main test case"""
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
@@ -102,39 +102,43 @@ class Delivery(unittest.TestCase):
 
         for i in ("Transportation",
                   "Transportation Transaction »",
-                  "Inward »",
-                  "Empty Unload",):
+                  "Bill »",
+                  "Freight Bill Generation",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
         if self.switch_frames("btn_NewRecord"):
             self.click_element(By.ID, "btn_NewRecord")
 
-        # Document Info
-        if self.switch_frames("OrganizationId"):
-            self.select_dropdown(By.ID, "OrganizationId", "DELHI")
-            # Calendor
-            self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
-            self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
-            self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
-            self.click_element(By.XPATH, "//a[text()='1']")
+            # Document Details
+            if self.switch_frames("OrganizationId"):
+                self.select_dropdown(By.ID, "OrganizationId", "BHIWANDI")
+                time.sleep(1)
+                # Calendor
+                self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
+                self.click_element(By.XPATH, "//a[text()='1']")
 
-        # Booking Detail
-        self.autocomplete_select(By.ID, "VehicleId-select", "MH18AC0358")
-        time.sleep(2)
-        self.select_dropdown(By.ID, "VehicleTripId", "BWD-000102-LHC")
-        time.sleep(2)
+            # Party Info
+            self.autocomplete_select(By.ID, "PartyId-select", "Adani Wilmar")
+            time.sleep(1)
+            self.click_element(By.ID, "GSTPayableById")
+            time.sleep(2)
 
-        # Arrival Detail
-        self.click_element(By.XPATH, "(//img[@title='...'])[6]")
-        self.select_dropdown(By.XPATH, "(//select[@class='ui-datepicker-month'])[1]", "Jun")
-        self.select_dropdown(By.XPATH, "(//select[@class='ui-datepicker-year'])[1]", "2024")
-        self.click_element(By.XPATH, "(//a[normalize-space()='1'])[1]")
-        self.select_dropdown(By.ID, "ReasonDelayId", "TRAFFIC JAAM")
+            # Operation Bill Reference Info
+            self.click_element(By.ID, "btn_Pick_TransportItem")
+            if self.switch_frames("btn_GetBillItem"):
+                self.click_element(By.ID, "btn_GetBillItem")
+                time.sleep(2)
+                self.click_element(By.ID, "IsSelectTransportInvoiceItemSearchSessionName6701")
+                self.click_element(By.ID, "btn_PickSelectedBillItem")
+                time.sleep(1)
 
-        # Submit form
-        self.click_element(By.ID, "mysubmit")
-        print("Form submitted successfully.")
+            # Submit Bill
+            self.switch_frames("mysubmit")
+            self.click_element(By.ID, "mysubmit")
+            time.sleep(1)
 
     @classmethod
     def tearDownClass(cls):

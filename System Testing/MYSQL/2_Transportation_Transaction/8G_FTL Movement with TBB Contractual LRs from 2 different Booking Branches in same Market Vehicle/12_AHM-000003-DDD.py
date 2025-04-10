@@ -102,8 +102,8 @@ class Delivery(unittest.TestCase):
 
         for i in ("Transportation",
                   "Transportation Transaction »",
-                  "Inward »",
-                  "Empty Unload",):
+                  "Delivery »",
+                  "Direct Door Delivery (POD)",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
@@ -112,9 +112,9 @@ class Delivery(unittest.TestCase):
 
         # Document Info
         if self.switch_frames("OrganizationId"):
-            self.select_dropdown(By.ID, "OrganizationId", "DELHI")
-            # Calendor
-            self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
+            self.select_dropdown(By.ID, "OrganizationId", "AHMEDABAD")
+            # Calendar
+            self.click_element(By.ID, "DocumentDate")
             self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
             self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
             self.click_element(By.XPATH, "//a[text()='1']")
@@ -123,6 +123,8 @@ class Delivery(unittest.TestCase):
         self.autocomplete_select(By.ID, "VehicleId-select", "MH18AC0358")
         time.sleep(2)
         self.select_dropdown(By.ID, "VehicleTripId", "BWD-000102-LHC")
+        self.select_dropdown(By.ID, "BookingId", "BWD-000102-BKG")
+        self.select_dropdown(By.ID, "BookingId", "Select LR")
         time.sleep(2)
 
         # Arrival Detail
