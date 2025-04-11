@@ -1,3 +1,4 @@
+
 from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
@@ -9,8 +10,6 @@ import unittest
 import time
 import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
-
-#Paid Freight Receivable Document Mapping error = Add Cr and Dr for Booking(Sundry Debtors)
 
 class Booking(unittest.TestCase):
     @classmethod
@@ -55,7 +54,7 @@ class Booking(unittest.TestCase):
             element.send_keys(text)
             print(f'Sent keys {text} to {by} with value {value}')
             return True
-        except ex.NoSuchElementException:
+        except (ex.NoSuchElementException, ex.StaleElementReferenceException):
             print(f'Element not found: {value}')
             return False
 
@@ -111,8 +110,8 @@ class Booking(unittest.TestCase):
 
     #Document Details
         if self.switch_frames("OrganizationId"):
-            self.select_dropdown(By.ID,"OrganizationId","AHMEDABAD")
-            self.select_dropdown(By.ID,"SeriesId","AHMEDABAD - 101 To 500")
+            self.select_dropdown(By.ID,"OrganizationId","BHIWANDI")
+            self.select_dropdown(By.ID,"SeriesId","BHIWANDI - 101 To 500")
             #Calendor
             self.click_element(By.CLASS_NAME,"ui-datepicker-trigger")
             self.select_dropdown(By.CLASS_NAME,"ui-datepicker-month","Jun")
@@ -121,48 +120,49 @@ class Booking(unittest.TestCase):
 
     #Booking Details
         self.select_dropdown(By.ID, "FreightOnId", "Fixed")
-        self.select_dropdown(By.ID,"PaymentTypeId","FOC")
-        self.select_dropdown(By.ID,"BookingTypeId","FTL")
-        self.select_dropdown(By.ID,"BookingModeId","Door")
-        self.select_dropdown(By.ID, "DeliveryTypeId", "Door")
-        self.select_dropdown(By.ID, "PickupTypeId", "Door")
+        self.select_dropdown(By.ID, "PaymentTypeId", "To Be Billed")
+        self.select_dropdown(By.ID, "BookingTypeId", "FTL")
         self.select_dropdown(By.ID, "RiskTypeId", "Owners Risk")
         self.select_dropdown(By.ID, "ConsigneeCopyWithId", "Consignor")
+        self.select_dropdown(By.ID, "DeliveryTypeId", "Door")
+        self.select_dropdown(By.ID, "PickupTypeId", "Door")
         self.click_element(By.ID, "IsPOD")
 
     #Route Details
-        self.autocomplete_select(By.ID, "FromServiceNetworkId-select", "AHMEDABAD")
-        self.autocomplete_select(By.ID, "ToServiceNetworkId-select", "DELHI")
-        self.autocomplete_select(By.ID, "VehicleId-select", "MH18AC0358")
+        self.autocomplete_select(By.ID, "FromServiceNetworkId-select", "BHIWANDI")
+        self.autocomplete_select(By.ID, "ToServiceNetworkId-select", "AHMEDABAD")
+        self.autocomplete_select(By.ID, "VehicleId-select", "MH04AA7007")
 
     #Consignor/Consignee Details
-        self.autocomplete_select(By.ID, "ConsignorId-select", "Adani Wilmar")
-        self.autocomplete_select(By.ID, "ConsigneeId-select", "P M Enterprise")
+        self.autocomplete_select(By.ID, "ConsignorId-select", "Kirloskar Pump")
+        self.autocomplete_select(By.ID, "ConsigneeId-select", "Adani Wilmar")
+        self.select_dropdown(By.ID, "BillingOnId", "Consignee")
 
     #Item Details
-        self.autocomplete_select(By.ID, "ItemId-select", "TV & Refrigerator")
-        self.select_dropdown(By.ID, "PackingTypeId", "CARTON BOX")
-        self.send_keys(By.ID, "Packets", "100")
-        self.send_keys(By.ID, "UnitWeight", "10000")
-        #self.send_keys(By.ID, "BasicFreight", "40000")
+        self.autocomplete_select(By.ID, "ItemId-select", "Copper")
+        self.select_dropdown(By.ID, "PackingTypeId", "BAGS")
+        self.send_keys(By.ID, "Packets", "500")
+        self.send_keys(By.ID, "UnitWeight", "14000")
+        self.send_keys(By.ID, "BasicFreight", "45000")
         self.click_element(By.ID, "btnSave-BookingItemSession633")
         time.sleep(1)
         self.click_element(By.ID, "RFRSGSTDetails")
 
     # Invoice Details
-        self.send_keys(By.ID, "InvoiceNo", "784558")
+        self.send_keys(By.ID, "InvoiceNo", "1")
         self.send_keys(By.ID, "InvoiceDate", "01-06-2024")
-        self.send_keys(By.ID, "InvoiceValue", "60000")
+        self.send_keys(By.ID, "InvoiceValue", "1")
         self.click_element(By.ID, "btnSave-BookingInvoiceSession633")
         time.sleep(1)
 
     #Submit Details
         self.click_element(By.ID, "mysubmit")
-        time.sleep(1)
+        time.sleep(3)
 
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
+
 
 if __name__ == "__main__":
     unittest.main()

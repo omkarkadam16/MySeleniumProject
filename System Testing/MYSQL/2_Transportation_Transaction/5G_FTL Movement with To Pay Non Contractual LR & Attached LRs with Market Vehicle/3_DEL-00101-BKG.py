@@ -142,7 +142,7 @@ class Booking(unittest.TestCase):
     #Item Details
         self.autocomplete_select(By.ID, "ItemId-select", "Food Products")
         self.select_dropdown(By.ID, "PackingTypeId", "BAGS")
-        self.autocomplete_select(By.ID, "Packets", "1500")
+        self.send_keys(By.ID, "Packets", "1500")
         self.send_keys(By.ID, "UnitWeight", "6")
         self.send_keys(By.ID, "BasicFreight", "17000")
         self.click_element(By.ID, "btnSave-BookingItemSession633")
