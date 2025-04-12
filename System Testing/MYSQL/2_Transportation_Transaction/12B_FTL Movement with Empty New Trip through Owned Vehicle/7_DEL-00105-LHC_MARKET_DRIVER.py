@@ -171,7 +171,7 @@ class LHC(unittest.TestCase):
         self.handle_alert()
 
         if self.switch_frames("OrganizationalLocationId-select"):
-            self.auto_select(By.ID, "OrganizationalLocationId-select", "AHMEDABAD")
+            self.auto_select(By.ID, "OrganizationalLocationId-select", "DELHI")
             self.send_keys(By.ID, "AdvanceAmount", "20000")
             self.click_element(By.ID, "btnSave-VehicleTripAdvanceVehicleTripSessionName661")
             time.sleep(1)

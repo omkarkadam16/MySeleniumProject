@@ -11,7 +11,7 @@ import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class Booking(unittest.TestCase):
+class SupplementaryBill(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -89,25 +89,71 @@ class Booking(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
-    def test_Master(self):
+    def handle_popup(self, button_text="OK"):
+        try:
+            # Wait for the popup button with the given text
+            popup_ok_button = self.wait.until(EC.element_to_be_clickable(
+                (By.XPATH, f"//div[contains(@class, 'ui-dialog')]//button[text()='{button_text}']")
+            ))
+            popup_ok_button.click()
+            print(f"Popup with button '{button_text}' handled successfully.")
+            return True
+        except ex.TimeoutException:
+            print(f"Popup with button '{button_text}' not found.")
+            return False
+
+    def test_Supplementary_Bill(self):
         driver = self.driver
-        driver.get("http://192.168.0.72/Rlogic9RLS/")
+        driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
         print("Logging in...")
-        self.send_keys(By.ID, "Login", "Riddhi")
-        self.send_keys(By.ID, "Password", "omsgn9")
+        self.send_keys(By.ID, "Login", "admin")
+        self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
         for i in ("Transportation",
                   "Transportation Transaction »",
-                  "Outward »",
-                  "Lorry Hire Challan",):
+                  "Bill »",
+                  "Supplementary Bill (Without LR)",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
         if self.switch_frames("btn_NewRecord"):
             self.click_element(By.ID, "btn_NewRecord")
+
+            # Document Details
+            if self.switch_frames("OrganizationId"):
+                self.select_dropdown(By.ID, "OrganizationId", "DELHI")
+                time.sleep(1)
+                # Calendar
+                self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
+                self.click_element(By.XPATH, "//a[text()='1']")
+
+                # Party Info
+                self.autocomplete_select(By.ID, "PartyId-select", "Adani Wilmar")
+                time.sleep(2)
+                self.autocomplete_select(By.ID, "SacHsnId-select", "9967")
+                time.sleep(1)
+
+                # Vehicle Info
+                self.autocomplete_select(By.ID, "VehicleId-select","MH18AC0358")
+                self.send_keys(By.ID, "VehicleAmount","24000")
+                time.sleep(1)
+
+                #Charge Head
+                self.switch_frames("SupplementaryTIChargeHeadValueSession720-9821")
+                self.click_element(By.ID, "SupplementaryTIChargeHeadValueSession720-9821")
+                self.switch_frames("Value")
+                self.send_keys(By.ID, "Value", "1000")
+                self.click_element(By.ID, "btnSave-SupplementaryTIChargeHeadValueSession720")
+
+                # Submit Bill
+                self.switch_frames("mysubmit")
+                self.click_element(By.ID, "mysubmit")
+                time.sleep(5)
 
     @classmethod
     def tearDownClass(cls):

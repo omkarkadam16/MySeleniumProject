@@ -11,25 +11,25 @@ import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class Booking(unittest.TestCase):
+class BillSubmission(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         cls.driver.maximize_window()
         cls.wait=WebDriverWait(cls.driver,15)
 
-    def click_element(self, by, value, retry=2):
+    def click_element(self,by,value,retry=2):
         for i in range(retry):
             try:
-                self.wait.until(EC.element_to_be_clickable((by, value))).click()
-                print("Clicked on element", value)
+                self.wait.until(EC.element_to_be_clickable((by,value))).click()
+                print("Clicked on element",value)
                 return True
-            except(ex.ElementClickInterceptedException, ex.StaleElementReferenceException, ex.TimeoutException):
-                print(f'Retrying click on {by} with value {value}, attempt {i + 1}/{retry}')
+            except(ex.ElementClickInterceptedException,ex.StaleElementReferenceException,ex.TimeoutException):
+                print(f'Retrying click on {by} with value {value}, attempt {i+1}/{retry}')
                 time.sleep(1)
         try:
-            element = self.driver.find_element(by, value)
-            self.driver.execute_script("arguments[0].click();", element)
+            element=self.driver.find_element(by,value)
+            self.driver.execute_script("arguments[0].click();",element)
             return True
         except:
             return False
@@ -73,14 +73,14 @@ class Booking(unittest.TestCase):
         except (ex.NoSuchElementException, ex.ElementClickInterceptedException, ex.TimeoutException):
             return False
 
-    def autocomplete_select(self, by, value, text):
-        input_text = self.wait.until(EC.visibility_of_element_located((by, value)))
+    def autocomplete_select(self,by,value,text):
+        input_text=self.wait.until(EC.visibility_of_element_located((by,value)))
         input_text.clear()
         input_text.send_keys(text)
         time.sleep(1)
-        suggest = self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "ui-menu-item")))
+        suggest=self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME,"ui-menu-item")))
         for i in suggest:
-            if text.upper() in i.text.upper():
+            if text.upper() in i .text.upper():
                 i.click()
                 time.sleep(1)
                 print("Selected autocomplete option:", text)
@@ -89,25 +89,56 @@ class Booking(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
-    def test_Master(self):
+    def test_BillSub_Master(self):
+        """Main test case"""
         driver = self.driver
-        driver.get("http://192.168.0.72/Rlogic9RLS/")
+        driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
         print("Logging in...")
-        self.send_keys(By.ID, "Login", "Riddhi")
-        self.send_keys(By.ID, "Password", "omsgn9")
+        self.send_keys(By.ID, "Login", "admin")
+        self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
         for i in ("Transportation",
                   "Transportation Transaction »",
-                  "Outward »",
-                  "Lorry Hire Challan",):
+                  "Bill »",
+                  "Bill Submission",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
         if self.switch_frames("btn_NewRecord"):
             self.click_element(By.ID, "btn_NewRecord")
+
+            # Document Details
+            if self.switch_frames("OrganizationId"):
+                self.select_dropdown(By.ID, "OrganizationId", "DELHI")
+                time.sleep(1)
+                # Calendor
+                self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
+                self.click_element(By.XPATH, "//a[text()='1']")
+
+            # Bill Search
+            self.send_keys(By.ID, "FromDate", "01-06-2024")
+            self.send_keys(By.ID, "ToDate", "01-06-2024")
+            self.autocomplete_select(By.ID, "PartyId-select", "Adani Wilmar")
+            self.send_keys(By.ID, "SubmittedTo", "Omkar")
+            self.send_keys(By.ID, "SubmittedDate", "01-06-2024")
+
+            # Bill Info
+            self.click_element(By.ID, "BtnSearch")
+            time.sleep(1)
+            self.click_element(By.ID, "IsSelectBillSubmissionBillSessionName7171")
+
+            # Submission Info
+            self.send_keys(By.ID, "SubmittedBy", "Parth")
+            self.send_keys(By.ID, "AcknowledgedDate", "01-06-2024")
+            self.send_keys(By.ID, "ReceivedDate", "01-06-2024")
+
+            # Submit Bill
+            self.click_element(By.ID, "mysubmit")
 
     @classmethod
     def tearDownClass(cls):
