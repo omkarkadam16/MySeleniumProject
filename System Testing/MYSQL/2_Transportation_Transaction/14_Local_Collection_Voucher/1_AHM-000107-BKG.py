@@ -121,7 +121,7 @@ class Booking(unittest.TestCase):
 
     #Booking Details
         self.select_dropdown(By.ID, "FreightOnId", "Fixed")
-        self.select_dropdown(By.ID,"PaymentTypeId","To Pay")
+        self.select_dropdown(By.ID,"PaymentTypeId","To Be Billed")
         self.select_dropdown(By.ID,"BookingTypeId","FTL")
         self.select_dropdown(By.ID, "DeliveryTypeId", "Door")
         self.select_dropdown(By.ID, "PickupTypeId", "Door")
@@ -131,19 +131,20 @@ class Booking(unittest.TestCase):
 
     #Route Details
         self.autocomplete_select(By.ID, "FromServiceNetworkId-select", "AHMEDABAD")
-        self.autocomplete_select(By.ID, "ToServiceNetworkId-select", "DELHI")
-        self.autocomplete_select(By.ID, "VehicleId-select", "MH18AC0358")
+        self.autocomplete_select(By.ID, "ToServiceNetworkId-select", "PUNE")
+        self.autocomplete_select(By.ID, "VehicleId-select", "MHO4ER9009")
 
     #Consignor/Consignee Details
-        self.autocomplete_select(By.ID, "ConsignorId-select", "Adani Wilmar")
-        self.autocomplete_select(By.ID, "ConsigneeId-select", "P M Enterprise")
+        self.autocomplete_select(By.ID, "ConsignorId-select", "P M Enterprise")
+        self.autocomplete_select(By.ID, "ConsigneeId-select", "Adani Wilmar")
+        self.select_dropdown(By.ID, "BillingOnId", "Consignor")
 
     #Item Details
         self.autocomplete_select(By.ID, "ItemId-select", "TV & Refrigerator")
         self.select_dropdown(By.ID, "PackingTypeId", "CARTON BOX")
-        self.send_keys(By.ID, "Packets", "100")
-        self.send_keys(By.ID, "UnitWeight", "10000")
-        self.send_keys(By.ID, "BasicFreight", "40000")
+        self.send_keys(By.ID, "Packets", "560")
+        self.send_keys(By.ID, "UnitWeight", "880")
+        self.send_keys(By.ID, "BasicFreight", "42000")
         self.click_element(By.ID, "btnSave-BookingItemSession633")
         time.sleep(1)
         self.click_element(By.ID, "RFRSGSTDetails")
@@ -151,14 +152,10 @@ class Booking(unittest.TestCase):
     # Invoice Details
         self.send_keys(By.ID, "InvoiceNo", "784555")
         self.send_keys(By.ID, "InvoiceDate", "01-06-2024")
-        self.send_keys(By.ID, "InvoiceValue", "350000")
+        self.send_keys(By.ID, "InvoiceValue", "50000")
         self.click_element(By.ID, "btnSave-BookingInvoiceSession633")
         time.sleep(1)
 
-    #Receipt Details Paid amount and Balance amount should be equal
-        self.send_keys(By.ID, "PaidAmount", "20000")
-        self.click_element(By.ID, "BalanceAmount")
-        time.sleep(2)
     #Submit Details
         self.click_element(By.ID, "mysubmit")
         time.sleep(1)

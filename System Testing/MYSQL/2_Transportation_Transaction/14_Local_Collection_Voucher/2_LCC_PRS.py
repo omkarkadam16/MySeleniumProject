@@ -48,16 +48,19 @@ class Booking(unittest.TestCase):
                 driver.switch_to.default_content()
         return False
 
-    def send_keys(self,by,value,text):
-        try:
-            element = self.wait.until(EC.visibility_of_element_located((by, value)))
-            element.clear()
-            element.send_keys(text)
-            print(f'Sent keys {text} to {by} with value {value}')
-            return True
-        except ex.NoSuchElementException:
-            print(f'Element not found: {value}')
-            return False
+    def send_keys(self, by, value, text):
+        """Send keys after checking visibility"""
+        for attempt in range(3):
+            try:
+                print(f"[INFO] Attempt {attempt + 1}: Entering text...")
+                element = self.wait.until(EC.visibility_of_element_located((by, value)))
+                element.clear()
+                element.send_keys(text)
+                print("Sent keys", text)
+                return True
+            except (ex.NoSuchElementException, ex.UnexpectedAlertPresentException, ex.TimeoutException,
+                    ex.StaleElementReferenceException) as e:
+                print(f"[WARNING]Error : {type(e)} occurred. Retrying...")
 
     def select_dropdown(self,by,value,text):
         try:
@@ -73,7 +76,7 @@ class Booking(unittest.TestCase):
         except (ex.NoSuchElementException, ex.ElementClickInterceptedException, ex.TimeoutException):
             return False
 
-    def autocomplete_select(self,by,value,text):
+    def auto_select(self,by,value,text):
         input_text=self.wait.until(EC.visibility_of_element_located((by,value)))
         input_text.clear()
         input_text.send_keys(text)
@@ -89,6 +92,19 @@ class Booking(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
+    def handle_alert(self):
+        """Check for an alert and handle it if present."""
+        try:
+            time.sleep(2)  # Small delay to allow alert to appear
+            alert = self.driver.switch_to.alert
+            print(f"[ALERT] Detected: {alert.text}")
+            alert.accept()
+            print("[ALERT] Alert accepted.")
+            return True
+        except ex.NoAlertPresentException:
+            print("[INFO] No alert found. Continuing execution...")
+            return False
+
     def test_booking(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
@@ -102,7 +118,7 @@ class Booking(unittest.TestCase):
         for i in ("Transportation",
             "Transportation Transaction »",
             "Booking »",
-            "Consignment Note",):
+            "Local Collection Voucher (PRS)",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
@@ -120,48 +136,40 @@ class Booking(unittest.TestCase):
             self.click_element(By.XPATH,"//a[text()='1']")
 
     #Booking Details
-        self.select_dropdown(By.ID, "FreightOnId", "Fixed")
-        self.select_dropdown(By.ID,"PaymentTypeId","To Pay")
-        self.select_dropdown(By.ID,"BookingTypeId","FTL")
-        self.select_dropdown(By.ID, "DeliveryTypeId", "Door")
-        self.select_dropdown(By.ID, "PickupTypeId", "Door")
-        self.select_dropdown(By.ID, "RiskTypeId", "Owners Risk")
-        self.select_dropdown(By.ID, "ConsigneeCopyWithId", "Consignor")
-        self.click_element(By.ID, "IsPOD")
-
-    #Route Details
-        self.autocomplete_select(By.ID, "FromServiceNetworkId-select", "AHMEDABAD")
-        self.autocomplete_select(By.ID, "ToServiceNetworkId-select", "DELHI")
-        self.autocomplete_select(By.ID, "VehicleId-select", "MH18AC0358")
-
-    #Consignor/Consignee Details
-        self.autocomplete_select(By.ID, "ConsignorId-select", "Adani Wilmar")
-        self.autocomplete_select(By.ID, "ConsigneeId-select", "P M Enterprise")
-
-    #Item Details
-        self.autocomplete_select(By.ID, "ItemId-select", "TV & Refrigerator")
-        self.select_dropdown(By.ID, "PackingTypeId", "CARTON BOX")
-        self.send_keys(By.ID, "Packets", "100")
-        self.send_keys(By.ID, "UnitWeight", "10000")
-        self.send_keys(By.ID, "BasicFreight", "40000")
-        self.click_element(By.ID, "btnSave-BookingItemSession633")
-        time.sleep(1)
-        self.click_element(By.ID, "RFRSGSTDetails")
-
-    # Invoice Details
-        self.send_keys(By.ID, "InvoiceNo", "784555")
-        self.send_keys(By.ID, "InvoiceDate", "01-06-2024")
-        self.send_keys(By.ID, "InvoiceValue", "350000")
-        self.click_element(By.ID, "btnSave-BookingInvoiceSession633")
-        time.sleep(1)
-
-    #Receipt Details Paid amount and Balance amount should be equal
-        self.send_keys(By.ID, "PaidAmount", "20000")
-        self.click_element(By.ID, "BalanceAmount")
+        self.auto_select(By.ID, "VehicleId-select", "MHO4ER9009")
+        self.auto_select(By.ID, "StartLocationId-select", "MUMBAI")
+        self.auto_select(By.ID, "EndLocationId-select", "AHMEDABAD")
         time.sleep(2)
-    #Submit Details
+
+        # Hire Details
+        self.send_keys(By.ID, "DriverName", "Ram")
+        self.send_keys(By.ID, "LicenseExpDate", "31-12-2027")
+        self.send_keys(By.ID, "LicenseNo", "98765")
+        self.send_keys(By.ID, "ContactNo", "9863575754")
+
+        #Pick Booking
+        self.select_dropdown(By.ID, "ddlSearchOn","Document Print No")
+        self.send_keys(By.ID, "DocumentSearchSession665DocumentNo","AHM-000108-BKG")
+        self.click_element(By.ID, "btn_Search")
+
+
+        # Hire Charges Details
+        self.select_dropdown(By.ID, "FreightUnitId", "Fixed")
+        time.sleep(2)
+        self.send_keys(By.ID, "FreightRate", "2400")
+        self.click_element(By.ID, "FreightUnitId")
+        time.sleep(2)
+        self.handle_alert()
+
+        if self.switch_frames("OrganizationalLocationId-select"):
+            self.auto_select(By.ID, "OrganizationalLocationId-select", "AHMEDABAD")
+            self.send_keys(By.ID, "AdvanceAmount", "2400")
+            self.click_element(By.ID, "btnSave-VehicleTripAdvanceVehicleTripSessionName665")
+            time.sleep(1)
+
+        #Submit Details
         self.click_element(By.ID, "mysubmit")
-        time.sleep(1)
+        time.sleep(3)
 
     @classmethod
     def tearDownClass(cls):
