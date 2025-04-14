@@ -1,5 +1,3 @@
-
-
 import unittest
 import time
 import selenium.common.exceptions as ex
@@ -98,7 +96,7 @@ class ProductParameter(unittest.TestCase):
         self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
 
-        menus = ["Fleet", "Fleet Master »", "Preventive Maintainance »", "PM Service"]
+        menus = ["Fleet", "Fleet Master »", "Preventive Maintainance »", "Vehicle PM Service"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
@@ -107,23 +105,30 @@ class ProductParameter(unittest.TestCase):
                 time.sleep(2)
 
                 # Info 1
-                if self.switch_frames("Code"):
-                    self.select_dropdown(By.ID, "ServiceCategoryId", "Checks")
-                    self.select_dropdown(By.ID, "ServiceProductId-select", "Checks")
-                    self.send_keys(By.ID, "Code", "FC")
-                    self.send_keys(By.ID, "ServiceName", "Air Filter Checking")
-                    self.send_keys(By.ID, "Code", "FC")
+                if self.switch_frames("VehicleId-select"):
+                    self.autocomplete_select(By.ID,"VehicleId-select","MH04TT9008")
+                    self.select_dropdown(By.ID, "ServiceId", "Oil Check")
+                    self.select_dropdown(By.ID, "ScheduleById", "KM")
+                    self.send_keys(By.ID, "DueEveryKm", "5000")
+                    self.send_keys(By.ID, "AlertBeforeKm", "500")
+                    self.send_keys(By.ID, "LastServiceKm", "8000")
+                    self.click_element(By.ID,"btnSave-PMVehicleModelServiceSession1088")
                 if self.switch_frames("mysubmitNew"):
                     self.click_element(By.ID, "mysubmitNew")
                     time.sleep(2)
 
                 # Info 2
-                if self.switch_frames("Code"):
-                    self.send_keys(By.ID, "Code", "OC")
-                    self.send_keys(By.ID, "ServiceName", "Oil Check")
-                    self.select_dropdown(By.ID, "ServiceCategoryId", "Checks")
-                    self.autocomplete_select(By.ID, "ServiceProductId-select", "Checks")
-
+                if self.switch_frames("ServiceId"):
+                    self.autocomplete_select(By.ID, "VehicleId-select", "MH04TT9008")
+                    self.select_dropdown(By.ID, "ServiceId", "Wheel Servicing")
+                    self.select_dropdown(By.ID, "ScheduleById", "BOTH")
+                    self.send_keys(By.ID, "DueEveryKm", "12000")
+                    self.send_keys(By.ID, "AlertBeforeKm", "1000")
+                    self.send_keys(By.ID, "LastServiceKm", "10000")
+                    self.send_keys(By.ID, "DueEveryDays", "80")
+                    self.send_keys(By.ID, "AlertBeforeDays", "10")
+                    self.send_keys(By.ID, "LastServiceDate", "24-01-2025")
+                    self.click_element(By.ID, "btnSave-PMVehicleModelServiceSession1088")
                 if self.switch_frames("mysubmit"):
                     self.click_element(By.ID, "mysubmit")
                     time.sleep(2)
