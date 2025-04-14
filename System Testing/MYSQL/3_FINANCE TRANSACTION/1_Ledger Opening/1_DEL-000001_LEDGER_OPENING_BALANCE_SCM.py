@@ -11,7 +11,7 @@ import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class Delivery(unittest.TestCase):
+class Payment(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -89,7 +89,7 @@ class Delivery(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
-    def test_Delivery_Master(self):
+    def test_Payment_Master(self):
         """Main test case"""
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
@@ -100,41 +100,45 @@ class Delivery(unittest.TestCase):
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
-        for i in ("Transportation",
-                  "Transportation Transaction »",
-                  "Delivery »",
-                  "Direct Door Delivery (POD)",):
+        for i in ("Finance",
+                  "Finance Transaction »",
+                  "Ledger Openings »",
+                  "Ledger Opening Balance",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
         if self.switch_frames("btn_NewRecord"):
             self.click_element(By.ID, "btn_NewRecord")
 
-        # Document Info
-        if self.switch_frames("OrganizationId"):
-            self.select_dropdown(By.ID, "OrganizationId", "PUNE")
-            # Calendar
-            self.click_element(By.ID, "DocumentDate")
-            self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
-            self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
-            self.click_element(By.XPATH, "//a[text()='1']")
+            if self.switch_frames("OrganizationId"):
+                self.select_dropdown(By.ID, "OrganizationId", "DELHI")
+                # Calendar
+                self.click_element(By.CLASS_NAME, "ui-datepicker-trigger")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
+                self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
+                self.click_element(By.XPATH, "//a[text()='1']")
 
-        # Booking Detail
-        self.autocomplete_select(By.ID, "VehicleId-select", "MHO4ER9009")
-        time.sleep(2)
-        self.select_dropdown(By.ID, "VehicleTripId", "AHM-000108-LHC")
+            # Voucher Ledger Details
+            self.autocomplete_select(By.ID,"LedgerVoucherLegderSubledgerSession-select","Sundry Creditors (Market)")
+            time.sleep(1)
+            self.autocomplete_select(By.ID, "SubLedgerVoucherLegderSubledgerSession-select", "VIJAY ENTERPRISE")
+            self.send_keys(By.ID, "Credit","2000")
+            self.send_keys(By.ID, "Narration", "OPENING")
 
-        # Arrival Detail
-        self.click_element(By.XPATH, "(//img[@title='...'])[6]")
-        self.select_dropdown(By.XPATH, "(//select[@class='ui-datepicker-month'])[1]", "Jun")
-        self.select_dropdown(By.XPATH, "(//select[@class='ui-datepicker-year'])[1]", "2024")
-        self.click_element(By.XPATH, "(//a[normalize-space()='1'])[1]")
-        self.select_dropdown(By.ID, "ReasonDelayId", "TRAFFIC JAAM")
+            #Adjustment Details
+            if self.switch_frames("BillRefNoTextBox"):
+                self.send_keys(By.ID, "BillRefNoTextBox","DEL-BILL-561234")
+                self.send_keys(By.ID, "BillAmount","2000")
+                self.click_element(By.ID, "btnSave-VoucherLedgerCollectionSession894VoucherLedgerBillRefSession")
+                time.sleep(2)
+            self.click_element(By.ID, "btnSave-VoucherLedgerCollectionSession894")
 
-        # Submit form
-        self.click_element(By.ID, "mysubmit")
-        time.sleep(1)
-        print("Form submitted successfully.")
+
+            #Submit Payment
+            self.click_element(By.ID, "mysubmit")
+            print("Advanced Payment submitted successfully.")
+            time.sleep(2)
+
 
     @classmethod
     def tearDownClass(cls):

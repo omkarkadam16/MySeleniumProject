@@ -115,7 +115,7 @@ class DocumentMappingSD(unittest.TestCase):
                     self.click_element(By.ID, "btnSave-FinanceRuleConfigSession")
                     print("Finance Rule BILL saved")
 
-            # Finance Rule Ledger Opening
+            # Finance Rule 1_Ledger Opening
                 if self.switch_frames("Sign"):
                     self.select_dropdown(By.ID, "Sign", "Cr")
                     self.select_dropdown(By.ID, "ProcessId", "Ledger Opening")
@@ -126,13 +126,13 @@ class DocumentMappingSD(unittest.TestCase):
                     self.click_element(By.ID, "btnSave-FinanceRuleConfigSession")
                     time.sleep(2)
                     self.select_dropdown(By.ID, "Sign", "Dr")
-                    self.select_dropdown(By.ID, "ProcessId", "Ledger Opening")
+                    self.select_dropdown(By.ID, "ProcessId", "1_Ledger Opening")
                     self.autocomplete_select(By.ID, "LedgerId-select", "Sundry Debtors")
                     # time.sleep(2)
                     #self.autocomplete_select(By.ID, "AccountGroupId-select", "Sundry Debtors")
                     self.click_element(By.ID, "ProcessId")
                     self.click_element(By.ID, "btnSave-FinanceRuleConfigSession")
-                    print("Finance Rule Ledger Opening saved")
+                    print("Finance Rule 1_Ledger Opening saved")
 
             # Finance Rule Fund Transfer
                 if self.switch_frames("Sign"):

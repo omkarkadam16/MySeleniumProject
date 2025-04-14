@@ -1,3 +1,7 @@
+
+import unittest
+import time
+import selenium.common.exceptions as ex
 from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
@@ -5,31 +9,27 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import unittest
-import time
-import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
-
-class Delivery(unittest.TestCase):
+class ProductParameter(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+        cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         cls.driver.maximize_window()
-        cls.wait=WebDriverWait(cls.driver,15)
+        cls.wait = WebDriverWait(cls.driver, 10)
 
-    def click_element(self,by,value,retry=2):
+    def click_element(self, by, value, retry=2):
         for i in range(retry):
             try:
-                self.wait.until(EC.element_to_be_clickable((by,value))).click()
-                print("Clicked on element",value)
+                self.wait.until(EC.element_to_be_clickable((by, value))).click()
+                print("Clicked on element", value)
                 return True
-            except(ex.ElementClickInterceptedException,ex.StaleElementReferenceException,ex.TimeoutException):
-                print(f'Retrying click on {by} with value {value}, attempt {i+1}/{retry}')
+            except(ex.ElementClickInterceptedException, ex.StaleElementReferenceException, ex.TimeoutException):
+                print(f'Retrying click on {by} with value {value}, attempt {i + 1}/{retry}')
                 time.sleep(1)
         try:
-            element=self.driver.find_element(by,value)
-            self.driver.execute_script("arguments[0].click();",element)
+            element = self.driver.find_element(by, value)
+            self.driver.execute_script("arguments[0].click();", element)
             return True
         except:
             return False
@@ -73,14 +73,14 @@ class Delivery(unittest.TestCase):
         except (ex.NoSuchElementException, ex.ElementClickInterceptedException, ex.TimeoutException):
             return False
 
-    def autocomplete_select(self,by,value,text):
-        input_text=self.wait.until(EC.visibility_of_element_located((by,value)))
+    def autocomplete_select(self, by, value, text):
+        input_text = self.wait.until(EC.visibility_of_element_located((by, value)))
         input_text.clear()
         input_text.send_keys(text)
         time.sleep(1)
-        suggest=self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME,"ui-menu-item")))
+        suggest = self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "ui-menu-item")))
         for i in suggest:
-            if text.upper() in i .text.upper():
+            if text.upper() in i.text.upper():
                 i.click()
                 time.sleep(1)
                 print("Selected autocomplete option:", text)
@@ -89,57 +89,48 @@ class Delivery(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
-    def test_Delivery_Master(self):
-        """Main test case"""
+    def test_product_parameter(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
-        print("Logging in...")
         self.send_keys(By.ID, "Login", "admin")
         self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
-        print("Login successful.")
 
-        for i in ("Transportation",
-                  "Transportation Transaction »",
-                  "Delivery »",
-                  "Direct Door Delivery (POD)",):
-            self.click_element(By.LINK_TEXT, i)
-            print(f"Navigated to {i}.")
+        menus = ["Fleet", "Fleet Master »", "Tyre »", "Tyre Manufacturer"]
+        for link_test in menus:
+            self.click_element(By.LINK_TEXT, link_test)
 
-        if self.switch_frames("btn_NewRecord"):
-            self.click_element(By.ID, "btn_NewRecord")
+            if self.switch_frames("btn_NewRecord"):
+                self.click_element(By.ID, "btn_NewRecord")
+                time.sleep(2)
 
-        # Document Info
-        if self.switch_frames("OrganizationId"):
-            self.select_dropdown(By.ID, "OrganizationId", "PUNE")
-            # Calendar
-            self.click_element(By.ID, "DocumentDate")
-            self.select_dropdown(By.CLASS_NAME, "ui-datepicker-month", "Jun")
-            self.select_dropdown(By.CLASS_NAME, "ui-datepicker-year", "2024")
-            self.click_element(By.XPATH, "//a[text()='1']")
+                # Driver Info
+                if self.switch_frames("ProductManufacturerName"):
+                    self.send_keys(By.ID, "ProductManufacturerName", "Apollo")
 
-        # Booking Detail
-        self.autocomplete_select(By.ID, "VehicleId-select", "MHO4ER9009")
-        time.sleep(2)
-        self.select_dropdown(By.ID, "VehicleTripId", "AHM-000108-LHC")
+                if self.switch_frames("mysubmitNew"):
+                    self.click_element(By.ID, "mysubmitNew")
+                    time.sleep(2)
 
-        # Arrival Detail
-        self.click_element(By.XPATH, "(//img[@title='...'])[6]")
-        self.select_dropdown(By.XPATH, "(//select[@class='ui-datepicker-month'])[1]", "Jun")
-        self.select_dropdown(By.XPATH, "(//select[@class='ui-datepicker-year'])[1]", "2024")
-        self.click_element(By.XPATH, "(//a[normalize-space()='1'])[1]")
-        self.select_dropdown(By.ID, "ReasonDelayId", "TRAFFIC JAAM")
+                if self.switch_frames("ProductManufacturerName"):
+                    self.send_keys(By.ID, "ProductManufacturerName", "MRF Tyres")
 
-        # Submit form
-        self.click_element(By.ID, "mysubmit")
-        time.sleep(1)
-        print("Form submitted successfully.")
+                if self.switch_frames("mysubmitNew"):
+                    self.click_element(By.ID, "mysubmitNew")
+                    time.sleep(2)
+
+                if self.switch_frames("ProductManufacturerName"):
+                    self.send_keys(By.ID, "ProductManufacturerName", "Bridgestone")
+
+                if self.switch_frames("mysubmit"):
+                    self.click_element(By.ID, "mysubmit")
+                    time.sleep(2)
+
 
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
-
 
 if __name__ == "__main__":
     unittest.main()
