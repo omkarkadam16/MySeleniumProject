@@ -143,7 +143,7 @@ class Booking(unittest.TestCase):
         self.select_dropdown(By.ID, "PackingTypeId", "BAGS")
         self.send_keys(By.ID, "Packets", "1")
         self.send_keys(By.ID, "UnitWeight", "9")
-        self.send_keys(By.ID, "BasicFreight", "1500")
+        self.send_keys(By.ID, "BasicFreight", "-1500")
         self.click_element(By.ID, "btnSave-BookingItemSession633")
         time.sleep(1)
         self.click_element(By.ID, "RFRSGSTDetails")
