@@ -11,7 +11,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-class LocationMapping(unittest.TestCase):
+class DigiCardMapping(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -79,33 +79,57 @@ class LocationMapping(unittest.TestCase):
         input_text.send_keys(Keys.DOWN)
         input_text.send_keys(Keys.ENTER)
 
-    def test_Location_Mapping(self):
+    def test_DigiCard_Mapping(self):
         driver = self.driver
-        driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
+        driver.get("http://192.168.0.72/Rlogic9RLS/")
 
-        self.send_keys(By.ID, "Login", "admin")
-        self.send_keys(By.ID, "Password", "Omsgn9")
+        print("Logging in...")
+        self.send_keys(By.ID, "Login", "Riddhi")
+        self.send_keys(By.ID, "Password", "omsgn9")
         self.click_element(By.ID, "btnLogin")
+        print("Login successful.")
 
-        menus = ["Finance", "Ledger Creation »", "Location Ledger Creation"]
+        menus = ["Finance", "Mapping »", "DigiCard Mapping"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
+
+        series = [
+            {"LedgerName": "F-9211", "LedgerAlias": "F-9211"},
+            {"LedgerName": "F-9212", "LedgerAlias": "F-9212"},
+            {"LedgerName": "F-9213", "LedgerAlias": "F-9213"},
+            {"LedgerName": "T-9215", "LedgerAlias": "T-9215"},
+            {"LedgerName": "T-9216", "LedgerAlias": "T-9216"},
+            {"LedgerName": "T-9214", "LedgerAlias": "T-9214"},
+            {"LedgerName": "D-9217", "LedgerAlias": "D-9217"},
+            {"LedgerName": "D-9218", "LedgerAlias": "D-9218"},
+            {"LedgerName": "D-9219", "LedgerAlias": "D-9219"},
+        ]
+
+        for i in series:
 
             # General Information
             if self.switch_frames("MappingType"):
                 self.select_dropdown(By.ID, "MappingType", "General Mapping")
+                self.send_keys(By.ID, "txt_search", i["LedgerName"])
                 self.click_element(By.ID, "btn_Seach")
-                time.sleep(5)
+                self.click_element(By.ID, "LedgerMappingGridSession917-1")
+                self.autocomplete_select(By.ID, "SubLedgerLedgerMappingSession-select", i["LedgerAlias"])
+                # Save after each selection
+                self.click_element(By.ID, "btnSave-LedgerMappingGridSession917")
+                time.sleep(2)
+                self.click_element(By.ID, "LedgerMappingGridSession917-1")
+                time.sleep(2)
+                self.click_element(By.ID, "btnSave-LedgerMappingGridSession917")
 
-                if self.switch_frames("chkIsSelectAll"):
-                    self.click_element(By.ID, "chkIsSelectAll")
-                    time.sleep(2)
+                # Switch back to default content after submission
+                driver.switch_to.default_content()
+                time.sleep(2)
 
-                if self.switch_frames("LedgerTypeId"):
-                    self.select_dropdown(By.ID, "LedgerTypeId", "General Ledger")
-                    self.select_dropdown(By.ID, "AccountGroupId", "Branch And Division")
-                    self.click_element(By.ID, "btnCreateLedger")
-                    time.sleep(2)
+                menus = ["Finance", "Mapping »", "DigiCard Mapping"]
+                for link_test in menus:
+                    self.click_element(By.LINK_TEXT, link_test)
+
+
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()

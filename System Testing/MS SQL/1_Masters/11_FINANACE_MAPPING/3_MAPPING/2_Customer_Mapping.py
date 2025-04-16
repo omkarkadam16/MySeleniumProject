@@ -5,12 +5,13 @@ from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-class FuelRate(unittest.TestCase):
+class CustomerMapping(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -45,13 +46,19 @@ class FuelRate(unittest.TestCase):
         return False
 
     def send_keys(self, by, value, text):
-        try:
-            element = self.wait.until(EC.visibility_of_element_located((by, value)))
-            element.clear()
-            element.send_keys(text)
-            return True
-        except ex.NoSuchElementException:
-            return False
+        """Send keys after checking visibility"""
+        for attempt in range(3):
+            try:
+                print(f"[INFO] Attempt {attempt + 1}: Entering text...")
+                element = self.wait.until(EC.visibility_of_element_located((by, value)))
+                element.is_enabled()
+                element.clear()
+                element.send_keys(text)
+                print("Sent keys", text)
+                return True
+            except (ex.NoSuchElementException, ex.UnexpectedAlertPresentException, ex.TimeoutException,
+                    ex.StaleElementReferenceException) as e:
+                print(f"[WARNING]Error : {type(e)} occurred. Retrying...")
 
     def select_dropdown(self, by, value, text):
         try:
@@ -78,7 +85,7 @@ class FuelRate(unittest.TestCase):
         input_text.send_keys(Keys.DOWN)
         input_text.send_keys(Keys.ENTER)
 
-    def test_FuelRate(self):
+    def test_Customer_Mapping(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9RLS/")
 
@@ -88,39 +95,41 @@ class FuelRate(unittest.TestCase):
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
-        menus = ["Fleet", "Fleet Master »", "Fuel »", "Fuel Rate"]
+        menus = ["Finance", "Mapping »", "Customer Ledger Mapping"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
-        Series = [
-            {
-                "FuelType": "PETROL",
-                "Rate": "80"
-            },
-            {
-                "FuelType": "DIESEL",
-                "Rate": "60"
-            }
+        series = [
+            {"LedgerName": "Adani Wilmar Pvt. LTD", "LedgerAlias": "Adani Wilmar Pvt. LTD"},
+            {"LedgerName": "P M Enterprises Pvt. LTD", "LedgerAlias": "P M Enterprises Pvt. LTD"},
+            {"LedgerName": "Dr. Reddys Lab Ltd", "LedgerAlias": "Dr. Reddys Lab Ltd"},
+            {"LedgerName": "Bharat Earth Movers Ltd", "LedgerAlias": "Bharat Earth Movers Ltd"},
         ]
 
-        # Iterate over each location and create it
-        for i in Series:
-            if self.switch_frames("btn_NewRecord"):
-                self.click_element(By.ID, "btn_NewRecord")
+        for i in series:
 
-            # General Details
-            if self.switch_frames("FuelTypeId"):
-                self.select_dropdown(By.ID, "FuelTypeId", i["FuelType"])
-                self.autocomplete_select(By.ID, "FuelCityId-select", "DELHI")
-                self.autocomplete_select(By.ID, "FuelVendorId-select", "IOCL FUEL PUMP")
-                self.send_keys(By.ID, "EffectiveDate", "01-04-2018")
-                self.send_keys(By.ID, "Rate", i["Rate"])
-
-            if self.switch_frames("mysubmit"):
-                self.click_element(By.ID, "mysubmit")
-                print("Successfully submitted", i["FuelType"])
+            # General Information
+            if self.switch_frames("MappingType"):
+                self.select_dropdown(By.ID, "MappingType", "General Mapping")
+                self.send_keys(By.ID, "txt_search", i["LedgerName"])
+                self.click_element(By.ID, "btn_Seach")
+                self.click_element(By.ID, "LedgerMappingGridSession273-1")
+                self.autocomplete_select(By.ID, "SubLedgerLedgerMappingSession-select", i["LedgerAlias"])
+                # Save after each selection
+                self.click_element(By.ID, "btnSave-LedgerMappingGridSession273")
                 time.sleep(2)
-        print("All data created successfully.")
+                self.click_element(By.ID, "LedgerMappingGridSession273-1")
+                time.sleep(2)
+                self.click_element(By.ID, "btnSave-LedgerMappingGridSession273")
+
+                # Switch back to default content after submission
+                driver.switch_to.default_content()
+                time.sleep(2)
+
+                menus = ["Finance", "Mapping »", "Customer Ledger Mapping"]
+                for link_test in menus:
+                    self.click_element(By.LINK_TEXT, link_test)
+
 
     @classmethod
     def tearDownClass(cls):

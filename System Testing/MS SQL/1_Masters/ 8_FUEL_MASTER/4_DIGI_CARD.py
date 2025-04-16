@@ -80,11 +80,13 @@ class DigiCard1(unittest.TestCase):
 
     def test_DigiCard1(self):
         driver = self.driver
-        driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
+        driver.get("http://192.168.0.72/Rlogic9RLS/")
 
-        self.send_keys(By.ID, "Login", "admin")
-        self.send_keys(By.ID, "Password", "Omsgn9")
+        print("Logging in...")
+        self.send_keys(By.ID, "Login", "Riddhi")
+        self.send_keys(By.ID, "Password", "omsgn9")
         self.click_element(By.ID, "btnLogin")
+        print("Login successful.")
 
         menus = ["Fleet", "Fleet Master »", "Fuel »", "DigiCard"]
         for link_test in menus:
@@ -112,38 +114,38 @@ class DigiCard1(unittest.TestCase):
             {
                 "DigiCardNo": "T-9214",
                 "RefDigiCardNo": "T-9214",
-                "DigiCardType": "TollCard",
-                "DigiCardCompany": "FASTag"
+                "DigiCardType": "FuelCard",
+                "DigiCardCompany": "IOCL"
             },
             {
                 "DigiCardNo": "T-9215",
                 "RefDigiCardNo": "T-9215",
-                "DigiCardType": "TollCard",
-                "DigiCardCompany": "NHAI Toll Card"
+                "DigiCardType": "FuelCard",
+                "DigiCardCompany": "HPCL"
             },
             {
                 "DigiCardNo": "T-9216",
                 "RefDigiCardNo": "T-9216",
-                "DigiCardType": "TollCard",
-                "DigiCardCompany": "FASTag"
+                "DigiCardType": "FuelCard",
+                "DigiCardCompany": "HPCL"
             },
             {
                 "DigiCardNo": "D-9217",
                 "RefDigiCardNo": "D-9217",
-                "DigiCardType": "DebitCard",
-                "DigiCardCompany": "MasterCard Debit"
+                "DigiCardType": "FuelCard",
+                "DigiCardCompany": "HPCL"
             },
             {
                 "DigiCardNo": "D-9218",
                 "RefDigiCardNo": "D-9218",
-                "DigiCardType": "DebitCard",
-                "DigiCardCompany": "RuPay Debit"
+                "DigiCardType": "FuelCard",
+                "DigiCardCompany": "HPCL"
             },
             {
                 "DigiCardNo": "D-9219",
                 "RefDigiCardNo": "D-9219",
-                "DigiCardType": "DebitCard",
-                "DigiCardCompany": "MasterCard Debit"
+                "DigiCardType": "FuelCard",
+                "DigiCardCompany": "HPCL"
             }
         ]
 

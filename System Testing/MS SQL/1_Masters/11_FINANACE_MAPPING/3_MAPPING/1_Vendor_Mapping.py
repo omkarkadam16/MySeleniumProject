@@ -11,7 +11,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-class BankMapping(unittest.TestCase):
+class VendorMapping(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -79,33 +79,57 @@ class BankMapping(unittest.TestCase):
         input_text.send_keys(Keys.DOWN)
         input_text.send_keys(Keys.ENTER)
 
-    def test_Bank_Mapping(self):
+    def test_Vendor_Mapping(self):
         driver = self.driver
-        driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
+        driver.get("http://192.168.0.72/Rlogic9RLS/")
 
-        self.send_keys(By.ID, "Login", "admin")
-        self.send_keys(By.ID, "Password", "Omsgn9")
+        print("Logging in...")
+        self.send_keys(By.ID, "Login", "Riddhi")
+        self.send_keys(By.ID, "Password", "omsgn9")
         self.click_element(By.ID, "btnLogin")
+        print("Login successful.")
 
-        menus = ["Finance", "Ledger Creation »", "Bank Ledger Creation"]
+        menus = ["Finance", "Mapping »", "Vendor Mapping"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
+
+        series = [
+            {"LedgerName": "BHORUKA LOGISTICS PVT LTD", "LedgerAlias": "BHORUKA LOGISTICS PVT LTD"},
+            {"LedgerName": "BAJAJ CORPORATION PVT LTD", "LedgerAlias": "BAJAJ CORPORATION PVT LTD"},
+            {"LedgerName": "INTER INDIA ROADWAYS LTD", "LedgerAlias": "INTER INDIA ROADWAYS LTD"},
+            {"LedgerName": "VIJAY ENTERPRISES", "LedgerAlias": "VIJAY ENTERPRISES"},
+            {"LedgerName": "SHAKTI FREIGHT CARRIERS", "LedgerAlias": "SHAKTI FREIGHT CARRIERS"},
+            {"LedgerName": "AKIL KHAN SO HABIB KHAN", "LedgerAlias": "AKIL KHAN SO HABIB KHAN"},
+            {"LedgerName": "BHAGAT SINGH", "LedgerAlias": "BHAGAT SINGH"},
+            {"LedgerName": "DARSHAN SINGH", "LedgerAlias": "DARSHAN SINGH"},
+            {"LedgerName": "IOCL FUEL PUMP", "LedgerAlias": "IOCL FUEL PUMP"},
+        ]
+
+        for i in series:
 
             # General Information
             if self.switch_frames("MappingType"):
                 self.select_dropdown(By.ID, "MappingType", "General Mapping")
+                self.send_keys(By.ID, "txt_search", i["LedgerName"])
                 self.click_element(By.ID, "btn_Seach")
-                time.sleep(5)
+                self.click_element(By.ID, "LedgerMappingGridSession244-1")
+                self.autocomplete_select(By.ID, "SubLedgerLedgerMappingSession-select", i["LedgerAlias"])
+                # Save after each selection
+                self.click_element(By.ID, "btnSave-LedgerMappingGridSession244")
+                time.sleep(2)
+                self.click_element(By.ID, "LedgerMappingGridSession244-1")
+                time.sleep(2)
+                self.click_element(By.ID, "btnSave-LedgerMappingGridSession244")
 
-                if self.switch_frames("chkIsSelectAll"):
-                    self.click_element(By.ID, "chkIsSelectAll")
-                    time.sleep(2)
+                # Switch back to default content after submission
+                driver.switch_to.default_content()
+                time.sleep(2)
 
-                if self.switch_frames("LedgerTypeId"):
-                    self.select_dropdown(By.ID, "LedgerTypeId", "General Ledger")
-                    self.select_dropdown(By.ID, "AccountGroupId", "BANK")
-                    self.click_element(By.ID, "btnCreateLedger")
-                    time.sleep(2)
+                menus = ["Finance", "Mapping »", "Vendor Mapping"]
+                for link_test in menus:
+                    self.click_element(By.LINK_TEXT, link_test)
+
+
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()

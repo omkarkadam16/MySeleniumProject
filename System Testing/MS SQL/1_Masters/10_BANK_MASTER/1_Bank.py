@@ -80,18 +80,20 @@ class BankMaster(unittest.TestCase):
 
     def test_Bank(self):
         driver = self.driver
-        driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
+        driver.get("http://192.168.0.72/Rlogic9RLS/")
 
-        self.send_keys(By.ID, "Login", "admin")
-        self.send_keys(By.ID, "Password", "Omsgn9")
+        print("Logging in...")
+        self.send_keys(By.ID, "Login", "Riddhi")
+        self.send_keys(By.ID, "Password", "omsgn9")
         self.click_element(By.ID, "btnLogin")
+        print("Login successful.")
 
         menus = ["Finance", "Finance Master »", "Bank Master »", "Bank"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
         series = [
-            {"BankAccountNo": "123456789012", "BankName": "State Bank of India", "City": "MUMBAI", "IFSCCode": "SBIN0001234"},
+            {"BankAccountNo": "123456789012", "BankName": "SBI Bank", "City": "MUMBAI", "IFSCCode": "SBIN0001234"},
             {"BankAccountNo": "987654321098", "BankName": "HDFC Bank", "City": "MUMBAI","IFSCCode": "HDFC0005678"},
         ]
 

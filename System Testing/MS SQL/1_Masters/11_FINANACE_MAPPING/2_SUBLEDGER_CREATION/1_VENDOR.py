@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-class FuelRate(unittest.TestCase):
+class SubLedgerMaster(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -78,7 +78,7 @@ class FuelRate(unittest.TestCase):
         input_text.send_keys(Keys.DOWN)
         input_text.send_keys(Keys.ENTER)
 
-    def test_FuelRate(self):
+    def test_customer(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9RLS/")
 
@@ -88,39 +88,41 @@ class FuelRate(unittest.TestCase):
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
-        menus = ["Fleet", "Fleet Master »", "Fuel »", "Fuel Rate"]
+        menus = ["Finance", "Finance Master »", "ACCOUNT MASTER »", "Account Sub Ledger"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
-        Series = [
-            {
-                "FuelType": "PETROL",
-                "Rate": "80"
-            },
-            {
-                "FuelType": "DIESEL",
-                "Rate": "60"
-            }
+        series = [
+            {"LedgerName": "BHORUKA LOGISTICS PVT LTD", "LedgerAlias": "BHORUKA LOGISTICS PVT LTD"},
+            {"LedgerName": "BAJAJ CORPORATION PVT LTD", "LedgerAlias": "BAJAJ CORPORATION PVT LTD"},
+            {"LedgerName": "INTER INDIA ROADWAYS LTD", "LedgerAlias": "INTER INDIA ROADWAYS LTD"},
+            {"LedgerName": "VIJAY ENTERPRISES", "LedgerAlias": "VIJAY ENTERPRISES"},
+            {"LedgerName": "SHAKTI FREIGHT CARRIERS", "LedgerAlias": "SHAKTI FREIGHT CARRIERS"},
+            {"LedgerName": "AKIL KHAN SO HABIB KHAN", "LedgerAlias": "AKIL KHAN SO HABIB KHAN"},
+            {"LedgerName": "BHAGAT SINGH", "LedgerAlias": "BHAGAT SINGH"},
+            {"LedgerName": "DARSHAN SINGH", "LedgerAlias": "DARSHAN SINGH"},
+            {"LedgerName": "IOCL FUEL PUMP", "LedgerAlias": "IOCL FUEL PUMP"},
         ]
 
-        # Iterate over each location and create it
-        for i in Series:
+        for i in series:
             if self.switch_frames("btn_NewRecord"):
                 self.click_element(By.ID, "btn_NewRecord")
+                time.sleep(2)
 
-            # General Details
-            if self.switch_frames("FuelTypeId"):
-                self.select_dropdown(By.ID, "FuelTypeId", i["FuelType"])
-                self.autocomplete_select(By.ID, "FuelCityId-select", "DELHI")
-                self.autocomplete_select(By.ID, "FuelVendorId-select", "IOCL FUEL PUMP")
-                self.send_keys(By.ID, "EffectiveDate", "01-04-2018")
-                self.send_keys(By.ID, "Rate", i["Rate"])
+            # General Information
+            if self.switch_frames("LedgerName"):
+                self.send_keys(By.ID, "LedgerName", i["LedgerName"])
+                self.send_keys(By.ID, "LedgerAlias", i["LedgerAlias"])
+                self.select_dropdown(By.ID, "ControlLedgerId", "Sundry Creditors (Market)")
+                time.sleep(2)
+
 
             if self.switch_frames("mysubmit"):
                 self.click_element(By.ID, "mysubmit")
-                print("Successfully submitted", i["FuelType"])
+                print("Successfully submitted", i["LedgerName"])
                 time.sleep(2)
-        print("All data created successfully.")
+
+        print("All BankName created successfully.")
 
     @classmethod
     def tearDownClass(cls):

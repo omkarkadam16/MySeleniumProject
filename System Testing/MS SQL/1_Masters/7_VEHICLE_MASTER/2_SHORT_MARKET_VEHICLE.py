@@ -80,11 +80,13 @@ class ShortVehicleMaster(unittest.TestCase):
 
     def test_short_market_vehicle(self):
         driver = self.driver
-        driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
+        driver.get("http://192.168.0.72/Rlogic9RLS/")
 
-        self.send_keys(By.ID, "Login", "admin")
-        self.send_keys(By.ID, "Password", "Omsgn9")
+        print("Logging in...")
+        self.send_keys(By.ID, "Login", "Riddhi")
+        self.send_keys(By.ID, "Password", "omsgn9")
         self.click_element(By.ID, "btnLogin")
+        print("Login successful.")
 
         menus = ["Fleet", "Fleet Master »", "Vehicle »", "Short Market Vehicle"]
         for link_test in menus:
@@ -93,7 +95,7 @@ class ShortVehicleMaster(unittest.TestCase):
         Series = [
             {
                 "VehicleNo": "MHO4ER9009",
-                "VehicleTypeId": "10 MT",
+                "VehicleTypeId": "15 MT",
                 "PurchasedBooked": "Broker",
                 "VehicleBrokerId": "Vijay Enterprises",
                 "Manufacture": "EICHER MOTORS",
@@ -101,7 +103,7 @@ class ShortVehicleMaster(unittest.TestCase):
             },
             {
                 "VehicleNo": "MH04AA456",
-                "VehicleTypeId": "10 MT",
+                "VehicleTypeId": "15 MT",
                 "PurchasedBooked": "Broker",
                 "VehicleBrokerId": "Vijay Enterprises",
                 "Manufacture": "EICHER MOTORS",
@@ -109,7 +111,7 @@ class ShortVehicleMaster(unittest.TestCase):
             },
             {
                 "VehicleNo": "MH05SA101",
-                "VehicleTypeId": "10 MT",
+                "VehicleTypeId": "15 MT",
                 "PurchasedBooked": "Owner",
                 "VehicleOwnerId": "BAJAJ CORPORATION PVT LTD",
                 "Manufacture": "TATA MOTORS",
@@ -117,7 +119,7 @@ class ShortVehicleMaster(unittest.TestCase):
             },
             {
                 "VehicleNo": "MHO4FR2001",
-                "VehicleTypeId": "10 MT",
+                "VehicleTypeId": "15 MT",
                 "PurchasedBooked": "Broker",
                 "VehicleBrokerId": "Vijay Enterprises",
                 "Manufacture": "TATA MOTORS",
@@ -125,7 +127,7 @@ class ShortVehicleMaster(unittest.TestCase):
             },
             {
                 "VehicleNo": "MH18AC0358",
-                "VehicleTypeId": "10 MT",
+                "VehicleTypeId": "20 MT",
                 "PurchasedBooked": "Owner",
                 "VehicleOwnerId": "BHAGAT SINGH",
                 "Manufacture": "TATA MOTORS",
@@ -133,7 +135,7 @@ class ShortVehicleMaster(unittest.TestCase):
             },
             {
                 "VehicleNo": "MH16AY9744",
-                "VehicleTypeId": "10 MT",
+                "VehicleTypeId": "16 MT",
                 "PurchasedBooked": "Owner",
                 "VehicleOwnerId": "DARSHAN SINGH",
                 "Manufacture": "EICHER MOTORS",

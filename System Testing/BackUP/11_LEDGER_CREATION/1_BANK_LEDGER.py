@@ -80,18 +80,20 @@ class LedgerMaster(unittest.TestCase):
 
     def test_customer(self):
         driver = self.driver
-        driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
+        driver.get("http://192.168.0.72/Rlogic9RLS/")
 
-        self.send_keys(By.ID, "Login", "admin")
-        self.send_keys(By.ID, "Password", "Omsgn9")
+        print("Logging in...")
+        self.send_keys(By.ID, "Login", "Riddhi")
+        self.send_keys(By.ID, "Password", "omsgn9")
         self.click_element(By.ID, "btnLogin")
+        print("Login successful.")
 
-        menus = ["Finance", "Finance Master »", "Account Master »", "Account Ledger"]
+        menus = ["Finance", "Finance Master »", "ACCOUNT MASTER »", "Account Ledger"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
         series = [
-            {"LedgerName": "State Bank of India", "LedgerAlias": "State Bank of India"},
+            {"LedgerName": "SBI Bank", "LedgerAlias": "State Bank of India"},
             {"LedgerName": "HDFC Bank", "LedgerAlias": "HDFC Bank"},
         ]
 

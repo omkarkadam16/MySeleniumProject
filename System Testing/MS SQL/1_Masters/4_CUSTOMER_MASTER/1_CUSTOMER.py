@@ -80,11 +80,13 @@ class CustomerMaster(unittest.TestCase):
 
     def test_customer(self):
         driver = self.driver
-        driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
+        driver.get("http://192.168.0.72/Rlogic9RLS/")
 
-        self.send_keys(By.ID, "Login", "admin")
-        self.send_keys(By.ID, "Password", "Omsgn9")
+        print("Logging in...")
+        self.send_keys(By.ID, "Login", "Riddhi")
+        self.send_keys(By.ID, "Password", "omsgn9")
         self.click_element(By.ID, "btnLogin")
+        print("Login successful.")
 
         menus = ["Transportation", "Transportation Master »", "Customer »", "Customer"]
         for link_test in menus:
@@ -147,9 +149,9 @@ class CustomerMaster(unittest.TestCase):
                 self.select_dropdown(By.ID, "BillingLocationTypeId", "Booking Branch")
                 self.autocomplete_select(By.ID, "CollectionLocationId-select", "AHMEDABAD")
             if self.switch_frames("SubmissionLocationId-select"):
-                self.autocomplete_select(By.ID, "SubmissionLocationId-select", "MUMBAI")
+                self.autocomplete_select(By.ID, "SubmissionLocationId-select", "AHMEDABAD")
                 self.send_keys(By.ID, "CreditDays", "20")
-                self.send_keys(By.ID, "Party_CreditLimit", "20000")
+                self.send_keys(By.ID, "Party_CreditLimit", "20000000")
 
             driver.execute_script("window.scrollTo(0, 0);")
             time.sleep(2)

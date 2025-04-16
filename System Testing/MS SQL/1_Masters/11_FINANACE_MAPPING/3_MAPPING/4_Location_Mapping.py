@@ -5,12 +5,13 @@ from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-class FuelRate(unittest.TestCase):
+class LocationMapping(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -78,7 +79,7 @@ class FuelRate(unittest.TestCase):
         input_text.send_keys(Keys.DOWN)
         input_text.send_keys(Keys.ENTER)
 
-    def test_FuelRate(self):
+    def test_Location_Mapping(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9RLS/")
 
@@ -88,39 +89,43 @@ class FuelRate(unittest.TestCase):
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
-        menus = ["Fleet", "Fleet Master »", "Fuel »", "Fuel Rate"]
+        menus = ["Finance", "Mapping »", "Location Mapping"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
-        Series = [
-            {
-                "FuelType": "PETROL",
-                "Rate": "80"
-            },
-            {
-                "FuelType": "DIESEL",
-                "Rate": "60"
-            }
+        series = [
+            {"Name": "MUMBAI", "SubLedger": "MUMBAI"},
+            {"Name": "BHIWANDI", "SubLedger": "BHIWANDI"},
+            {"Name": "PUNE", "SubLedger": "PUNE"},
+            {"Name": "JAIPUR", "SubLedger": "JAIPUR"},
+            {"Name": "AHMEDABAD", "SubLedger": "AHMEDABAD"},
+            {"Name": "HYDERABAD", "SubLedger": "HYDERABAD"},
+            {"Name": "DELHI", "SubLedger": "DELHI"},
         ]
 
-        # Iterate over each location and create it
-        for i in Series:
-            if self.switch_frames("btn_NewRecord"):
-                self.click_element(By.ID, "btn_NewRecord")
+        for i in series:
 
-            # General Details
-            if self.switch_frames("FuelTypeId"):
-                self.select_dropdown(By.ID, "FuelTypeId", i["FuelType"])
-                self.autocomplete_select(By.ID, "FuelCityId-select", "DELHI")
-                self.autocomplete_select(By.ID, "FuelVendorId-select", "IOCL FUEL PUMP")
-                self.send_keys(By.ID, "EffectiveDate", "01-04-2018")
-                self.send_keys(By.ID, "Rate", i["Rate"])
-
-            if self.switch_frames("mysubmit"):
-                self.click_element(By.ID, "mysubmit")
-                print("Successfully submitted", i["FuelType"])
+            # General Information
+            if self.switch_frames("MappingType"):
+                self.select_dropdown(By.ID, "MappingType", "General Mapping")
+                self.send_keys(By.ID, "txt_search", i["Name"])
+                self.click_element(By.ID, "btn_Seach")
+                self.click_element(By.ID, "LedgerMappingGridSession727-1")
+                self.autocomplete_select(By.ID, "LedgerLedgerMappingSession-select", i["SubLedger"])
+                # Save after each selection
+                self.click_element(By.ID, "btnSave-LedgerMappingGridSession727")
                 time.sleep(2)
+
+                # Switch back to default content after submission
+                driver.switch_to.default_content()
+                time.sleep(2)
+
+                menus = ["Finance", "Mapping »", "Location Mapping"]
+                for link_test in menus:
+                    self.click_element(By.LINK_TEXT, link_test)
+
         print("All data created successfully.")
+
 
     @classmethod
     def tearDownClass(cls):

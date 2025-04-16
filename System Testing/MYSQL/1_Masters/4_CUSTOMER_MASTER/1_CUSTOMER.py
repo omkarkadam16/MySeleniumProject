@@ -149,7 +149,7 @@ class CustomerMaster(unittest.TestCase):
             if self.switch_frames("SubmissionLocationId-select"):
                 self.autocomplete_select(By.ID, "SubmissionLocationId-select", "MUMBAI")
                 self.send_keys(By.ID, "CreditDays", "20")
-                self.send_keys(By.ID, "Party_CreditLimit", "20000")
+                self.send_keys(By.ID, "Party_CreditLimit", "20000000")
 
             driver.execute_script("window.scrollTo(0, 0);")
             time.sleep(2)

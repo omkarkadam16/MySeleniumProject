@@ -98,6 +98,8 @@ class VehicleMaster1(unittest.TestCase):
                 "VehicleBody": "CONTAINER BODY",
                 "ControllingBranchId": "Ahmedabad",
                 "VehicleOwnerId": "INTER INDIA ROADWAYS LTD",
+                "Manufacture": "TATA MOTORS",
+                "VehicleModel": "TATA - 2516 TC",
                 "ChasisNo": "ch88",
                 "EngineNo": "eng88"
             },
@@ -108,6 +110,8 @@ class VehicleMaster1(unittest.TestCase):
                 "VehicleBody": "CLOSED BODY",
                 "ControllingBranchId": "Jaipur",
                 "VehicleOwnerId": "None",
+                "Manufacture": "EICHER MOTORS",
+                "VehicleModel": "EML",
                 "ChasisNo": "ch99",
                 "EngineNo": "eng99"
             },
@@ -118,6 +122,8 @@ class VehicleMaster1(unittest.TestCase):
                 "VehicleBody": "CONTAINER BODY",
                 "ControllingBranchId": "Delhi",
                 "VehicleOwnerId": "Bhoruka Logistics Pvt Ltd",
+                "Manufacture": "TATA MOTORS",
+                "VehicleModel": "TATA - 3516",
                 "ChasisNo": "ch810",
                 "EngineNo": "eng810"
             },
@@ -128,6 +134,8 @@ class VehicleMaster1(unittest.TestCase):
                 "VehicleBody": "FULL BODY",
                 "ControllingBranchId": "PUNE",
                 "VehicleOwnerId": "None",
+                "Manufacture": "TATA MOTORS",
+                "VehicleModel": "TATA - 2516 TC",
                 "ChasisNo": "ch07",
                 "EngineNo": "eng07"
             }
@@ -146,8 +154,8 @@ class VehicleMaster1(unittest.TestCase):
                 self.select_dropdown(By.ID, "VehicleBodyId", i["VehicleBody"])
                 self.select_dropdown(By.ID, "CarrierCategoryId", "GOODS CARRIER")
                 self.send_keys(By.ID, "YearOfManufacturer", "2020")
-                self.select_dropdown(By.ID, "ManufactureId", "TATA MOTORS")
-                self.select_dropdown(By.ID, "VehicleModelId", "TATA - 3520")
+                self.select_dropdown(By.ID, "ManufactureId", i["Manufacture"])
+                self.select_dropdown(By.ID, "VehicleModelId", i["VehicleModel"])
                 self.send_keys(By.ID, "OnRoadDate", "05-03-2020")
                 self.autocomplete_select(By.ID, "ControllingBranchId-select",i["ControllingBranchId"])
                 if i["VehicleCategory"] != "Owned" and i["VehicleOwnerId"] != "None":

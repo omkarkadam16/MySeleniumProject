@@ -5,13 +5,12 @@ from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-class CustomerMapping(unittest.TestCase):
+class LedgerMaster1(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -79,34 +78,50 @@ class CustomerMapping(unittest.TestCase):
         input_text.send_keys(Keys.DOWN)
         input_text.send_keys(Keys.ENTER)
 
-    def test_Customer_Mapping(self):
+    def test_customer(self):
         driver = self.driver
-        driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
+        driver.get("http://192.168.0.72/Rlogic9RLS/")
 
-        self.send_keys(By.ID, "Login", "admin")
-        self.send_keys(By.ID, "Password", "Omsgn9")
+        print("Logging in...")
+        self.send_keys(By.ID, "Login", "Riddhi")
+        self.send_keys(By.ID, "Password", "omsgn9")
         self.click_element(By.ID, "btnLogin")
+        print("Login successful.")
 
-        menus = ["Finance", "Ledger Creation »", "Customer Ledger Creation"]
+        menus = ["Finance", "Finance Master »", "ACCOUNT MASTER »", "Account Ledger"]
         for link_test in menus:
             self.click_element(By.LINK_TEXT, link_test)
 
+        series = [
+            {"LedgerName": "MUMBAI", "LedgerAlias": "MUM"},
+            {"LedgerName": "BHIWANDI", "LedgerAlias": "BWD"},
+            {"LedgerName": "PUNE", "LedgerAlias": "PUN"},
+            {"LedgerName": "JAIPUR", "LedgerAlias": "JPR"},
+            {"LedgerName": "AHMEDABAD", "LedgerAlias": "AHM"},
+            {"LedgerName": "HYDERABAD", "LedgerAlias": "HYD"},
+            {"LedgerName": "DELHI", "LedgerAlias": "DEL"},
+        ]
+
+        for i in series:
+            if self.switch_frames("btn_NewRecord"):
+                self.click_element(By.ID, "btn_NewRecord")
+                time.sleep(2)
+
             # General Information
-            if self.switch_frames("MappingType"):
-                self.select_dropdown(By.ID, "MappingType", "General Mapping")
-                self.click_element(By.ID, "btn_Seach")
-                time.sleep(5)
+            if self.switch_frames("LedgerName"):
+                self.send_keys(By.ID, "LedgerName", i["LedgerName"])
+                self.send_keys(By.ID, "LedgerAlias", i["LedgerAlias"])
+                self.select_dropdown(By.ID, "LedgerTypeId", "General Ledger")
+                self.select_dropdown(By.ID, "AccountGroupId", "Branch And Division")
+                time.sleep(2)
 
-                if self.switch_frames("chkIsSelectAll"):
-                    self.click_element(By.ID, "chkIsSelectAll")
-                    time.sleep(2)
 
-                if self.switch_frames("LedgerTypeId"):
-                    self.select_dropdown(By.ID, "LedgerTypeId", "Sub Ledger")
-                    self.select_dropdown(By.ID, "ControlLedgerId", "Sundry Debtors")
-                    self.click_element(By.ID, "btnCreateLedger")
-                    time.sleep(2)
+            if self.switch_frames("mysubmit"):
+                self.click_element(By.ID, "mysubmit")
+                print("Successfully submitted", i["LedgerName"])
+                time.sleep(2)
 
+        print("All BankName created successfully.")
 
     @classmethod
     def tearDownClass(cls):
