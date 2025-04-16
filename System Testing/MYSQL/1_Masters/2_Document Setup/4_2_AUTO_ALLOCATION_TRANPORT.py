@@ -122,7 +122,7 @@ class AutoAllocation(unittest.TestCase):
                 self.select_dropdown(By.ID, "YearCodeId", i["YearCode"])
                 self.send_keys(By.ID, "DocNoLength", i["DocNoLength"])
                 self.click_element(By.ID, "btn_GetAutoSeries")
-                time.sleep(3)
+                time.sleep(5)
                 self.click_element(By.ID, "chkSelectAll")
                 print(f"Details entered for {i['LocationId']}")
 

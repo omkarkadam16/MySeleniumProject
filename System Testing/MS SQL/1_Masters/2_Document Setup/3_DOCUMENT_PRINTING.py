@@ -11,12 +11,12 @@ import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class Booking(unittest.TestCase):
+class DocumentPrint(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         cls.driver.maximize_window()
-        cls.wait=WebDriverWait(cls.driver,15)
+        cls.wait=WebDriverWait(cls.driver,10)
 
     def click_element(self,by,value,retry=2):
         for i in range(retry):
@@ -30,6 +30,7 @@ class Booking(unittest.TestCase):
         try:
             element=self.driver.find_element(by,value)
             self.driver.execute_script("arguments[0].click();",element)
+            print("Clicked on element using JavaScript")
             return True
         except:
             return False
@@ -47,15 +48,16 @@ class Booking(unittest.TestCase):
                 driver.switch_to.default_content()
         return False
 
-    def send_keys(self,by,value,text):
+    def send_keys(self, by, value, text):
         try:
             element = self.wait.until(EC.visibility_of_element_located((by, value)))
+            element.is_enabled()
             element.clear()
             element.send_keys(text)
-            print(f'Sent keys {text} to {by} with value {value}')
+            print("Sent keys", text)
             return True
         except ex.NoSuchElementException:
-            print(f'Element not found: {value}')
+            print(f"Element not found: {value}")
             return False
 
     def select_dropdown(self,by,value,text):
@@ -63,11 +65,9 @@ class Booking(unittest.TestCase):
             e = self.wait.until(EC.element_to_be_clickable((by, value)))
             e.is_enabled()
             e.click()
-            print("[SUCCESS] Clicked dropdown")
             self.wait.until(EC.visibility_of_element_located((by, value)))
             element = Select(self.driver.find_element(by, value))
             element.select_by_visible_text(text)
-            print(f"[SUCCESS] Selected dropdown option: {text}")
             return True
         except (ex.NoSuchElementException, ex.ElementClickInterceptedException, ex.TimeoutException):
             return False
@@ -88,76 +88,86 @@ class Booking(unittest.TestCase):
         input_text.send_keys(Keys.ENTER)
         print("Selected autocomplete option using keyboard:", text)
 
-    def test_booking(self):
+
+    def test_DocumentPrint(self):
         driver = self.driver
-        driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
+        driver.get("http://192.168.0.72/Rlogic9RLS/")
 
         print("Logging in...")
-        self.send_keys(By.ID, "Login", "admin")
-        self.send_keys(By.ID, "Password", "Omsgn9")
+        self.send_keys(By.ID, "Login", "Riddhi")
+        self.send_keys(By.ID, "Password", "omsgn9")
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
-        for i in ("Transportation",
-            "Transportation Transaction »",
-            "Booking »",
-            "Consignment Note",):
+        for i in ("Common",
+                  "Document Setup »",
+                  "Document Printing",):
             self.click_element(By.LINK_TEXT, i)
             print(f"Navigated to {i}.")
 
-        if self.switch_frames("btn_NewRecord"):
-            self.click_element(By.ID, "btn_NewRecord")
+        Series = [
+            {
+                "Document": "Booking",
+                "YearCode": "2024 - 2025",
+                "StartNo": "5001",
+                "EndNo": "6000"
+            },
+            {
+                "Document": "Booking",
+                "YearCode": "2024 - 2025",
+                "StartNo": "201",
+                "EndNo": "500"
+            },
+            {
+                "Document": "Trip Settlement",
+                "YearCode": "2024 - 2025",
+                "StartNo": "201",
+                "EndNo": "500"
+            },
+            {
+                "Document": "Bank Payment",
+                "YearCode": "2024 - 2025",
+                "StartNo": "201",
+                "EndNo": "500"
+            },
+            {
+                "Document": "DirectDoorDelivery",
+                "YearCode": "2024 - 2025",
+                "StartNo": "301",
+                "EndNo": "400"
+            },
+            {
+                "Document": "Journal Voucher",
+                "YearCode": "2024 - 2025",
+                "StartNo": "5001",
+                "EndNo": "6000"
+            },
+            {
+                "Document": "Operational Expense",
+                "YearCode": "2024 - 2025",
+                "StartNo": "301",
+                "EndNo": "400"
+            }
+        ]
 
-    #Document Details
-        if self.switch_frames("OrganizationId"):
-            self.select_dropdown(By.ID,"OrganizationId","AHMEDABAD")
-            self.select_dropdown(By.ID,"SeriesId","AHM - 101 To 500")
-            #Calendor
-            self.click_element(By.CLASS_NAME,"ui-datepicker-trigger")
-            self.select_dropdown(By.CLASS_NAME,"ui-datepicker-month","Jun")
-            self.select_dropdown(By.CLASS_NAME,"ui-datepicker-year","2024")
-            self.click_element(By.XPATH,"//a[text()='1']")
+        # Iterate over each location and create it
+        for i in Series:
+            if self.switch_frames("btn_NewRecord"):
+                self.click_element(By.ID, "btn_NewRecord")
 
-    #Booking Details
-        self.select_dropdown(By.ID, "FreightOnId", "Weight")
-        self.select_dropdown(By.ID,"PaymentTypeId","To Be Billed")
-        self.select_dropdown(By.ID,"BookingTypeId","FTL")
-        self.select_dropdown(By.ID,"BookingModeId","Road")
-        self.select_dropdown(By.ID, "DeliveryTypeId", "Door")
-        self.select_dropdown(By.ID, "PickupTypeId", "Door")
-        self.select_dropdown(By.ID, "RiskTypeId", "Owners Risk")
-        self.select_dropdown(By.ID, "ConsigneeCopyWithId", "Consignor")
+            # Fill out the form
+            if self.switch_frames("DocumentId"):
+                self.select_dropdown(By.ID, "DocumentId", i["Document"])
+                self.select_dropdown(By.ID, "ddl_YearCode", i["YearCode"])
+                self.send_keys(By.ID, "StartNo", i["StartNo"])
+                self.send_keys(By.ID, "EndNo", i["EndNo"])
+                print(f"Details entered for {i['Document']}")
 
-    #Route Details
-        self.autocomplete_select(By.ID, "FromServiceNetworkId-select", "AHMEDABAD")
-        self.autocomplete_select(By.ID, "ToServiceNetworkId-select", "PUNE")
-        self.autocomplete_select(By.ID, "VehicleId-select", "MHO4ER9009")
+            # Submit the form
+            if self.switch_frames("mysubmit"):
+                self.click_element(By.ID, "mysubmit")
+                print(f"Series {i['Document']} created successfully.")
 
-    #Consignor/Consignee Details(selectedtext="P M Enterprises Pvt. LTD")
-        self.autocomplete_select(By.ID, "ConsignorId-select", "P M Enterprise")
-        self.autocomplete_select(By.ID, "ConsigneeId-select", "Adani Wilmar")
-        self.select_dropdown(By.ID, "BillingOnId", "Consignor")
-
-    #Item Details
-        self.autocomplete_select(By.ID, "ItemId-select", "Coal")
-        self.select_dropdown(By.ID, "PackingTypeId", "BAGS")
-        self.send_keys(By.ID, "Packets", "1")
-        self.send_keys(By.ID, "UnitWeight", "9")
-        self.send_keys(By.ID, "BasicFreight", "1500")
-        self.click_element(By.ID, "btnSave-BookingItemSession633")
-        time.sleep(1)
-        self.click_element(By.ID, "RFRSGSTDetails")
-
-    #Invoice Details
-        self.send_keys(By.ID, "InvoiceNo", "264155")
-        self.send_keys(By.ID, "InvoiceDate", "01-06-2024")
-        self.send_keys(By.ID, "InvoiceValue", "50000")
-        self.click_element(By.ID,"btnSave-BookingInvoiceSession633")
-        time.sleep(1)
-
-    #Submit Details
-        self.click_element(By.ID, "mysubmit")
-        time.sleep(1)
 
     @classmethod
     def tearDownClass(cls):
@@ -166,4 +176,3 @@ class Booking(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

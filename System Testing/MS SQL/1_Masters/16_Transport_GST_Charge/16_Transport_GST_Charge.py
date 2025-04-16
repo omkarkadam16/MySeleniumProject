@@ -1,3 +1,6 @@
+import unittest
+import time
+import selenium.common.exceptions as ex
 from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
@@ -5,32 +8,25 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import unittest
-import time
-import selenium.common.exceptions as ex
 from webdriver_manager.chrome import ChromeDriverManager
 
-
-class AutoAllocation(unittest.TestCase):
+class TransportGST(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         cls.driver.maximize_window()
-        cls.wait = WebDriverWait(cls.driver, 10)
+        cls.wait = WebDriverWait(cls.driver, 15)
 
     def click_element(self, by, value, retry=2):
         for i in range(retry):
             try:
                 self.wait.until(EC.element_to_be_clickable((by, value))).click()
-                print("Clicked on element", value)
                 return True
             except (ex.ElementClickInterceptedException, ex.StaleElementReferenceException, ex.TimeoutException):
-                print(f'Retrying click on {by} with value {value}, attempt {i + 1}/{retry}')
                 time.sleep(1)
         try:
             element = self.driver.find_element(by, value)
             self.driver.execute_script("arguments[0].click();", element)
-            print("Clicked on element using JavaScript")
             return True
         except:
             return False
@@ -51,13 +47,10 @@ class AutoAllocation(unittest.TestCase):
     def send_keys(self, by, value, text):
         try:
             element = self.wait.until(EC.visibility_of_element_located((by, value)))
-            element.is_enabled()
             element.clear()
             element.send_keys(text)
-            print("Sent keys", text)
             return True
         except ex.NoSuchElementException:
-            print(f"Element not found: {value}")
             return False
 
     def select_dropdown(self, by, value, text):
@@ -81,67 +74,42 @@ class AutoAllocation(unittest.TestCase):
         for i in suggest:
             if text.upper() in i.text.upper():
                 i.click()
-                time.sleep(1)
-                print("Selected autocomplete option:", text)
                 return
         input_text.send_keys(Keys.DOWN)
         input_text.send_keys(Keys.ENTER)
-        print("Selected autocomplete option using keyboard:", text)
 
-    def test_AutoAllocation(self):
+
+    def test_Transport_GST(self):
         driver = self.driver
         driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
 
-        print("Logging in...")
         self.send_keys(By.ID, "Login", "admin")
         self.send_keys(By.ID, "Password", "Omsgn9")
         self.click_element(By.ID, "btnLogin")
-        print("Login successful.")
 
-        Series = [
-            {"Document": "Finance", "LocationId": "MUMBAI", "YearCode": "2024 - 2025", "DocNoLength": "6"},
-            {"Document": "Finance", "LocationId": "BHIWANDI", "YearCode": "2024 - 2025", "DocNoLength": "6"},
-            {"Document": "Finance", "LocationId": "PUNE", "YearCode": "2024 - 2025", "DocNoLength": "6"},
-            {"Document": "Finance", "LocationId": "JAIPUR", "YearCode": "2024 - 2025", "DocNoLength": "6"},
-            {"Document": "Finance", "LocationId": "AHMEDABAD", "YearCode": "2024 - 2025", "DocNoLength": "6"},
-            {"Document": "Finance", "LocationId": "HYDERABAD", "YearCode": "2024 - 2025", "DocNoLength": "6"},
-            {"Document": "Finance", "LocationId": "DELHI", "YearCode": "2024 - 2025", "DocNoLength": "6"},
+        menus = ["Transportation", "Transportation Master »", "Common Masters »", "Transport GST Charge"]
+        for link_test in menus:
+            self.click_element(By.LINK_TEXT, link_test)
+
+        data = [
+            {"GST": "FCM","State": "RAJASTHAN"},
+            {"GST": "RCM","State": "MANIPUR"},
         ]
 
-        for i in ("Common", "Document Setup »", "Auto Series Allocation"):
-            self.click_element(By.LINK_TEXT, i)
-            print(f"Navigated to {i}.")
-
-        for i in Series:
+        for i in data:
             if self.switch_frames("btn_NewRecord"):
                 self.click_element(By.ID, "btn_NewRecord")
-
-            if self.switch_frames("MenuHeadId"):
-                self.select_dropdown(By.ID, "MenuHeadId", i["Document"])
-                self.autocomplete_select(By.ID, "LocationId-select", i["LocationId"])
-                self.select_dropdown(By.ID, "YearCodeId", i["YearCode"])
-                self.send_keys(By.ID, "DocNoLength", i["DocNoLength"])
-                self.click_element(By.ID, "btn_GetAutoSeries")
-                time.sleep(5)
-                self.click_element(By.ID, "chkSelectAll")
-                print(f"Details entered for {i['LocationId']}")
-
-            if self.switch_frames("mysubmit"):
-                self.click_element(By.ID, "mysubmit")
-                print(f"Series {i['LocationId']} created successfully.")
-
-            # Switch back to default content after submission
-            driver.switch_to.default_content()
-            time.sleep(2)
-
-            for i in ("Common", "Document Setup »", "Auto Series Allocation"):
-                self.click_element(By.LINK_TEXT, i)
-                print(f"Re-navigated to {i}.")
-
+            # Field Detail
+                if self.switch_frames("TrpGSTChargeTypeId"):
+                    self.select_dropdown(By.ID, "TrpGSTChargeTypeId", i["GST"])
+                    self.select_dropdown(By.ID, "StateId", i["State"])
+                    self.send_keys(By.ID, "WEFDate", "01-04-2018")
+                    self.click_element(By.ID, "mysubmit")
+                    time.sleep(1)
+                    print(i["GST"],i["State"] ,"Transport GST Charge saved")
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
-
 
 if __name__ == "__main__":
     unittest.main()

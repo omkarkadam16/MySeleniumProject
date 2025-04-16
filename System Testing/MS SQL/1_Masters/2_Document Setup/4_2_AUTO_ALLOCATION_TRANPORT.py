@@ -90,22 +90,22 @@ class AutoAllocation(unittest.TestCase):
 
     def test_AutoAllocation(self):
         driver = self.driver
-        driver.get("http://192.168.0.72/Rlogic9UataScript?ccode=UATASCRIPT")
+        driver.get("http://192.168.0.72/Rlogic9RLS/")
 
         print("Logging in...")
-        self.send_keys(By.ID, "Login", "admin")
-        self.send_keys(By.ID, "Password", "Omsgn9")
+        self.send_keys(By.ID, "Login", "Riddhi")
+        self.send_keys(By.ID, "Password", "omsgn9")
         self.click_element(By.ID, "btnLogin")
         print("Login successful.")
 
         Series = [
-            {"Document": "Finance", "LocationId": "MUMBAI", "YearCode": "2024 - 2025", "DocNoLength": "6"},
-            {"Document": "Finance", "LocationId": "BHIWANDI", "YearCode": "2024 - 2025", "DocNoLength": "6"},
-            {"Document": "Finance", "LocationId": "PUNE", "YearCode": "2024 - 2025", "DocNoLength": "6"},
-            {"Document": "Finance", "LocationId": "JAIPUR", "YearCode": "2024 - 2025", "DocNoLength": "6"},
-            {"Document": "Finance", "LocationId": "AHMEDABAD", "YearCode": "2024 - 2025", "DocNoLength": "6"},
-            {"Document": "Finance", "LocationId": "HYDERABAD", "YearCode": "2024 - 2025", "DocNoLength": "6"},
-            {"Document": "Finance", "LocationId": "DELHI", "YearCode": "2024 - 2025", "DocNoLength": "6"},
+            {"LocationId": "MUMBAI", "YearCode": "2024 - 2025", "DocNoLength": "6"},
+            {"LocationId": "BHIWANDI", "YearCode": "2024 - 2025", "DocNoLength": "6"},
+            {"LocationId": "PUNE", "YearCode": "2024 - 2025", "DocNoLength": "6"},
+            {"LocationId": "JAIPUR", "YearCode": "2024 - 2025", "DocNoLength": "6"},
+            {"LocationId": "AHMEDABAD", "YearCode": "2024 - 2025", "DocNoLength": "6"},
+            {"LocationId": "HYDERABAD", "YearCode": "2024 - 2025", "DocNoLength": "6"},
+            {"LocationId": "DELHI", "YearCode": "2024 - 2025", "DocNoLength": "6"},
         ]
 
         for i in ("Common", "Document Setup »", "Auto Series Allocation"):
@@ -117,7 +117,7 @@ class AutoAllocation(unittest.TestCase):
                 self.click_element(By.ID, "btn_NewRecord")
 
             if self.switch_frames("MenuHeadId"):
-                self.select_dropdown(By.ID, "MenuHeadId", i["Document"])
+                self.select_dropdown(By.ID, "MenuHeadId","Transportation")
                 self.autocomplete_select(By.ID, "LocationId-select", i["LocationId"])
                 self.select_dropdown(By.ID, "YearCodeId", i["YearCode"])
                 self.send_keys(By.ID, "DocNoLength", i["DocNoLength"])
@@ -128,7 +128,7 @@ class AutoAllocation(unittest.TestCase):
 
             if self.switch_frames("mysubmit"):
                 self.click_element(By.ID, "mysubmit")
-                print(f"Series {i['LocationId']} created successfully.")
+                print(f"Transportation Series  {i['LocationId']} created successfully.")
 
             # Switch back to default content after submission
             driver.switch_to.default_content()
